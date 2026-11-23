@@ -816,7 +816,7 @@ if(S.mode!=='dead'){const mm=ST.mana*(1-ST.reserve);H.mana=Math.min(mm,H.mana+ST
 H.moving=moving;if(!H.leap)heroLoco(dt,moving);}
 if(S.mode!=='zone')return;
 if(OBJ&&OBJ.barrier&&!OBJ.done){const d=Math.hypot(p.x-BOSSP.x,p.z-BOSSP.z);if(d<10.3){p.x=BOSSP.x+(p.x-BOSSP.x)/d*10.3;p.z=BOSSP.z+(p.z-BOSSP.z)/d*10.3}}updObjective(dt);
-for(const l of loot.slice())if(l.fly.t>=1&&Math.hypot(l.pos.x-p.x,l.pos.z-p.z)<1.5)tryPick(l);
+for(const l of loot.slice())if(l.fly.t>=1&&Math.hypot(l.pos.x-p.x,l.pos.z-p.z)<(l.it?1.5:2.8))tryPick(l);
 for(const c of chests)if(!c.open&&Math.hypot(c.x-p.x,c.z-p.z)<2.2)openChest(c);
 // whirl
 if(H.whirl){const w=H.whirl;w.t-=dt;w.tick-=dt;if(w.tick<=0){w.tick=w.int/(ST.aps/1.3);aoeHit(p.x,p.z,w.r,w.ctx);for(let i=0;i<10;i++){const a=rand(0,6.28);emit(p.x+Math.cos(a)*w.r*.8,rand(.6,1.4),p.z+Math.sin(a)*w.r*.8,-Math.sin(a)*8,0,Math.cos(a)*8,.25,.4,1.6,1.5,1.3,0,3)}noise(.06,.05,2200)}H.c.root.rotation.y=time*14;if(w.t<=0)H.whirl=null}
@@ -879,7 +879,7 @@ enemyShot(sp2.x,sp2.z,Math.atan2(v.x,v.z),kind==='orb'?9:15,M.dmg,'#c060ff',0,ki
 else if(!miss){if(M.tgt&&M.tgt.hp>0){if(M.tgt.g.position.distanceTo(q)<rng+.8)enemyHitAlly(M.tgt,M.dmg)}else if(M.tgtP&&M.tgtP.g){if(Math.hypot(M.tgtP.g.position.x-q.x,M.tgtP.g.position.z-q.z)<rng+.8)hurtTarget({peer:M.tgtP},M.dmg)}else if(Math.hypot(p.x-q.x,p.z-q.z)<rng+.8){hurtHero(M.dmg,M);if(M.rm.includes('vamp'))M.hp=Math.min(M.max,M.hp+M.dmg);burst({x:p.x,y:1.2,z:p.z},'#ff5a4a',6,2,.25,.3,1.5)}}}}
 if(M.rm.includes('frost')&&dist<4){H.chillT=.3}
 if((M.D.summoner||M.rm.includes('summon'))&&!M.boss){M.sumT-=dt;if(M.sumT<=0&&mons.length<90){M.sumT=7;c.play('Spellcast_Summon',{once:true,restart:true});for(let k=0;k<2;k++){const s2=spawnMon('minion',q.x+rand(-2,2),q.z+rand(-2,2),{});wake(s2)}}}
-if(M.boss){$('bossBar').classList.add('on');$('bossName').textContent=M.name+(OBJ&&!OBJ.done?' · неуязвим':'');$('bossFill').style.width=Math.max(0,M.hp/M.max*100)+'%';bossAI(M,dt,dist)}}}
+if(M.boss){$('bossBar').classList.add('on');$('bossName').textContent=M.name+(OBJ&&!OBJ.done?' · неуязвим':'');$('bossFill').style.width=Math.max(0,M.hp/M.max*100)+'%';{const bb=$('bossBar').querySelector('.bar');const want=M.phases?'p':M.kit&&M.kit.includes('enrage')?'e':'';if(bb.dataset.k!==want){bb.dataset.k=want;bb.querySelectorAll('.tk').forEach(x=>x.remove());(want==='p'?[60,30]:want==='e'?[30]:[]).forEach(v=>bb.insertAdjacentHTML('beforeend',`<span class="tk" style="left:${v}%"></span>`))}$('bossBar').classList.toggle('enr',!!M.enraged)}bossAI(M,dt,dist)}}}
 for(const O of mons){if(O===M||O.dead)continue;const ox=q.x-O.g.position.x,oz=q.z-O.g.position.z,od=Math.hypot(ox,oz),mn=M.r+O.r;if(od<mn&&od>0){q.x+=ox/od*(mn-od)*.5;q.z+=oz/od*(mn-od)*.5}}
 collide(q,M.r);if(dist<40)c.mixer.update(dt)}
 // boss slam pending fill
