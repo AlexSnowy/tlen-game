@@ -138,7 +138,7 @@ function calc(eq=P.eq){const C=CLASSES[P.cls],s={};for(const k of KEYS)s[k]=0;s.
 let min=0,max=0,aps=1.2,range=C.ranged?10:2.2;const w=eq.weapon;
 if(w){const m=1+.1*w.upg,WB=WBASE[w.wb];min=w.dmg[0]*m;max=w.dmg[1]*m;aps=WB.aps;range=WB.range}else{min=1;max=3}
 for(const k of SLOTS){const it=eq[k];if(!it)continue;const m=1+.1*it.upg;if(it.armor)s.armor+=it.armor*m;if(it.imp)s[it.imp.k]+=it.imp.v*m;for(const a of it.aff)s[a.k]+=a.v*m;if(it.st)addSt(s,it.st)}
-for(const id of P.pas)addSt(s,TREE.nodes[id].st);
+for(const id of P.pas)addSt(s,TREE.nodes[id].st);ascSt(s);
 for(const id in P.sk){const sk=SKILLS[id];if(sk&&sk.kind==='mod'&&P.sk[id]>0)addSt(s,sk.st,P.sk[id])}
 for(const b of H.buffs)addSt(s,b.st);
 for(const id of activeAuras())addSt(s,SKILLS[id].p.st,(1+s.auraP/100)*(1+.12*(skLvl(id)-1)));
@@ -625,7 +625,27 @@ $('pSk').addEventListener('click',e=>{const u=e.target.closest('[data-up]'),s=e.
 if(u){const id=u.dataset.up,sk=SKILLS[id];if(!P.spts||!skAvail(id)||(P.sk[id]||0)>=(sk.max||5))return;P.sk[id]=(P.sk[id]||0)+1;P.spts--;if(sk.kind!=='mod'&&P.sk[id]===1){const free=P.slots.indexOf(null);if(free>=0)P.slots[free]=id}recalc();snd(660,.12,'triangle',.12,1.5);save();renderSk();updSkillBar()}
 if(s){const[id,i]=s.dataset.slot.split(':');const j=P.slots.indexOf(id);if(j>=0)P.slots[j]=P.slots[+i]===id?null:P.slots[+i];P.slots[+i]=id;if(j===+i)P.slots[+i]=id;recalc();save();renderSk();updSkillBar()}});
 // ----- passive tree
-function renderPas(){$('pasP').textContent=`Пассивных очков: ${P.ppts}. Изучай узлы, соединённые с уже изученными. Большие узлы — сильные эффекты, кольца — ключевые.`;
+/* ================= ВОСХОЖДЕНИЕ ================= */
+const ASC={
+mage:[{id:'elem',n:'Стихийник',d:'Повелевает огнём, льдом и молнией одновременно.',c:'#ff9a4a',ic:'fire-ring',nodes:[{n:'Триада стихий',st:{fireP:20,coldP:20,lightP:20}},{n:'Сердце бури',st:{chainAdd:1,shockCh:15}},{n:'Вечный пожар',st:{burnCh:20,aoeP:20}},{n:'Апофеоз',st:{dmgP:30,cdr:15},k:1}]},
+ {id:'occ',n:'Чернокнижник',d:'Тёмная магия, яды и жизнь врагов в обмен на свою.',c:'#b06aff',ic:'death-skull',nodes:[{n:'Шёпот бездны',st:{chaosP:25,poisonDur:30}},{n:'Пожиратель душ',st:{leech:2,manaRegen:4}},{n:'Проклятая плоть',st:{hpP:20,regen:4}},{n:'Тьма',st:{chaosP:40,critM:30},k:1}]}],
+knight:[{id:'guard',n:'Страж',d:'Несокрушимая стена. Ауры сильнее, урон отражается.',c:'#7fb4ff',ic:'crenulated-shield',nodes:[{n:'Каменная кожа',st:{armorP:40}},{n:'Светлая аура',st:{auraP:30,regen:3}},{n:'Последний рубеж',st:{dmgTaken:-10,hpP:15}},{n:'Возмездие',st:{reflect:25,armorP:30},k:1}]},
+ {id:'glad',n:'Гладиатор',d:'Мастер ближнего боя: кровь, оглушения и шквал ударов.',c:'#ff6a5a',ic:'crossed-swords',nodes:[{n:'Кровавая арена',st:{meleeP:25,bleed:20}},{n:'Шквал',st:{aspd:12,crit:2}},{n:'Сокрушитель',st:{stunCh:15,slamR:25}},{n:'Чемпион толпы',st:{meleeP:40,critM:40},k:1}]}],
+rogue:[{id:'deadeye',n:'Охотник',d:'Стрелы летят дальше, пробивают и множатся.',c:'#7cf08e',ic:'arrow-scope',nodes:[{n:'Лишний болт',st:{projAdd:1}},{n:'Бронебойность',st:{pierce:2,projP:20}},{n:'Ветер в спину',st:{move:12,aspd:8}},{n:'Глаз бури',st:{projP:40,critM:30},k:1}]},
+ {id:'assn',n:'Убийца',d:'Смертельные криты и яды, добивание раненых.',c:'#c0ff5a',ic:'hooded-assassin',nodes:[{n:'Точный удар',st:{crit:4,critM:30}},{n:'Чёрный яд',st:{chaosP:30,poisonDur:40}},{n:'Добивание',st:{execute:40}},{n:'Тень смерти',st:{critX:50,dmgP:20},k:1}]}],
+barbarian:[{id:'bers',n:'Берсерк',d:'Ярость и вампиризм. Сильнее, когда рискует.',c:'#ff4a3a',ic:'brutal-helm',nodes:[{n:'Жажда крови',st:{leech:2,aspd:10}},{n:'Безрассудство',st:{dmgP:30,dmgTaken:10}},{n:'Живучесть',st:{regen:6,hpP:15}},{n:'Бойня',st:{meleeP:45,move:8},k:1}]},
+ {id:'chief',n:'Вождь',d:'Огонь предков и сокрушительные удары о землю.',c:'#ff9a3a',ic:'totem',nodes:[{n:'Пламя предков',st:{fireP:30,burnCh:15}},{n:'Землетряс',st:{slamR:25,aoeP:20}},{n:'Шкура тура',st:{hp:60,armorP:25}},{n:'Ярость Вождя',st:{fireP:40,aoeP:20,stunCh:10},k:1}]}]};
+const ASC_SRC='Очки Восхождения дают стражи «Лагеря культистов», «Затопленных руин», «Сердца Тлена» и первая покорённая карта 5-го тира.';
+function ascTotal(){if(!P)return 0;return [2,5,7].filter(z=>(P.lore||[]).includes(z)).length+((P.atlas||[]).some(t=>t>=5)?1:0)}
+function ascSub(){return P.ascC?ASC[P.cls].find(a=>a.id===P.ascC):null}
+function ascSt(s){const a=ascSub();if(!a)return;for(const i of P.asc||[])addSt(s,a.nodes[i].st)}
+function ascHTML(){const tot=ascTotal(),used=(P.asc||[]).length,free=tot-used,a=ascSub();
+let h=`<div class="asc"><div class="asch"><b>Восхождение</b><span>${tot?`очков: <b style="color:#ffd774">${free}</b> из ${tot}`:'закрыто'}</span></div>`;
+if(!tot)h+=`<p class="muted">${ASC_SRC}</p>`;
+else if(!a)h+=`<p class="muted" style="margin:4px 0 8px">Выберите путь — навсегда для этого героя.</p><div class="ascc">`+ASC[P.cls].map(x=>`<button class="ascb" data-asc="${x.id}" style="--c:${x.c}">${gi(x.ic,x.c,'width:34px;height:34px')}<b>${x.n}</b><small>${x.d}</small><ul>${x.nodes.map(n=>`<li>${n.k?'★ ':''}${n.n}: ${Object.entries(n.st).map(([k,v])=>stLine(k,v)).join(', ')}</li>`).join('')}</ul></button>`).join('')+'</div>';
+else h+=`<div class="ascn" style="--c:${a.c}">${gi(a.ic,a.c,'width:30px;height:30px')}<b style="color:${a.c}">${a.n}</b></div><div class="ascl">`+a.nodes.map((n,i)=>{const on=(P.asc||[]).includes(i);return `<button class="ascnode ${on?'on':''} ${n.k?'key':''}" data-an="${i}" ${on||free<=0?'disabled':''} style="--c:${a.c}"><b>${n.k?'★ ':''}${n.n}</b><small>${Object.entries(n.st).map(([k,v])=>stLine(k,v)).join(', ')}</small>${on?'<i>изучено</i>':free>0?'<i>изучить</i>':''}</button>`}).join('')+`</div>${tot<4?`<p class="muted" style="font-size:12px;margin:6px 0 0">${ASC_SRC}</p>`:''}`;
+return h+'</div>'}
+function renderPas(){$('ascBox').innerHTML=ascHTML();$('pasP').textContent=`Пассивных очков: ${P.ppts}. Изучай узлы, соединённые с уже изученными. Большие узлы — сильные эффекты, кольца — ключевые.`;
 const cls=P.cls;let lines='',nodes='';const done=new Set();
 for(const n of TREE.list)for(const l of n.links){const k=[n.id,l].sort().join('|');if(done.has(k))continue;done.add(k);const m=TREE.nodes[l];const on=P.pas.includes(n.id)&&P.pas.includes(l);lines+=`<line x1="${n.x}" y1="${n.y}" x2="${m.x}" y2="${m.y}" class="${on?'on':''}"/>`}
 for(const n of TREE.list){const on=P.pas.includes(n.id),av=canAlloc(n.id);const r=n.t==='start'?16:n.t==='key'?15:n.t==='notable'?12:7;const col=n.cls?CLASSES[n.cls].col:'#bbb';
@@ -658,7 +678,7 @@ if(net){S.zone=net.zone;S.mods=net.mods}else S.zone={n:'Карта: '+base.n,th:
 if(net&&zi>=0){S.zone=ZONES[zi]}S.mode='zone';town.visible=false;zone.visible=true;buildZone();if(NET.on&&NET.host&&!net)nsend({t:'zone',zi,tier,seed:S.seed,zone:S.zone,mods:S.mods,L:S.L});H.g.position.set(0,0,46);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.regenOff=mod('noregen');
 for(const id of P.slots)if(id&&SKILLS[id].kind==='summon'&&P.sk[id])summon(id,skLvl(id));
 $('zoneName').textContent=S.zone.n;$('zoneSub').textContent='Уровень монстров '+S.L+(S.mods.length?' · '+S.mods.map(m=>m.n).join(' · '):' · Страж ждёт на севере');toast('Иди на север. В конце зоны тебя ждёт '+S.zone.boss+'.',3.5);snd(200,.8,'sine',.12,2)}
-function bossDown(){S.cleared=true;let lore=null,next='';if(S.zi>=0){if(S.zi+2>P.maxZone){P.maxZone=S.zi+2;next=S.zi<7?'Открыта зона «'+ZONES[S.zi+1].n+'».':'Открыты карты Кошмара!'}if(!P.lore.includes(S.zi)){P.lore.push(S.zi);lore=S.zone.lore}}else{if(S.map>P.maxMap){P.maxMap=S.map}P.atlas=P.atlas||[];if(!P.atlas.includes(S.map)){P.atlas.push(S.map);next='Атлас: тир '+S.map+' покорён (+3% к количеству предметов на картах).'}}
+function bossDown(){S.cleared=true;let lore=null,next='';if(S.zi>=0){if(S.zi+2>P.maxZone){P.maxZone=S.zi+2;next=S.zi<7?'Открыта зона «'+ZONES[S.zi+1].n+'».':'Открыты карты Кошмара!'}if(!P.lore.includes(S.zi)){P.lore.push(S.zi);lore=S.zone.lore;if([2,5,7].includes(S.zi))next+=' Получено очко Восхождения (Пассивы)!'}}else{if(S.map>P.maxMap){P.maxMap=S.map}P.atlas=P.atlas||[];if(!P.atlas.includes(S.map)){const hadA=P.atlas.some(t=>t>=5);P.atlas.push(S.map);if(!hadA&&S.map>=5)toast('Получено очко Восхождения!',3);next='Атлас: тир '+S.map+' покорён (+3% к количеству предметов на картах).'}}
 const p=S.boss.g.position;const g=prop('arch_gate',1);g.position.set(p.x,0,p.z-4);dyn.add(g);const d=new THREE.Mesh(new THREE.CircleGeometry(1.7,40),new THREE.MeshBasicMaterial({color:new THREE.Color('#9a5cff').multiplyScalar(2.2),transparent:true,opacity:.8,side:THREE.DoubleSide,toneMapped:false,map:softTex}));d.position.set(0,1.95,0);g.add(d);exitP=g;emitters.push({x:p.x,y:1.95,z:p.z-4,kind:'portal',w:zone});
 save();$('bossBar').classList.remove('on');setTimeout(()=>{if(lore){$('loreH').textContent=S.zone.boss+' повержен';$('loreP').textContent=lore;$('loreM').textContent=next+' Собери добычу и войди в портал, чтобы вернуться в лагерь.';$('ovLore').classList.add('on');setPaused()}else toast('Страж повержен! '+next,4)},1400)}
 $('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused()};
@@ -1118,3 +1138,8 @@ if(m){const RCm=['#c8c8c8','#8888ff','#ffd84a'];h+=`<div class="tdet"><h4 style=
 <div class="sect" style="margin-top:10px"><span>Изменить карту сферами</span></div><div class="orbacts">${['trans','alt','aug','regal','chaos','scour'].map(k=>`<button class="ob" data-mo="${k}" style="--c:${ORBS[k].c}" ${P.orbs[k]>0?'':'disabled'}>${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n.replace('Сфера ','')} (${P.orbs[k]||0})</button>`).join('')}</div>
 <div class="acts" style="margin-top:10px"><button class="ab" data-go="1">Открыть карту</button></div></div>`}
 return h}
+
+$('ascBox').addEventListener('click',e=>{const b=e.target.closest('[data-asc],[data-an]');if(!b)return;
+if(b.dataset.asc){const x=ASC[P.cls].find(a=>a.id===b.dataset.asc);if(!confirm('Выбрать путь «'+x.n+'»? Изменить выбор будет нельзя.'))return;P.ascC=x.id;P.asc=[];toast('Путь Восхождения: '+x.n,2.5);chime([523,659,784,1047],.1)}
+else{const i=+b.dataset.an;if(ascTotal()-(P.asc||[]).length<=0)return;P.asc=P.asc||[];if(!P.asc.includes(i))P.asc.push(i);chime([659,988],.09)}
+recalc();save();renderPas()});

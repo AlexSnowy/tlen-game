@@ -243,6 +243,15 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 .mapc.r1{border-color:#8888ff}.mapc.r2{border-color:#ffd84a;box-shadow:inset 0 0 12px rgba(255,216,74,.15)}.mapc.sel{outline:2px solid var(--gold)}.mapc.free{border-style:dashed;opacity:.8}
 .loot.mp{color:#9ad0ff;border-color:#6a9aff}.loot.mp.hi{border-width:2px;font-weight:600}
 .ob[disabled]{opacity:.35}
+.asc{border:1px solid rgba(255,215,116,.3);border-radius:14px;padding:10px 12px;margin:8px 0 12px;background:linear-gradient(180deg,rgba(255,200,90,.07),rgba(0,0,0,.15))}
+.asch{display:flex;justify-content:space-between;align-items:center;font-size:14px}.asch>b{font:700 17px 'Ruslan Display',serif;color:#ffd774;letter-spacing:.03em}
+.ascc{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ascb{text-align:left;padding:10px;border-radius:12px;border:1px solid var(--c);background:rgba(0,0,0,.25);color:var(--ink);cursor:pointer;font:inherit}
+.ascb b{display:block;font-size:16px;color:var(--c);margin:4px 0}.ascb small{display:block;color:#c9b8a0;font-size:12.5px}.ascb ul{margin:6px 0 0;padding-left:16px;font-size:12px;color:#a99f8f}
+.ascn{display:flex;align-items:center;gap:8px;margin:6px 0}.ascn b{font-size:17px}
+.ascl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.ascnode{padding:8px 6px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.25);color:var(--ink);text-align:center;cursor:pointer;font:inherit}
+.ascnode b{display:block;font-size:13px}.ascnode small{display:block;font-size:11px;color:#a99f8f;margin:3px 0}.ascnode i{font-style:normal;font-size:11px;color:var(--c)}
+.ascnode.on{border-color:var(--c);box-shadow:inset 0 0 14px color-mix(in srgb,var(--c) 35%,transparent)}.ascnode.key{border-width:2px}.ascnode[disabled]:not(.on){opacity:.55;cursor:default}
+@media (max-width:700px){.ascc{grid-template-columns:1fr}.ascl{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -302,7 +311,7 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 </div></div>
 <div class="panel" id="pPas"><div class="pw">
   <header><div><h3>Пассивное дерево</h3><p id="pasP"></p></div><button class="x" data-close>×</button></header>
-  <div class="treewrap"><div id="tree"></div><div id="pasInfo"></div></div>
+  <div id="ascBox"></div><div class="treewrap"><div id="tree"></div><div id="pasInfo"></div></div>
 </div></div>
 <div class="panel" id="pParty"><div class="pw" style="max-width:520px">
   <header><div><h3>Группа</h3><p>Проходите земли Тлена вместе — до трёх героев.</p></div><button class="x" data-close>×</button></header>
