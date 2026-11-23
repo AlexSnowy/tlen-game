@@ -1394,7 +1394,7 @@ const DIV=[
 {id:'storm',n:'Око бури',need:4,rw:'Уникальная вещь «Ураган» или «Посох вечной зимы»',f:()=>giveU(pick(['Ураган','Посох вечной зимы'])),flav:'В центре бури — тишина.'}];
 function giveU(n){const U=UNIQUES.find(u=>u.n===n);if(!U)return;const it=makeUnique(U,Math.max(S.L||1,P.lvl));if(P.bag.length<36)P.bag.push(it);else{stashLoad().tabs[0].push(it);stashSave()}}
 function giveO(k,n){P.orbs[k]=(P.orbs[k]||0)+n}
-function dropDiv(p){const W={gems:3,chaos:3,wolf:2,ash:2,storm:1.5,map:1.5,frag:1.5,crown:1,divine:1,exalt:.6};const C=DIV.find(c=>c.id===wpick(DIV.map(c=>[c.id,W[c.id]||1])));const el=document.createElement('div');el.className='loot dv';el.innerHTML=gi('card-random','#cfe8ff')+esc(C.n);const l=lootObj(p,el,{div:C.id,hi:true});
+function dropDiv(p){const W={gems:3,chaos:3,wolf:2,ash:2,storm:1.5,map:1.5,frag:1.5,crown:1,divine:1,exalt:.6};const cid=wpick(DIV.map(c=>[c.id,W[c.id]||1])),C=DIV.find(c=>c.id===cid);const el=document.createElement('div');el.className='loot dv';el.innerHTML=gi('card-random','#cfe8ff')+esc(C.n);const l=lootObj(p,el,{div:C.id,hi:true});
 const g=new THREE.Mesh(new THREE.BoxGeometry(.32,.46,.03),new THREE.MeshStandardMaterial({color:'#e8f2ff',emissive:'#8ab8ff',emissiveIntensity:1.6}));g.position.y=.4;l.g.add(g);l.gem=g;chime([988,1319],.07)}
 function divHTML(){P.cards=P.cards||{};const have=DIV.filter(c=>(P.cards[c.id]||0)>0);let h='<div class="sect"><span>Гадальные карты</span><small style="text-transform:none;letter-spacing:0">собери набор — получи награду</small></div>';
 if(!have.length)return h+'<p class="muted" style="font-size:12.5px">Гадальные карты изредка выпадают с монстров, чаще — с редких и стражей. Соберите полный набор, и Вера обменяет его на награду.</p>';
