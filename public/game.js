@@ -207,7 +207,7 @@ emitters=emitters.filter(e=>e.w!==zone);lights=lights.filter(l=>l.w==='town');if
 if(zGrass){zone.remove(zGrass);zGrass.geometry.dispose();zGrass.material.dispose();zGrass=null}dyn=new THREE.Group();zone.add(dyn);H.whirl=H.leap=H.charge=H.barrage=null;H.queue=[]}
 const mod=k=>S.mods.some(m=>m.k===k);
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function buildZone(){clearZone();S.mid=0;S.building=true;Math.random=mulberry(S.seed||1);try{buildZone0()}finally{Math.random=RNG0;S.building=false}}
+function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?.5:.3))makeRift()}finally{Math.random=RNG0;S.building=false}}
 function buildZone0(){const Z=S.zone,th=THEMES[Z.th];S.th=th;
 zGround=makeGround(130,noiseTex(th.g[0],th.g[1],th.g[2],{tiles:th.tiles}),th.tiles?26:18,zone);
 const start={x:0,z:46},bossP={x:0,z:-44};const near=(x,z,r)=>Math.hypot(x-start.x,z-start.z)<r||Math.hypot(x-bossP.x,z-bossP.z)<r+3;
@@ -230,7 +230,7 @@ function setEnv(fog,fd,sunC,si,hs){scene.background.set(fog);scene.fog.color.set
 const hpBgM=new THREE.SpriteMaterial({color:0x000000,opacity:.75,transparent:true,depthTest:false}),hpFgM=new THREE.SpriteMaterial({color:0xe03a2e,depthTest:false}),hpRareM=new THREE.SpriteMaterial({color:0xffd84a,depthTest:false}),hpAllyM=new THREE.SpriteMaterial({color:0x5ad06a,depthTest:false});
 function hpBar(g,hy,mat){const bg=new THREE.Sprite(hpBgM),fg=new THREE.Sprite(mat);bg.position.set(0,hy,0);bg.scale.set(1.3,.15,1);fg.center.set(0,.5);fg.position.set(-.62,hy,0);fg.scale.set(1.24,.09,1);bg.renderOrder=fg.renderOrder=5;g.add(bg,fg);return[bg,fg]}
 function spawnMon(type,x,z,o){if(isGuest()&&!S.building)return null;const D=MON[type],L=S.L,th=S.th;const boss=!!o.boss;const sc=(D.sc||1)*(boss?(D.sc?1.6:2.3):o.rare?1.2:1);
-const c=makeChar(D.model,{eyes:boss?th.eyes:o.rare?'#ffd84a':o.magic?'#6a9aff':th.eyes,tint:boss?th.tint:D.tint,show:D.show||[]});
+const c=makeChar(D.model,{eyes:boss?th.eyes:o.rare?'#ffd84a':o.magic?'#6a9aff':th.eyes,tint:o.tint||(boss?th.tint:D.tint),show:D.show||[]});
 if(D.w)for(const[b,w]of D.w)c.attach(b,w,1);const g=new THREE.Group();g.position.set(x,0,z);c.root.scale.setScalar(sc);c.root.rotation.y=rand(0,6.28);g.add(c.root);
 if(o.rare||boss||o.magic){const r=new THREE.Mesh(new THREE.RingGeometry(.75,1,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color(boss?th.eyes:o.rare?'#ffd84a':'#5a8aff').multiplyScalar(2),transparent:true,opacity:.6,toneMapped:false,depthWrite:false}));r.position.y=.05;r.scale.setScalar(sc);g.add(r)}
 const[bg,fg]=hpBar(g,2.5*sc+.3,o.rare?hpRareM:hpFgM);bg.visible=fg.visible=false;dyn.add(g);
@@ -307,7 +307,7 @@ function killMon(M){if(M.dead)return;M.dead=.01;if(NET.on&&NET.host&&!M.netKill)
 burst(p,M.boss?S.th.eyes:M.rare?'#ffd84a':'#d8cfb4',M.boss?70:22,M.boss?8:4.5,.4,.8,1.6);flash(p,M.boss?S.th.eyes:'#ffb060',M.boss?120:25,.35);noise(.25,.12,1600);snd(M.boss?90:170,.3,'sawtooth',.05,.4);
 if(M.rm.includes('fiery')&&!isGuest())tele(p.x,p.z,3,.6,M.dmg*1.5,'#ff5a1a');
 if(ST.spreadPoison&&M.st.poison.length){for(const o of mons)if(o!==M&&!o.dead&&o.g.position.distanceTo(M.g.position)<4.5){o.st.poison.push(...M.st.poison.map(x=>({dps:x.dps,t:x.t})));burst(o.g.position.clone().setY(1),'#7aff5a',6,2)}}
-gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathFx(M,p);if(!M.netKill||true){csAdd('k');if(M.rare)csAdd('r');if(M.boss){csAdd('b');if(S.zi<0&&!S.pin)csAdd('m')}}H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
+gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathFx(M,p);riftKill(p);if(!M.netKill||true){csAdd('k');if(M.rare)csAdd('r');if(M.boss){csAdd('b');if(S.zi<0&&!S.pin)csAdd('m')}}H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
 const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
 if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35)dropFrag(p);if(M.boss&&S.pin)pinReward(p)}
 else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
@@ -794,7 +794,7 @@ return false}
 
 /* ================= UPDATE ================= */
 let time=0;
-function update(dt){updEnchant(dt);monFx(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
+function update(dt){updEnchant(dt);monFx(dt);updRift(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
 if(!H.leap&&!H.charge)H.face=angLerp(H.face,H.faceT,1-Math.pow(.0005,dt));H.c.root.rotation.y=H.face;
 for(let i=0;i<3;i++)H.cds[i]=Math.max(0,H.cds[i]-dt);H.dashCd=Math.max(0,H.dashCd-dt);H.inv=Math.max(0,H.inv-dt);S.bagWarn-=dt;H.castT-=dt;H.c.lock-=dt;H.immortal=Math.max(0,H.immortal-dt);H.lastCast=(H.lastCast||0)-dt;H.aimT=(H.aimT||0)-dt;
 for(let i=H.queue.length-1;i>=0;i--){const q=H.queue[i];q.t-=dt;if(q.t<=0){H.queue.splice(i,1);q.f()}}
@@ -1182,6 +1182,7 @@ const CH=[
 {id:'uniq',n:'Легенда',d:'Подобрать уникальную вещь',ic:'crowned-skull',p:()=>[cs('u'),1],rw:{chaos:2}},
 {id:'up6',n:'Аура кузнеца',d:'Заточить вещь до +6',ic:'anvil-impact',p:()=>[cs('up'),6],rw:{divine:1}},
 {id:'up10',n:'Сияние',d:'Заточить вещь до +10',ic:'sun',p:()=>[cs('up'),10],rw:{exalt:2}},
+{id:'rift5',n:'Страж Разлома',d:'Закрыть 5 разломов',ic:'magic-portal',p:()=>[cs('rift'),5],rw:{chaos:2,regal:1}},
 {id:'maps5',n:'Картограф',d:'Пройти 5 карт',ic:'treasure-map',p:()=>[cs('m'),5],rw:{regal:2}},
 {id:'at10',n:'Покоритель Атласа',d:'Покорить 10 тиров Атласа',ic:'world',p:()=>[(P.atlas||[]).length,10],rw:{exalt:1,divine:1}},
 {id:'asc',n:'Восхождение',d:'Выбрать путь Восхождения',ic:'angel-wings',p:()=>[P.ascC?1:0,1],rw:{chaos:1}},
@@ -1223,3 +1224,24 @@ if(sockOpen&&sockOpen.startsWith(id+':')){const j=+sockOpen.split(':')[1];const 
 h+='<div class="sockl">'+(L[j]?`<button class="chip" data-put="${id}:${j}:">Вынуть</button>`:'')+(opts.length?opts.map(k=>`<button class="chip gemc" data-put="${id}:${j}:${k}"><b>${SUPP[k].n}</b> <small>${SUPP[k].d} · ×${gemFree(k)}</small></button>`).join(''):'<span class="muted" style="font-size:12.5px">Нет подходящих камней. Камни поддержки выпадают с редких монстров и стражей.</span>')+'</div>'}
 return h}
 function sockClick(d){if(d.sock){sockOpen=sockOpen===d.sock?null:d.sock}else if(d.put!==undefined){const[id,j,k]=d.put.split(':');P.links=P.links||{};const L=P.links[id]=P.links[id]||[null,null];L[+j]=k||null;sockOpen=null;snd(900,.06,'triangle',.06);save()}renderSk()}
+
+/* ================= РАЗЛОМ (лиговая механика) ================= */
+function makeRift(){const s=freeSpot(-28,30,4);if(!s)return;const g=new THREE.Group();g.position.set(s.x,0,s.z);
+const core=new THREE.Mesh(new THREE.TorusGeometry(1.1,.12,12,48),new THREE.MeshBasicMaterial({color:new THREE.Color('#c46aff').multiplyScalar(2.2),toneMapped:false}));core.position.y=1.6;g.add(core);
+const inner=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({color:'#6a1aaa',transparent:true,opacity:.75,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));inner.position.y=1.6;g.add(inner);
+const zoneR=new THREE.Mesh(new THREE.RingGeometry(.96,1,96).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color('#b05aff').multiplyScalar(2),transparent:true,opacity:0,toneMapped:false,depthWrite:false}));zoneR.position.y=.06;g.add(zoneR);
+const fill=new THREE.Mesh(new THREE.CircleGeometry(1,64).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:'#5a1a8a',transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));fill.position.y=.05;g.add(fill);
+dyn.add(g);const el=objLabel();el.innerHTML='<b style="color:#d08aff">Разлом</b> — подойди, чтобы открыть';S.rift={x:s.x,z:s.z,g,core,inner,zoneR,fill,el,st:0,t:0,r:4,sp:0,k:0}}
+function riftKill(p){const R=S.rift;if(!R||R.st!==1)return;if(Math.hypot(p.x-R.x,p.z-R.z)<R.r+1){R.k++;R.t=Math.min(R.t+.35,25);R.r=Math.min(15,R.r+.18)}}
+function updRift(dt){const R=S.rift;if(!R||S.mode!=='zone')return;const t=performance.now()/1000;R.core.rotation.z+=dt*1.5;R.core.rotation.y=Math.sin(t)*.4;R.inner.material.opacity=.5+.25*Math.sin(t*3);R.inner.lookAt(camera.position);
+if(R.st===0){if(Math.random()<.3)emit(R.x+rand(-.8,.8),rand(.6,2.6),R.z+rand(-.8,.8),0,rand(.2,.8),0,rand(.6,1),rand(.08,.15),.8,.4,1,0,1);
+if(proj(cp.set(R.x,3.3,R.z),sp)&&Math.hypot(R.x-H.g.position.x,R.z-H.g.position.z)<30){R.el.style.display='block';R.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else R.el.style.display='none';
+if(!isGuest()&&Math.hypot(R.x-H.g.position.x,R.z-H.g.position.z)<2.8){R.st=1;R.t=15;toast('Разлом открыт! Убивай тварей внутри круга — время продлевается.',3);chime([220,330,440,660],.12);S.shake=.4}return}
+if(R.st===1){R.t-=dt;R.sp-=dt;R.zoneR.scale.setScalar(R.r);R.fill.scale.setScalar(R.r);R.zoneR.material.opacity=.7;R.fill.material.opacity=.13+.04*Math.sin(t*4);
+for(let i=0;i<3;i++){const a=rand(0,6.28);emit(R.x+Math.cos(a)*R.r,.2,R.z+Math.sin(a)*R.r,0,rand(.5,1.5),0,rand(.5,.9),rand(.1,.16),.75,.35,1,0,1)}
+R.el.style.display='block';if(proj(cp.set(R.x,3.3,R.z),sp))R.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`;R.el.innerHTML=`<b style="color:#d08aff">Разлом</b> · ${Math.ceil(R.t)} с · убито ${R.k}`;
+if(R.sp<=0&&mons.length<110){R.sp=Math.max(.5,1.3-R.k*.01);const n=ri(2,3);for(let k=0;k<n;k++){const a=rand(0,6.28),d=R.r*rand(.6,.95);const m=spawnMon(zMon(),R.x+Math.cos(a)*d,R.z+Math.sin(a)*d,{magic:Math.random()<.35,tint:'#8a3aff'});if(m){wake(m);burst({x:m.g.position.x,y:1,z:m.g.position.z},'#c46aff',10,3,.3,.5,1.4)}}}
+if(R.t<=0){R.st=2;R.el.remove();R.g.visible=false;const p={x:R.x,z:R.z},L=S.L,rr=ST.rarity+20;S.shake=.6;
+const n=3+Math.floor(R.k/12);for(let i=0;i<n;i++)dropItem(p,genItem(L+1,i<2?2:1,rr));for(let i=0;i<2+Math.floor(R.k/20);i++)dropOrb(p);if(Math.random()<.4+R.k*.004)dropGem(p);if(S.zi<0&&Math.random()<.35)dropMap(p,genMap(Math.min(MAXT,S.map+1)));
+for(let i=0;i<70;i++){const a=rand(0,6.28),v=rand(2,8);emit(R.x,1,R.z,Math.cos(a)*v,rand(2,6),Math.sin(a)*v,rand(.8,1.4),rand(.12,.22),.8,.4,1,4,1)}
+toast('Разлом закрыт! Убито тварей: '+R.k+'. Забирай сокровища.',3.5);chime([440,554,659,880],.12);csAdd('rift')}}}
