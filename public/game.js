@@ -416,9 +416,37 @@ for(let i=0;i<30;i++){const a=rand(0,6.28);emit(H.g.position.x+Math.cos(a)*.6,ra
 
 /* ================= HERO LOOK ================= */
 const weaponMats={};
+/* ---- свечение заточки: +1..5 мерцание, +6 аура, +10 лучи ---- */
+const ENCH=new Set();let _gTex=null,_rTex=null;
+function gTex(){if(_gTex)return _gTex;const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(255,255,255,.55)');g.addColorStop(.6,'rgba(255,255,255,.12)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128);_gTex=new THREE.CanvasTexture(c);_gTex.colorSpace=THREE.SRGBColorSpace;return _gTex}
+function rTex(){if(_rTex)return _rTex;const W=32,Hh=256,c=document.createElement('canvas');c.width=W;c.height=Hh;const x=c.getContext('2d');const im=x.createImageData(W,Hh);
+for(let y=0;y<Hh;y++){const v=1-Math.abs(y-Hh/2)/(Hh/2);const a=Math.pow(v,2.2);for(let i=0;i<W;i++){const u=(i-W/2)/(W/2);const b=Math.exp(-u*u*9)*a;const o=(y*W+i)*4;im.data[o]=im.data[o+1]=im.data[o+2]=255;im.data[o+3]=Math.round(255*b)}}
+x.putImageData(im,0,0);_rTex=new THREE.CanvasTexture(c);_rTex.colorSpace=THREE.SRGBColorSpace;return _rTex}
+const ENCH_COL=r=>r===3?'#ff9a3a':r===2?'#ffd84a':r===1?'#7fa6ff':'#b5ccff';
+function clearEnchant(mesh){const fx=mesh&&mesh.userData.ench;if(!fx)return;if(fx.g.parent)fx.g.parent.remove(fx.g);fx.g.traverse(o=>{if(o.material)o.material.dispose()});ENCH.delete(fx);mesh.userData.ench=null}
+function setEnchant(mesh,upg,rar){if(!mesh)return;upg=upg|0;const fx0=mesh.userData.ench;if(fx0&&fx0.upg===upg&&fx0.rar===rar)return;clearEnchant(mesh);
+if(!mesh.userData.baseMat)mesh.userData.baseMat=mesh.material;
+if(upg<=0&&rar<2){mesh.material=mesh.userData.baseMat;return}
+const col=new THREE.Color(ENCH_COL(rar));const m=mesh.userData.baseMat.clone();m.emissive=col.clone();m.emissiveIntensity=.25;mesh.material=m;
+mesh.geometry.computeBoundingBox();const bb=mesh.geometry.boundingBox,c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());
+const L=Math.max(sz.x,sz.y,sz.z),ax=sz.y>=sz.x&&sz.y>=sz.z?new THREE.Vector3(0,1,0):sz.x>=sz.z?new THREE.Vector3(1,0,0):new THREE.Vector3(0,0,1);
+const g=new THREE.Group();g.position.copy(c);mesh.add(g);const fx={mesh,mat:m,g,upg,rar,col,L,c,ax,lo:bb.min.clone(),hi:bb.max.clone(),aura:[],rays:[],core:null,ph:Math.random()*6.28,acc:0};
+const sm=(map,o,colr)=>new THREE.Sprite(new THREE.SpriteMaterial({map,color:colr||col,transparent:true,opacity:o,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:true}));
+if(upg>=6){for(let i=0;i<3;i++){const s=sm(gTex(),.3);s.position.copy(ax).multiplyScalar((i-1)*L*.32);s.scale.setScalar(L*.62);s.renderOrder=5;g.add(s);fx.aura.push(s)}}
+if(upg>=10){const wc=col.clone().lerp(new THREE.Color('#ffffff'),.45);fx.core=sm(gTex(),.7,wc);fx.core.scale.setScalar(L*.55);fx.core.renderOrder=6;g.add(fx.core);
+for(let i=0;i<5;i++){const s=sm(rTex(),.6,wc);s.material.rotation=i*Math.PI/5;s.scale.set(L*.07,L*1.5,1);s.renderOrder=6;g.add(s);fx.rays.push(s)}}
+mesh.userData.ench=fx;ENCH.add(fx)}
+const _ev=new THREE.Vector3();
+function vis(o){for(;o;o=o.parent)if(!o.visible)return false;return true}
+function updEnchant(dt){const t=performance.now()/1000;for(const fx of ENCH){if(!fx.mesh.parent||!vis(fx.mesh))continue;const u=fx.upg,ph=fx.ph;
+fx.mat.emissiveIntensity=u>0?(.18+u*.055)+Math.sin(t*(2+u*.18)+ph)*(.08+u*.022)+Math.sin(t*7.3+ph*2)*.03*Math.min(u,5):.25;
+fx.aura.forEach((s,i)=>{const k=.5+.5*Math.sin(t*1.8+i*2.1+ph);s.material.opacity=(.26+.04*(u-6))*(.65+.35*k);s.scale.setScalar(fx.L*(.62+.14*k))});
+if(fx.core){const k=.5+.5*Math.sin(t*2.6+ph);fx.core.material.opacity=.45+.25*k;fx.core.scale.setScalar(fx.L*(.48+.1*k));
+fx.rays.forEach((s,i)=>{const d=i%2?1:-1;s.material.rotation=i*Math.PI/5+t*.28*d;const k2=.5+.5*Math.sin(t*1.6+i*1.37+ph);s.scale.set(fx.L*(.05+.03*k2),fx.L*(1.05+.75*k2),1);s.material.opacity=.3+.45*k2})}
+if(u>=3&&(Q!=='low'||Math.random()<.5)){fx.acc+=dt*(u<6?u*.8:u<10?u*2.2:u*3.5);while(fx.acc>1){fx.acc-=1;const a=Math.random();_ev.set(lerp(fx.lo.x,fx.hi.x,Math.random()),lerp(fx.lo.y,fx.hi.y,Math.random()),lerp(fx.lo.z,fx.hi.z,Math.random()));fx.mesh.localToWorld(_ev);
+const c=u>=10&&a<.4?[1,1,.95]:[fx.col.r,fx.col.g,fx.col.b];emit(_ev.x,_ev.y,_ev.z,rand(-.25,.25),rand(.2,.9),rand(-.25,.25),rand(.45,.9),u>=10?rand(.1,.18):rand(.06,.12),c[0],c[1],c[2],0,1.5)}}}}
 function heroLook(){if(!H.c)return;const C=CLASSES[P.cls],ms=H.c.meshes,w=P.eq.weapon,o=P.eq.offhand;for(const n of ALLW)if(ms[n])ms[n].visible=false;
-const glowUp=(mesh,it)=>{if(!mesh||!it)return;if(!mesh.userData.baseMat)mesh.userData.baseMat=mesh.material;const lv=it.rar>=2||it.upg>=5;if(!lv){mesh.material=mesh.userData.baseMat;return}
-const m=mesh.userData.baseMat.clone();m.emissive=new THREE.Color(it.rar===3?'#ff8a2a':it.rar===2?'#ffd84a':'#9ab0ff');m.emissiveIntensity=.25+it.upg*.07;mesh.material=m};
+const glowUp=(mesh,it)=>{if(!mesh||!it)return;setEnchant(mesh,it.upg,it.rar)};for(const n of ALLW)if(ms[n]&&ms[n].userData.ench&&!(w&&WBASE[w.wb].mesh===n)&&!(o&&o.mesh===n))setEnchant(ms[n],0,0);
 if(w){const mn=WBASE[w.wb].mesh;if(ms[mn]){ms[mn].visible=true;glowUp(ms[mn],w)}}
 if(o&&!(w&&WBASE[w.wb].hands===2)&&ms[o.mesh]){ms[o.mesh].visible=true;glowUp(ms[o.mesh],o)}
 if(C.hat&&ms[C.hat])ms[C.hat].visible=!!P.eq.helmet;
@@ -726,7 +754,7 @@ return false}
 
 /* ================= UPDATE ================= */
 let time=0;
-function update(dt){const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
+function update(dt){updEnchant(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
 if(!H.leap&&!H.charge)H.face=angLerp(H.face,H.faceT,1-Math.pow(.0005,dt));H.c.root.rotation.y=H.face;
 for(let i=0;i<3;i++)H.cds[i]=Math.max(0,H.cds[i]-dt);H.dashCd=Math.max(0,H.dashCd-dt);H.inv=Math.max(0,H.inv-dt);S.bagWarn-=dt;H.castT-=dt;H.c.lock-=dt;H.immortal=Math.max(0,H.immortal-dt);H.lastCast=(H.lastCast||0)-dt;H.aimT=(H.aimT||0)-dt;
 for(let i=H.queue.length-1;i>=0;i--){const q=H.queue[i];q.t-=dt;if(q.t<=0){H.queue.splice(i,1);q.f()}}
@@ -867,7 +895,7 @@ function zonePeers(){const k=zkey();return Object.values(NET.peers).filter(p=>p.
 function nearestPlayer(q){let best={x:H.g.position.x,z:H.g.position.z,peer:null,d:Math.hypot(H.g.position.x-q.x,H.g.position.z-q.z)};if(S.mode==='dead')best.d=999;
 for(const pr of zonePeers()){const d=Math.hypot(pr.g.position.x-q.x,pr.g.position.z-q.z);if(d<best.d)best={x:pr.g.position.x,z:pr.g.position.z,peer:pr,d}}return best}
 function hurtTarget(t,d,src){if(t.peer)nsend({t:'hurt',to:t.peer.id,d});else hurtHero(d,src)}
-function myLook(){const w=P.eq.weapon,o=P.eq.offhand,C=CLASSES[P.cls];return{w:w?WBASE[w.wb].mesh:null,wr:w?w.rar:0,o:o&&!(w&&WBASE[w.wb].hands===2)?o.mesh:null,hat:!!P.eq.helmet,cape:P.eq.chest?P.eq.chest.rar:-1}}
+function myLook(){const w=P.eq.weapon,o=P.eq.offhand,C=CLASSES[P.cls];return{w:w?WBASE[w.wb].mesh:null,wr:w?w.rar:0,wu:w?w.upg:0,o:o&&!(w&&WBASE[w.wb].hands===2)?o.mesh:null,hat:!!P.eq.helmet,cape:P.eq.chest?P.eq.chest.rar:-1}}
 function sendInfo(){if(!P)return;nsend({t:'info',name:NET.name||CLASSES[P.cls].n,cls:P.cls,lvl:P.lvl,look:myLook()})}
 const WSBASE=/workers\.dev$|^localhost|^127\./.test(location.hostname)?(location.protocol==='https:'?'wss://':'ws://')+location.host:'wss://tlen-game.zemlitlena.workers.dev';
 function netConnect(code){netLeave(true);code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length<4){toast('Код группы — 4–8 символов',2);return}
@@ -882,7 +910,7 @@ async function ensurePeer(m){let pr=NET.peers[m.from];if(!pr)pr=NET.peers[m.from
 if(m.t==='info'){const ch=pr.cls!==m.cls;Object.assign(pr,{name:m.name,cls:m.cls,lvl:m.lvl,look:m.look});if(ch||!pr.c){await loadAsset(CLASSES[m.cls].model);if(pr.g&&pr.g.parent)pr.g.parent.remove(pr.g);
 pr.c=makeChar(CLASSES[m.cls].model,{show:[],keepHead:1,layered:1});pr.g=new THREE.Group();pr.g.add(pr.c.root);pr.g.position.set(pr.x,0,pr.z);scene.add(pr.g);
 if(!pr.el){pr.el=document.createElement('div');pr.el.className='peerl';$('npcl').appendChild(pr.el)}}peerLook(pr);renderPartyHud()}return pr}
-function peerLook(pr){if(!pr.c||!pr.look)return;const ms=pr.c.meshes,lk=pr.look,C=CLASSES[pr.cls];for(const n of ALLW)if(ms[n])ms[n].visible=false;if(lk.w&&ms[lk.w])ms[lk.w].visible=true;if(lk.o&&ms[lk.o])ms[lk.o].visible=true;
+function peerLook(pr){if(!pr.c||!pr.look)return;const ms=pr.c.meshes,lk=pr.look,C=CLASSES[pr.cls];for(const n of ALLW)if(ms[n])ms[n].visible=false;if(lk.w&&ms[lk.w]){ms[lk.w].visible=true;setEnchant(ms[lk.w],lk.wu||0,lk.wr||0)}if(lk.o&&ms[lk.o])ms[lk.o].visible=true;
 if(C.hat&&ms[C.hat])ms[C.hat].visible=lk.hat;if(C.cape&&ms[C.cape])ms[C.cape].visible=lk.cape>=0;if(pr.el)pr.el.innerHTML=`${esc(pr.name)} <small>${C.n} · ${pr.lvl}</small><i style="--p:${Math.round(pr.hp/pr.mx*100)}%"></i>`}
 function myAnim(){return H.c?[H.c.lay.U.n,H.c.lay.L.n]:['Idle','Idle']}
 function netTick(dt){if(!NET.on||!P||!H.c)return;NET.sendT-=dt;if(NET.sendT<=0){NET.sendT=.1;const p=H.g.position,[U,L]=myAnim();
@@ -959,4 +987,4 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');const s=load();if(s){$('bCont').style.display='inline-block';$('bCont').textContent='Продолжить: '+CLASSES[s.cls].n+', ур. '+s.lvl}setPaused();
-window.__dbg={S,H,togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={S,H,heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
