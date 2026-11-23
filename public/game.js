@@ -549,7 +549,7 @@ const RC=RCH;
 function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass'].some(x=>$(x).classList.contains('on'))}
 function closePanels(){for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith','pStash','pCh'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
-({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');T.res=null;renderSmith()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
+({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');$('pShop').querySelector('header p').textContent=npcQuote('merchant');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');$('pSmith').querySelector('header p').textContent=npcQuote('smith');T.res=null;renderSmith()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closePanels);
 document.querySelectorAll('.panel').forEach(p=>p.addEventListener('pointerdown',e=>{if(e.target===p)closePanels()}));
 const ICO={weapon:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',wand:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',staff:'<path d="M6 21L18 4"/><circle cx="18" cy="4.5" r="2.5"/><path d="M14 6l3 3"/>',
@@ -1280,3 +1280,7 @@ if(U.wb){const W=WBASE[U.wb];it.wb=U.wb;it.dmg=[Math.round((W.dmg[0]+W.dmg[1]*l)
 const BOSS_U=['Жезл Морга','Ледяной шёпот','Чумной венец','Сердце Пепла','Пасть бездны','Клятва паладина','Корона Тлена','Глаз Атласа'];
 
 $('mini').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();S.bigMap=!S.bigMap;const c=$('mini');c.width=c.height=S.bigMap?230:140;c.classList.toggle('big',S.bigMap);drawMini()});
+
+const QUOTES={merchant:['«Покупаю всё, что принесёшь из земель Тлена. И продаю кое-что.»','«Опять с полной сумкой? Вываливай, посмотрим.»','«Сферы нынче дороги. Но для тебя — почти даром.»','«Говорят, на картах Кошмара падает настоящее золото.»','«Не продавай то, что лучше надетого. Я серьёзно.»'],
+smith:['«Каждая ступень делает вещь на 10% сильнее. Чем выше заточка — тем больше риск.»','«После шестой ступени металл начинает светиться. Красиво, а?»','«Десятка — это уже легенда. Лучи видно за милю.»','«Сгорит золото — не беда. Вещь-то цела.»']};
+function npcQuote(k){return pick(QUOTES[k])}
