@@ -587,7 +587,7 @@ if(w==='shop'){const pr=price(it)*4;acts+=`<button class="ab" data-a="buy" ${P.g
 else{if(w==='bag')acts+=`<button class="ab" data-a="equip">Надеть</button>`;else acts+=`<button class="ab alt" data-a="unequip" ${P.bag.length>=36?'disabled':''}>Снять</button>`;
 if(ctx==='merchant'&&w==='bag')acts+=`<button class="ab" data-a="sell">Продать за ${price(it)} зол.</button>`;
 if(ctx==='smith'){if(it.upg<10){const c=upCost(it);acts+=`<button class="ab" data-a="up" ${P.gold<c?'disabled':''}>Заточить до +${it.upg+1} · ${c} зол. · шанс ${upChance(it)}%</button>`}else acts+='<span class="muted">Заточено до предела</span>'}
-if(!ctx&&w==='bag')acts+=`<button class="ab alt" data-a="drop">Выбросить</button>`;
+if(!ctx&&w==='bag')acts+=`<button class="ab alt" data-a="drop">Выбросить</button>`;if(w==='bag'&&NET.on)for(const pr of Object.values(NET.peers).filter(x=>x.cls))acts+=`<button class="ab alt" data-a="gift" data-to="${pr.id}">Передать: ${esc(pr.name)}</button>`;
 if(it.rar<3)acts+='<div class="orbacts">'+ORB_K.filter(k=>P.orbs[k]>0).map(k=>`<button class="ob" data-orb="${k}" style="--c:${ORBS[k].c}" title="${ORBS[k].d}">${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n} (${P.orbs[k]})</button>`).join('')+'</div>'}
 d.innerHTML=`${ttHTML(it)}${w!=='eq'?cmpHTML(it):''}<div class="acts">${acts}</div>`}
 const orbPrice=k=>({trans:25,alt:40,aug:60}[k])*Math.max(1,S.L||1);
@@ -606,6 +606,7 @@ else if(a==='unequip'){if(P.bag.length>=36)return;P.bag.push(it);delete P.eq[it.
 else if(a==='sell'){P.gold+=price(it);P.bag.splice(S.sel.k,1);S.sel=null;snd(1200,.08,'square',.05)}
 else if(a==='buy'){const pr=price(it)*4;if(P.gold<pr||P.bag.length>=36)return;P.gold-=pr;P.bag.push(it);S.shop.splice(S.sel.k,1);S.sel=null;snd(1200,.08,'square',.05)}
 else if(a==='drop'){P.bag.splice(S.sel.k,1);S.sel=null}
+else if(a==='gift'){const to=e.target.closest('[data-to]').dataset.to;const it2=P.bag[S.sel.k];if(!it2)return;P.bag.splice(S.sel.k,1);S.sel=null;nsend({t:'gift',to,it:it2});toast('Передано: '+it2.name,2)}
 else if(a==='up'){const c=upCost(it);if(P.gold<c)return;P.gold-=c;if(Math.random()*100<upChance(it)){it.upg++;toast('Успех! '+it.name+' +'+it.upg,2);snd(660,.12,'triangle',.15);setTimeout(()=>snd(990,.25,'triangle',.15),100);npcChars[1]&&npcChars[1].play('Cheer',{once:true,restart:true})}else{toast('Металл не выдержал. Золото сгорело, вещь цела.',2.5);snd(120,.4,'sawtooth',.12,.5)}recalc()}
 save();renderInv()});
 $('sellAll').onclick=()=>{let g=0;P.bag=P.bag.filter(it=>{if(it.rar<=1&&it.upg===0){g+=price(it);return false}return true});P.gold+=g;S.sel=null;if(g){toast('Продано на '+g+' зол.',2);snd(1200,.08,'square',.05)}save();renderInv()};
@@ -969,6 +970,7 @@ if(pr.c.lay.U.n!==pr.U)pr.c.playL('U',pr.U,{fade:.1});if(pr.c.lay.L.n!==pr.L)pr.
 if(pr.el&&proj(cp.set(g.x,3,g.z),sp)){pr.el.style.display='block';pr.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else if(pr.el)pr.el.style.display='none'}}
 const monById=id=>mons.find(m=>m.id===id);
 async function onNet(m){const t=m.t;
+if(t==='gift'){if(m.to&&m.to!==NET.id)return;const it=m.it;if(!it)return;it.id=uid++;if(P.bag.length<36){P.bag.push(it);toast((NET.peers[m.from]&&NET.peers[m.from].name||'Союзник')+' передал вам: '+it.name,3);chime([660,880,1100],.08);save()}else{stashLoad().tabs[0].push(it);stashSave();toast('Подарок отправлен в хранилище: '+it.name,3)}return}
 if(t==='hello'){NET.id=m.id;NET.on=true;setHost(m.host);toast('Ты в группе '+NET.room+(NET.host?' · ты лидер':''),2.5);sendInfo();renderParty();return}
 if(t==='full'){toast('Группа уже заполнена (3 игрока)',2.5);netLeave(true);return}
 if(t==='join'){setHost(m.host);sendInfo();toast('В группу вошёл новый игрок',1.8);return}
