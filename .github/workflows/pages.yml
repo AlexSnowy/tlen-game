@@ -18,7 +18,10 @@ jobs:
       url: ${{ steps.d.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - run: touch public/.nojekyll
+      - run: |
+          touch public/.nojekyll
+          V=${GITHUB_SHA::8}
+          sed -i "s/__V__/$V/g" public/index.html public/game.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import {RelaySocket} from './relay.js';
-import {GI,SK_IC,IT_IC,UI_IC} from './icons.js';
+import {RelaySocket} from './relay.js?v=__V__';
+import {GI,SK_IC,IT_IC,UI_IC} from './icons.js?v=__V__';
 const gi=(n,c,st='')=>GI[n]?`<svg class="gi" viewBox="0 0 512 512" style="${c?'color:'+c+';':''}${st}">${GI[n]}</svg>`:'';
 const uiI=(k,c,st)=>gi(UI_IC[k],c,st);
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -10,7 +10,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
-import {EL,CLASSES,WBASE,OBASE,ALLW,SLOTS,SLOT_N,ABASE,AFF,UNIQUES,ORBS,SKILLS,RAYS,STAT_N,MON,RAREMODS,THEMES,ZONES,MAPMODS,OBJ_POOL,BOSS_SK} from './data.js';
+import {EL,CLASSES,WBASE,OBASE,ALLW,SLOTS,SLOT_N,ABASE,AFF,UNIQUES,ORBS,SKILLS,RAYS,STAT_N,MON,RAREMODS,THEMES,ZONES,MAPMODS,OBJ_POOL,BOSS_SK} from './data.js?v=__V__';
 
 const $=id=>document.getElementById(id);
 const rand=(a,b)=>a+Math.random()*(b-a),ri=(a,b)=>Math.floor(rand(a,b+1)),pick=a=>a[Math.floor(Math.random()*a.length)];
