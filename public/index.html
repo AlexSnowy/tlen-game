@@ -260,6 +260,10 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 .tt.r{border-color:#6e5a1e}.tt.u{border-color:#7a3e16}.tt.m{border-color:#3c3c8a}
 .pin{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;margin:12px 0;padding:10px 12px;border-radius:14px;border:1px solid #ff5a8a77;background:linear-gradient(90deg,rgba(120,10,40,.35),rgba(0,0,0,.25))}.pin b{display:block;color:#ff8aa8;font-size:16px}.pin small{color:#c9b8a0;font-size:12.5px;line-height:1.35}
 .loot.fr{color:#ff8aa8;border-color:#ff5a8a;border-width:2px;font-weight:700;background:rgba(60,6,24,.9)}
+.chl{display:grid;gap:6px}.chr{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.2)}
+.chr svg.gi{width:30px;height:30px}.chr b{display:block;font-size:14.5px}.chr small{color:#a99f8f;font-size:12px}.chr .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:4px;overflow:hidden}.chr .bar i{display:block;height:100%;background:linear-gradient(90deg,#d59a2a,#ffe39a)}
+.chr.done{border-color:#ffd77466;background:rgba(255,215,116,.06)}.chr.got{opacity:.55}.chr .ab{min-height:36px;padding:6px 12px;font-size:13.5px}.chr .rw{font-size:12px;color:#ffd774;text-align:right}
+.chsum{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px;color:#c9b8a0}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -272,7 +276,7 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
   <div class="tl"><b id="zoneName">Лагерь</b><small id="zoneSub"></small><div id="objTxt" class="objt"></div><div id="partyHud"></div></div>
   <div class="tr">
     <div class="trow"><span class="gold" id="gold">0 зол.</span><button class="hb" id="bParty">Группа<kbd>G</kbd></button><button class="hb" id="bInv">Сумка<kbd>I</kbd></button><button class="hb" id="bSk">Умения<kbd>K</kbd><i class="badge" id="skB"></i></button><button class="hb" id="bPas">Пассивы<kbd>P</kbd><i class="badge" id="pasB"></i></button></div>
-    <div class="trow"><button class="hb" id="bTown">В лагерь<kbd>T</kbd></button></div>
+    <div class="trow"><button class="hb" id="bCh">Испытания<kbd>J</kbd><i class="badge" id="chB"></i></button><button class="hb" id="bTown">В лагерь<kbd>T</kbd></button></div>
     <canvas id="mini" width="140" height="140"></canvas>
   </div>
   <div id="bossBar"><b id="bossName"></b><div class="bar"><i id="bossFill"></i></div></div>
@@ -311,6 +315,10 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 <div class="panel" id="pStash"><div class="pw tw">
   <header><div><h3>Хранилище</h3><p>Общий сундук: вещи в нём доступны всем вашим героям.</p></div><span class="gpill" id="stGold"></span><button class="x" data-close>×</button></header>
   <div id="stBody"></div>
+</div></div>
+<div class="panel" id="pCh"><div class="pw tw" style="max-width:620px">
+  <header><div><h3>Испытания</h3><p>Выполняйте задания и забирайте награды.</p></div><button class="x" data-close>×</button></header>
+  <div id="chBody"></div>
 </div></div>
 <div class="panel" id="pSk"><div class="pw">
   <header><div><h3>Умения</h3><p id="skP"></p></div><button class="x" data-close>×</button></header>
