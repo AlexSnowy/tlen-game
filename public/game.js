@@ -315,7 +315,7 @@ function killMon(M){if(M.dead)return;M.dead=.01;if(NET.on&&NET.host&&!M.netKill)
 burst(p,M.boss?S.th.eyes:M.rare?'#ffd84a':'#d8cfb4',M.boss?70:22,M.boss?8:4.5,.4,.8,1.6);flash(p,M.boss?S.th.eyes:'#ffb060',M.boss?120:25,.35);noise(.25,.12,1600);snd(M.boss?90:170,.3,'sawtooth',.05,.4);
 if(M.rm.includes('fiery')&&!isGuest())tele(p.x,p.z,3,.6,M.dmg*1.5,'#ff5a1a');
 if(ST.spreadPoison&&M.st.poison.length){for(const o of mons)if(o!==M&&!o.dead&&o.g.position.distanceTo(M.g.position)<4.5){o.st.poison.push(...M.st.poison.map(x=>({dps:x.dps,t:x.t})));burst(o.g.position.clone().setY(1),'#7aff5a',6,2)}}
-gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathFx(M,p);riftKill(p);if(!M.netKill||true){csAdd('k');if(M.rare)csAdd('r');if(M.boss){csAdd('b');if(S.zi<0&&!S.pin)csAdd('m')}}H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
+gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathFx(M,p);riftKill(p);if(M.rare&&!M.boss&&!(S.slow>0))S.slow=.14;if(!M.netKill||true){csAdd('k');if(M.rare)csAdd('r');if(M.boss){csAdd('b');if(S.zi<0&&!S.pin)csAdd('m')}}H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
 const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
 if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35)dropFrag(p);if(M.boss&&S.pin)pinReward(p)}
 else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
@@ -973,6 +973,7 @@ if(pr.c.lay.U.n!==pr.U)pr.c.playL('U',pr.U,{fade:.1});if(pr.c.lay.L.n!==pr.L)pr.
 if(pr.el&&proj(cp.set(g.x,3,g.z),sp)){pr.el.style.display='block';pr.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else if(pr.el)pr.el.style.display='none'}}
 const monById=id=>mons.find(m=>m.id===id);
 async function onNet(m){const t=m.t;
+if(t==='rift'){if(m.zk!==zkey()||!S.rift)return;const R=S.rift;if(m.st===1){if(R.st===0)toast('Разлом открыт!',2);R.st=1;R.r=m.r;R.t=m.tt;R.k=m.k}else if(m.st===2&&R.st===1){R.k=m.k;R.t=0;R.fin=1}return}
 if(t==='gift'){if(m.to&&m.to!==NET.id)return;const it=m.it;if(!it)return;it.id=uid++;if(P.bag.length<36){P.bag.push(it);toast((NET.peers[m.from]&&NET.peers[m.from].name||'Союзник')+' передал вам: '+it.name,3);chime([660,880,1100],.08);save()}else{stashLoad().tabs[0].push(it);stashSave();toast('Подарок отправлен в хранилище: '+it.name,3)}return}
 if(t==='hello'){NET.id=m.id;NET.on=true;setHost(m.host);toast('Ты в группе '+NET.room+(NET.host?' · ты лидер':''),2.5);sendInfo();renderParty();return}
 if(t==='full'){toast('Группа уже заполнена (3 игрока)',2.5);netLeave(true);return}
@@ -1246,12 +1247,12 @@ function riftKill(p){const R=S.rift;if(!R||R.st!==1)return;if(Math.hypot(p.x-R.x
 function updRift(dt){const R=S.rift;if(!R||S.mode!=='zone')return;const t=performance.now()/1000;R.core.rotation.z+=dt*1.5;R.core.rotation.y=Math.sin(t)*.4;R.inner.material.opacity=.5+.25*Math.sin(t*3);R.inner.lookAt(camera.position);
 if(R.st===0){if(Math.random()<.3)emit(R.x+rand(-.8,.8),rand(.6,2.6),R.z+rand(-.8,.8),0,rand(.2,.8),0,rand(.6,1),rand(.08,.15),.8,.4,1,0,1);
 if(proj(cp.set(R.x,3.3,R.z),sp)&&Math.hypot(R.x-H.g.position.x,R.z-H.g.position.z)<30){R.el.style.display='block';R.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else R.el.style.display='none';
-if(!isGuest()&&Math.hypot(R.x-H.g.position.x,R.z-H.g.position.z)<2.8){R.st=1;R.t=15;toast('Разлом открыт! Убивай тварей внутри круга — время продлевается.',3);chime([220,330,440,660],.12);S.shake=.4}return}
-if(R.st===1){R.t-=dt;R.sp-=dt;R.zoneR.scale.setScalar(R.r);R.fill.scale.setScalar(R.r);R.zoneR.material.opacity=.7;R.fill.material.opacity=.13+.04*Math.sin(t*4);
+if(!isGuest()&&[H.g.position,...zonePeers().map(p=>p.g.position)].some(q=>Math.hypot(R.x-q.x,R.z-q.z)<2.8)){R.st=1;R.t=15;if(NET.on)nsend({t:'rift',zk:zkey(),st:1,r:R.r,tt:R.t,k:0});toast('Разлом открыт! Убивай тварей внутри круга — время продлевается.',3);chime([220,330,440,660],.12);S.shake=.4}return}
+if(R.st===1){R.t-=dt;R.sp-=dt;if(NET.on&&!isGuest()){R.nt=(R.nt||0)-dt;if(R.nt<=0){R.nt=1;nsend({t:'rift',zk:zkey(),st:1,r:R.r,tt:R.t,k:R.k})}}R.zoneR.scale.setScalar(R.r);R.fill.scale.setScalar(R.r);R.zoneR.material.opacity=.7;R.fill.material.opacity=.13+.04*Math.sin(t*4);
 for(let i=0;i<3;i++){const a=rand(0,6.28);emit(R.x+Math.cos(a)*R.r,.2,R.z+Math.sin(a)*R.r,0,rand(.5,1.5),0,rand(.5,.9),rand(.1,.16),.75,.35,1,0,1)}
 R.el.style.display='block';if(proj(cp.set(R.x,3.3,R.z),sp))R.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`;R.el.innerHTML=`<b style="color:#d08aff">Разлом</b> · ${Math.ceil(R.t)} с · убито ${R.k}`;
-if(R.sp<=0&&mons.length<110){R.sp=Math.max(.5,1.3-R.k*.01);const n=ri(2,3);for(let k=0;k<n;k++){const a=rand(0,6.28),d=R.r*rand(.6,.95);const m=spawnMon(zMon(),R.x+Math.cos(a)*d,R.z+Math.sin(a)*d,{magic:Math.random()<.35,tint:'#8a3aff'});if(m){wake(m);burst({x:m.g.position.x,y:1,z:m.g.position.z},'#c46aff',10,3,.3,.5,1.4)}}}
-if(R.t<=0){R.st=2;R.el.remove();R.g.visible=false;const p={x:R.x,z:R.z},L=S.L,rr=ST.rarity+20;S.shake=.6;
+if(!isGuest()&&R.sp<=0&&mons.length<110){R.sp=Math.max(.5,1.3-R.k*.01);const n=ri(2,3);for(let k=0;k<n;k++){const a=rand(0,6.28),d=R.r*rand(.6,.95);const m=spawnMon(zMon(),R.x+Math.cos(a)*d,R.z+Math.sin(a)*d,{magic:Math.random()<.35,tint:'#8a3aff'});if(m){wake(m);burst({x:m.g.position.x,y:1,z:m.g.position.z},'#c46aff',10,3,.3,.5,1.4)}}}
+if(R.t<=0&&(!isGuest()||R.fin)){R.st=2;if(NET.on&&!isGuest())nsend({t:'rift',zk:zkey(),st:2,k:R.k});R.el.remove();R.g.visible=false;const p={x:R.x,z:R.z},L=S.L,rr=ST.rarity+20;S.shake=.6;
 const n=3+Math.floor(R.k/12);for(let i=0;i<n;i++)dropItem(p,genItem(L+1,i<2?2:1,rr));for(let i=0;i<2+Math.floor(R.k/20);i++)dropOrb(p);if(Math.random()<.4+R.k*.004)dropGem(p);if(S.zi<0&&Math.random()<.35)dropMap(p,genMap(Math.min(MAXT,S.map+1)));
 for(let i=0;i<70;i++){const a=rand(0,6.28),v=rand(2,8);emit(R.x,1,R.z,Math.cos(a)*v,rand(2,6),Math.sin(a)*v,rand(.8,1.4),rand(.12,.22),.8,.4,1,4,1)}
 toast('Разлом закрыт! Убито тварей: '+R.k+'. Забирай сокровища.',3.5);chime([440,554,659,880],.12);csAdd('rift')}}}
