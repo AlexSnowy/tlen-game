@@ -13,7 +13,8 @@ function pkt(type, body) {
 }
 
 export class RelaySocket {
-  constructor(room, brokers = BROKERS) {
+  constructor(room, brokers = BROKERS, opt = {}) {
+    this.max = opt.max || MAX;
     this.room = room; this.id = Math.random().toString(36).slice(2, 10); this.ts = Date.now();
     this.peers = {}; this.readyState = 0; this.started = false; this.pend = [];
     this.onopen = this.onmessage = this.onclose = this.onerror = null;
@@ -72,7 +73,7 @@ export class RelaySocket {
   ready() {
     if (this.readyState !== 0) return;
     const ids = Object.keys(this.peers);
-    if (ids.length >= MAX && ids.some(id => this.peers[id].ts <= this.ts)) {
+    if (ids.length >= this.max && ids.some(id => this.peers[id].ts <= this.ts)) {
       this.readyState = 1; this.emit({ t: 'full' }); this.close(); return;
     }
     this.readyState = 1; this.started = true;

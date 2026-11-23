@@ -552,7 +552,7 @@ collide(p,.45);return l>.08}
 /* ================= UI ================= */
 const RC=RCH;
 function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass'].some(x=>$(x).classList.contains('on'))}
-function closePanels(){for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith','pStash','pCh'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
+function closePanels(){lobbyClose();for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith','pStash','pCh'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
 ({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');$('pShop').querySelector('header p').textContent=npcQuote('merchant');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');$('pSmith').querySelector('header p').textContent=npcQuote('smith');T.res=null;renderSmith()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closePanels);
@@ -1024,11 +1024,12 @@ case'warcry':case'buff':case'summon':ringFx(g.x,g.z,sk.p.r||2.5,'#ffd774',.5);br
 function renderParty(){const box=$('partyBox');if(!box)return;const link=NET.room?location.origin+location.pathname+'?room='+NET.room:'';
 if(!NET.on){box.innerHTML=`<label class="fl">Имя героя<input id="pName" maxlength="16" value="${esc(NET.name)}" placeholder="${P?CLASSES[P.cls].n:'Имя'}"></label>
 <div class="acts"><button class="ab" data-pa2="create">Создать группу</button></div><label class="fl">Или войти по коду<input id="pCode" maxlength="8" placeholder="Например, K7QX"></label><div class="acts"><button class="ab alt" data-pa2="join">Войти</button></div>
-<p class="muted">Играть вместе могут до 3 героев. Каждый получает свою добычу. Сложность монстров растёт с размером группы.</p>`;return}
+<div class="sect" style="margin-top:14px"><span>Открытые группы</span><button class="chip" data-pa2="lobby">Обновить</button></div><div id="lobbyList">${lobbyHTML()}</div><p class="muted">Играть вместе могут до 3 героев. Каждый получает свою добычу. Сложность монстров растёт с размером группы.</p>`;lobbyOpen();return}
 const mem=[`<li><b>${esc(NET.name||CLASSES[P.cls].n)}</b> · ${CLASSES[P.cls].n} ${P.lvl}${NET.host?' · <span class="lead">лидер</span>':''} (ты)</li>`].concat(Object.values(NET.peers).map(p=>`<li><b>${esc(p.name)}</b> · ${p.cls?CLASSES[p.cls].n:''} ${p.lvl||''}</li>`)).join('');
 box.innerHTML=`<p>Код группы: <b class="code">${NET.room}</b></p><div class="acts"><button class="ab" data-pa2="copy">Скопировать приглашение</button><button class="ab alt" data-pa2="leave">Покинуть группу</button></div><ul class="mem">${mem}</ul>
-${NET.leaderZone&&!NET.host?`<p class="muted">Лидер открыл: ${esc(NET.leaderZone.zone.n)}. Иди к порталу в лагере.</p>`:''}<p class="muted">Ссылка для друзей: <span class="lnk">${esc(link)}</span></p>`}
-$('partyBox').addEventListener('click',e=>{const b=e.target.closest('[data-pa2]');if(!b)return;const a=b.dataset.pa2;const nm=$('pName');if(nm){NET.name=nm.value.trim().slice(0,16);try{localStorage.setItem('tlen_name',NET.name)}catch(_){}}
+${NET.leaderZone&&!NET.host?`<p class="muted">Лидер открыл: ${esc(NET.leaderZone.zone.n)}. Иди к порталу в лагере.</p>`:''}<p class="muted">Ссылка для друзей: <span class="lnk">${esc(link)}</span></p>${NET.host?`<label class="hcl" style="justify-content:flex-start"><input type="checkbox" id="openChk" ${NET.open?'checked':''}> Открытая группа — видна всем в списке «Открытые группы»</label>`:''}`}
+$('partyBox').addEventListener('change',e=>{if(e.target.id==='openChk'){NET.open=e.target.checked;advTick(true)}});
+$('partyBox').addEventListener('click',e=>{const jb=e.target.closest('[data-lj]');if(jb){lobbyClose();netConnect(jb.dataset.lj);setTimeout(renderParty,300);return}const b=e.target.closest('[data-pa2]');if(!b)return;if(b.dataset.pa2==='lobby'){lobbyClose();lobbyOpen();return}const a=b.dataset.pa2;const nm=$('pName');if(nm){NET.name=nm.value.trim().slice(0,16);try{localStorage.setItem('tlen_name',NET.name)}catch(_){}}
 if(a==='create'){const c=Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');netConnect(c)}
 if(a==='join'){netConnect(($('pCode').value||'').trim())}if(a==='leave'){netLeave()}
 if(a==='copy'){const link=location.origin+location.pathname+'?room='+NET.room;const txt='Заходи ко мне в «Земли Тлена»: '+link;try{navigator.clipboard.writeText(txt).then(()=>toast('Приглашение скопировано',1.5),()=>toast(link,6))}catch(_){toast(link,6)}
@@ -1359,8 +1360,21 @@ const GUIDE=[['Управление','Телефон: коснись экран�
 ['Восхождение','Победа над стражами «Лагеря культистов», «Затопленных руин», «Сердца Тлена» и первая карта 5-го тира дают очки Восхождения. Выбери один из двух подклассов в окне «Пассивы».'],
 ['Атлас','После кампании открываются карты: тир 1–12, редкость и модификаторы. Больше модификаторов — больше добычи. Каждый покорённый тир даёт +3% к количеству предметов. Стражи карт 4+ тира роняют Фрагменты Тлена — 4 фрагмента открывают Обитель Пожирателя.'],
 ['События','Разлом: подойди, и круг наполнится тварями — убивай внутри, чтобы продлить время, в конце сокровища. Святилища дают сильное благословение на 25 секунд.'],
-['Группа','До 3 игроков. Кнопка «Группа» → создать комнату и отправить ссылку. У каждого своя добыча, вещи можно передавать союзнику из сумки.']];
+['Группа','До 3 игроков. Кнопка «Группа» → «Создать группу» и отправьте ссылку другу, или отметьте «Открытая группа» — тогда вас увидят все в списке «Открытые группы». У каждого своя добыча, вещи можно передавать союзнику из сумки.']];
 function guideHTML(){return '<div class="guide">'+GUIDE.map(([t,d],i)=>`<details ${i===0?'open':''}><summary>${t}</summary><p>${d}</p></details>`).join('')+'</div>'}
 
 function chTabs(){return `<div class="tabs"><button data-cht="c" class="${S.chTab!=='g'?'on':''}">Испытания</button><button data-cht="g" class="${S.chTab==='g'?'on':''}">Справочник</button></div>`}
 $('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-cht]');if(!b)return;S.chTab=b.dataset.cht;renderCh()});
+
+/* лобби открытых групп */
+let LOB=null,LADV={},ADV=null;
+function lobbyOpen(){if(LOB||NET.on)return;try{LOB=new RelaySocket('LOBBY1',BRK(),{max:999});LOB.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}if(m.t==='adv'&&m.room){LADV[m.room]=Object.assign(m,{at:Date.now()});lobbyRender()}}}catch(e){LOB=null}}
+function lobbyRender(){const el=$('lobbyList');if(!el)return;const h=lobbyHTML();if(el._h!==h){el._h=h;el.innerHTML=h}}
+function lobbyClose(){if(LOB){try{LOB.close()}catch(e){}LOB=null}}
+function lobbyHTML(){const now=Date.now();const L=Object.values(LADV).filter(a=>now-a.at<12000&&a.n<3);if(!L.length)return '<p class="muted" style="font-size:12.5px">Пока никого. Создайте группу и отметьте «Открытая группа» — вас увидят другие игроки.</p>';
+return L.map(a=>`<div class="lob"><span>${uiI('cls:'+a.cls,CLASSES[a.cls]?CLASSES[a.cls].col:'#fff','width:22px;height:22px;filter:none')}<b>${esc(a.name)}</b> <small>ур. ${a.lvl} · ${esc(a.zone||'лагерь')} · ${a.n}/3</small></span><button class="ab" data-lj="${esc(a.room)}">Войти</button></div>`).join('')}
+function advTick(now){if(!NET.on||!NET.host||!NET.open){if(ADV){try{ADV.close()}catch(e){}ADV=null}return}if(!ADV){ADV=new RelaySocket('LOBBY1',BRK(),{max:999})}
+const send=()=>{if(ADV&&ADV.readyState===1)ADV.send(JSON.stringify({t:'adv',room:NET.room,name:NET.name||CLASSES[P.cls].n,cls:P.cls,lvl:P.lvl,n:1+Object.values(NET.peers).filter(p=>p.cls).length,zone:S.mode==='zone'?S.zone.n:'лагерь'}))};if(now)setTimeout(send,1800);else send()}
+setInterval(()=>{advTick();if(LOB)lobbyRender()},4000);
+
+function BRK(){const m=location.search.match(/[?&]broker=([^&]+)/);return m?[decodeURIComponent(m[1])]:undefined}
