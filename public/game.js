@@ -308,7 +308,9 @@ burst(p,M.boss?S.th.eyes:M.rare?'#ffd84a':'#d8cfb4',M.boss?70:22,M.boss?8:4.5,.4
 if(M.rm.includes('fiery')&&!isGuest())tele(p.x,p.z,3,.6,M.dmg*1.5,'#ff5a1a');
 if(ST.spreadPoison&&M.st.poison.length){for(const o of mons)if(o!==M&&!o.dead&&o.g.position.distanceTo(M.g.position)<4.5){o.st.poison.push(...M.st.poison.map(x=>({dps:x.dps,t:x.t})));burst(o.g.position.clone().setY(1),'#7aff5a',6,2)}}
 gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:1)*(M.boss?12:1)));H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
-const q=1+S.mods.reduce((a,m)=>a+m.q,0)/100,rr=ST.rarity,gm=1+ST.gold/100;
+const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
+if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)))}
+else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
 if(M.boss){for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.5;bossDown()}
 else if(M.rare){dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
 else{if(Math.random()<.18*q)dropItem(p,genItem(L,0,rr));if(Math.random()<.06*q)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
@@ -498,7 +500,7 @@ const m=new THREE.Mesh(orbG,new THREE.MeshStandardMaterial({color:ORBS[k].c,emis
 const hi={exalt:3,divine:3,chaos:2,regal:2}[k]||0;if(hi){el.classList.add('h'+hi);l.hi=true;const col=new THREE.Color(hi===3?'#fff6d8':'#ffd36a');const b=new THREE.Mesh(new THREE.CylinderGeometry(.16,.4,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b;
 hi===3?chime([784,1175,1568,2093],.1):chime([880,1320],.07)}else snd(990,.2,'sine',.06,1.3)}
 function dropGold(p,a){const el=document.createElement('div');el.className='loot g';el.innerHTML=uiI('gold','#ffd774')+a+' золота';const l=lootObj(p,el,{gold:a});l.g.add(prop('coin_stack_small',.55))}
-function tryPick(l){if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
+function tryPick(l){if(l.mapIt){P.maps=P.maps||[];P.maps.push(l.mapIt);toast('Подобрано: '+l.mapIt.name+' (тир '+l.mapIt.tier+')',1.6);snd(880,.12,'triangle',.08,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},'#9ad0ff',10,2,.3,.5,2,-2)}else if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
 else if(l.orb){P.orbs[l.orb]=(P.orbs[l.orb]||0)+1;toast('Подобрано: '+ORBS[l.orb].n,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},ORBS[l.orb].c,10,2,.3,.5,2,-2);snd(1100,.12,'triangle',.08,1.4)}
 else{if(P.bag.length>=36){if(S.bagWarn<=0){toast('Сумка полна. Продай лишнее у торговки.',2);S.bagWarn=3}return}P.bag.push(l.it);snd(600,.1,'triangle',.08,1.3);burst({x:l.pos.x,y:.5,z:l.pos.z},RCH[l.it.rar],10,2,.3,.5,2,-2);if(l.it.rar>=2)toast('Подобрано: '+l.it.name,1.6)}
 l.el.remove();dyn.remove(l.g);loot.splice(loot.indexOf(l),1);if(H.pick===l)H.pick=null}
@@ -636,9 +638,14 @@ $('pPas').addEventListener('click',e=>{const g=e.target.closest('[data-n]');if(g
 if(a.dataset.pa==='add'&&P.ppts&&canAlloc(S.pasSel)){P.pas.push(S.pasSel);P.ppts--;snd(660,.12,'triangle',.12,1.5)}else if(a.dataset.pa==='ref'&&canRefund(S.pasSel)&&P.gold>=20*P.lvl){P.gold-=20*P.lvl;P.pas=P.pas.filter(x=>x!==S.pasSel);P.ppts++}recalc();save();renderPas()});
 // ----- portal
 function renderPortal(){let h='<h4 class="ph">Кампания</h4><div class="zl">';for(let i=0;i<Math.min(P.maxZone,8);i++){const Z=ZONES[i];h+=`<button class="zb" data-z="${i}"><b>${i+1}. ${Z.n}</b><small>Уровень монстров ${i+1}${i+1===P.maxZone?' · новая':''} · Страж: ${Z.boss}</small></button>`}h+='</div>';
-if(P.maxZone>8){h+='<h4 class="ph">Карты Кошмара</h4><p class="muted">Случайная зона с модификаторами. Каждый модификатор увеличивает количество добычи.</p><div class="zl">';for(let t=1;t<=P.maxMap+1;t++)h+=`<button class="zb" data-map="${t}"><b>Карта, уровень ${t}</b><small>Монстры ${8+t} уровня${t===P.maxMap+1?' · новая':''}</small></button>`;h+='</div>'}
+if(P.maxZone>8)h+=atlasHTML();
 $('zoneList').innerHTML=h}
-$('zoneList').addEventListener('click',e=>{const b=e.target.closest('[data-z],[data-map]');if(!b)return;closePanels();if(b.dataset.z!==undefined)enterZone(+b.dataset.z,0);else enterZone(-1,+b.dataset.map)});
+$('zoneList').addEventListener('click',e=>{const b=e.target.closest('[data-z],[data-mp],[data-mo],[data-go],[data-free]');if(!b)return;const d=b.dataset;
+if(d.z!==undefined){closePanels();enterZone(+d.z,0);return}
+if(d.mp!==undefined){AT.sel=+d.mp;renderPortal();return}
+if(d.mo){const m=P.maps[AT.sel];if(m&&mapOrb(m,d.mo))save();renderPortal();return}
+if(d.free){closePanels();enterZone(-1,1,null,{zi:Math.floor(Math.random()*8),tier:1,rar:0,mods:[]});return}
+if(d.go!==undefined){const m=P.maps[AT.sel];if(!m)return;P.maps.splice(AT.sel,1);AT.sel=null;save();closePanels();enterZone(-1,m.tier,null,m)}});
 // ----- skill bar
 function updSkillBar(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id],b=$('s'+i);b.innerHTML=(sk?skIcon(sk)+`<span class="sn">${sk.n}</span>`:'<span class="sn">пусто</span>')+`<em>${['Q','E','R'][i]}</em>`;b.classList.toggle('aura',!!sk&&sk.kind==='aura');b.classList.toggle('off',!!sk&&sk.kind==='aura'&&P.auraOff.includes(id))}}
 
@@ -646,12 +653,12 @@ function updSkillBar(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id
 function rollShop(){S.shop=[];for(let i=0;i<8;i++)S.shop.push(genItem(Math.max(1,P.maxZone>8?8+P.maxMap:P.maxZone),Math.random()<.35?1:0,0,i<2?'weapon':undefined))}
 function enterTown(){S.mode='town';closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
 setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');$('bossBar').classList.remove('on');rollShop();save();$('zoneName').textContent='Лагерь у костра';$('zoneSub').textContent=touch?'Торговка, кузнец и портал на севере':'Торговка, кузнец и портал. K — умения, P — пассивы, I — сумка'}
-function enterZone(zi,tier,net){if(isGuest()&&!net){toast('Портал открывает лидер группы',2);return}S.mods=[];S.seed=net?net.seed:Math.floor(RNG0()*1e9);if(zi>=0){S.zi=zi;S.zone=ZONES[zi];S.L=zi+1;S.map=0}else{const base=pick(ZONES);S.zi=-1;S.map=tier;S.L=8+tier;S.mods=shuffle(MAPMODS.slice()).slice(0,Math.min(4,1+Math.ceil(tier/2)));
+function enterZone(zi,tier,net,mi){if(isGuest()&&!net){toast('Портал открывает лидер группы',2);return}S.mods=[];S.seed=net?net.seed:Math.floor(RNG0()*1e9);if(zi>=0){S.zi=zi;S.zone=ZONES[zi];S.L=zi+1;S.map=0;S.mapRar=0}else{const base=mi?ZONES[mi.zi]:pick(ZONES);S.zi=-1;S.map=tier;S.L=8+tier;S.mapRar=mi?mi.rar:0;S.mods=mi?mi.mods.map(k=>MAPMODS.find(m=>m.k===k)).filter(Boolean):[];
 if(net){S.zone=net.zone;S.mods=net.mods}else S.zone={n:'Карта: '+base.n,th:base.th,mons:base.mons.concat([['fallen',1],['necro',.6],['berserker',1]]),boss:base.boss+' Кошмара',bt:base.bt,obj:pick(OBJ_POOL),kit:shuffle(Object.keys(BOSS_SK).filter(k=>k!=='enrage')).slice(0,3).concat(tier>=3?['enrage']:[])}}
 if(net&&zi>=0){S.zone=ZONES[zi]}S.mode='zone';town.visible=false;zone.visible=true;buildZone();if(NET.on&&NET.host&&!net)nsend({t:'zone',zi,tier,seed:S.seed,zone:S.zone,mods:S.mods,L:S.L});H.g.position.set(0,0,46);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.regenOff=mod('noregen');
 for(const id of P.slots)if(id&&SKILLS[id].kind==='summon'&&P.sk[id])summon(id,skLvl(id));
 $('zoneName').textContent=S.zone.n;$('zoneSub').textContent='Уровень монстров '+S.L+(S.mods.length?' · '+S.mods.map(m=>m.n).join(' · '):' · Страж ждёт на севере');toast('Иди на север. В конце зоны тебя ждёт '+S.zone.boss+'.',3.5);snd(200,.8,'sine',.12,2)}
-function bossDown(){S.cleared=true;let lore=null,next='';if(S.zi>=0){if(S.zi+2>P.maxZone){P.maxZone=S.zi+2;next=S.zi<7?'Открыта зона «'+ZONES[S.zi+1].n+'».':'Открыты карты Кошмара!'}if(!P.lore.includes(S.zi)){P.lore.push(S.zi);lore=S.zone.lore}}else{if(S.map>P.maxMap){P.maxMap=S.map;next='Открыта карта уровня '+(S.map+1)+'.'}}
+function bossDown(){S.cleared=true;let lore=null,next='';if(S.zi>=0){if(S.zi+2>P.maxZone){P.maxZone=S.zi+2;next=S.zi<7?'Открыта зона «'+ZONES[S.zi+1].n+'».':'Открыты карты Кошмара!'}if(!P.lore.includes(S.zi)){P.lore.push(S.zi);lore=S.zone.lore}}else{if(S.map>P.maxMap){P.maxMap=S.map}P.atlas=P.atlas||[];if(!P.atlas.includes(S.map)){P.atlas.push(S.map);next='Атлас: тир '+S.map+' покорён (+3% к количеству предметов на картах).'}}
 const p=S.boss.g.position;const g=prop('arch_gate',1);g.position.set(p.x,0,p.z-4);dyn.add(g);const d=new THREE.Mesh(new THREE.CircleGeometry(1.7,40),new THREE.MeshBasicMaterial({color:new THREE.Color('#9a5cff').multiplyScalar(2.2),transparent:true,opacity:.8,side:THREE.DoubleSide,toneMapped:false,map:softTex}));d.position.set(0,1.95,0);g.add(d);exitP=g;emitters.push({x:p.x,y:1.95,z:p.z-4,kind:'portal',w:zone});
 save();$('bossBar').classList.remove('on');setTimeout(()=>{if(lore){$('loreH').textContent=S.zone.boss+' повержен';$('loreP').textContent=lore;$('loreM').textContent=next+' Собери добычу и войди в портал, чтобы вернуться в лагерь.';$('ovLore').classList.add('on');setPaused()}else toast('Страж повержен! '+next,4)},1400)}
 $('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused()};
@@ -849,7 +856,7 @@ const mc=$('mini').getContext('2d');
 function drawMini(){const W=140,s=W/40;mc.clearRect(0,0,W,W);if(S.mode!=='zone')return;const hx=H.g.position.x,hz=H.g.position.z;const tx=x=>(x-hx)*s+W/2,tz=z=>(z-hz)*s+W/2;
 mc.save();mc.beginPath();mc.arc(W/2,W/2,W/2,0,7);mc.clip();mc.fillStyle='rgba(255,255,255,.12)';for(const o of zoneObs){if(Math.abs(o.x-hx)>22||Math.abs(o.z-hz)>22)continue;mc.beginPath();mc.arc(tx(o.x),tz(o.z),Math.max(1.2,o.r*s*.7),0,7);mc.fill()}
 for(const c of chests)if(!c.open){mc.fillStyle='#d8b56a';mc.fillRect(tx(c.x)-2.5,tz(c.z)-2.5,5,5)}
-for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':RCH[l.it.rar];mc.fillStyle=c;const r=l.hi?2.6:1.5;mc.fillRect(tx(l.pos.x)-r,tz(l.pos.z)-r,r*2,r*2);if(l.hi){mc.strokeStyle=c;mc.lineWidth=1;mc.beginPath();mc.arc(tx(l.pos.x),tz(l.pos.z),5+2*Math.sin(performance.now()/200),0,7);mc.stroke()}}
+for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':l.mapIt?'#9ad0ff':RCH[l.it.rar];mc.fillStyle=c;const r=l.hi?2.6:1.5;mc.fillRect(tx(l.pos.x)-r,tz(l.pos.z)-r,r*2,r*2);if(l.hi){mc.strokeStyle=c;mc.lineWidth=1;mc.beginPath();mc.arc(tx(l.pos.x),tz(l.pos.z),5+2*Math.sin(performance.now()/200),0,7);mc.stroke()}}
 for(const a of allies){mc.fillStyle='#5ad06a';mc.beginPath();mc.arc(tx(a.g.position.x),tz(a.g.position.z),2,0,7);mc.fill()}
 for(const M of mons){if(M.dead)continue;mc.fillStyle=M.boss?'#d04fff':M.rare?'#ffd84a':'#e0483c';const r=M.boss?4.5:M.rare?3:2;mc.beginPath();mc.arc(tx(M.g.position.x),tz(M.g.position.z),r,0,7);mc.fill()}
 if(OBJ)for(const e of OBJ.ents){if(e.done)continue;const ex=e.M?e.M.g.position.x:e.x,ez=e.M?e.M.g.position.z:e.z;let X=tx(ex),Z=tz(ez);const dd=Math.hypot(X-W/2,Z-W/2);if(dd>W/2-7){X=W/2+(X-W/2)/dd*(W/2-7);Z=W/2+(Z-W/2)/dd*(W/2-7)}mc.save();mc.translate(X,Z);mc.rotate(Math.PI/4);mc.fillStyle=e.M?'#ff5a3a':'#ffd774';mc.strokeStyle='#000';mc.fillRect(-4,-4,8,8);mc.strokeRect(-4,-4,8,8);mc.restore()}
@@ -1084,3 +1091,30 @@ else if(d.st!==undefined){const it=tab[+d.st];if(!it)return;if(P.bag.length>=36)
 else if(d.sbg!==undefined){const it=P.bag[+d.sbg];if(!it)return;if(tab.length>=ST_N){toast('Вкладка заполнена',1.5);return}P.bag.splice(+d.sbg,1);tab.push(it);T.last=it;snd(500,.05,'triangle',.05)}
 else if(d.sq){const f={w:it=>it.slot==='weapon'||it.slot==='offhand',a:it=>!['weapon','offhand'].includes(it.slot),r:it=>it.rar>=2,all:()=>true}[d.sq];P.bag=P.bag.filter(it=>{if(f(it)&&tab.length<ST_N){tab.push(it);return false}return true})}
 stashSave();save();renderStash()});
+
+/* ================= АТЛАС: КАРТЫ ================= */
+const MAXT=12,AT={sel:null};
+const mapName=m=>'Карта: '+ZONES[m.zi].n;
+function genMap(t){const r=Math.random();const m={id:uid++,map:1,tier:t,zi:Math.floor(Math.random()*8),rar:r<.08?2:r<.3?1:0,mods:[]};rollMapMods(m);m.name=mapName(m);return m}
+function rollMapMods(m){const n=m.rar===2?3+(Math.random()<.4?1:0):m.rar===1?1+(Math.random()<.5?1:0):0;m.mods=shuffle(MAPMODS.map(x=>x.k)).slice(0,n)}
+const mapQ=m=>m.mods.reduce((a,k)=>a+(MAPMODS.find(x=>x.k===k)||{q:0}).q,0);
+const atlasBonus=()=>((P.atlas||[]).length)*3;
+function dropMap(p,m){const el=document.createElement('div');el.className='loot mp'+(m.tier>=6?' hi':'');el.innerHTML=uiI('map','#9ad0ff')+esc(m.name)+' · тир '+m.tier;const l=lootObj(p,el,{mapIt:m,hi:m.tier>=4||m.rar===2});
+const g=new THREE.Mesh(new THREE.BoxGeometry(.5,.06,.36),new THREE.MeshStandardMaterial({color:'#c9d8ff',emissive:'#5a8aff',emissiveIntensity:1.4,roughness:.5}));g.position.y=.3;l.g.add(g);l.gem=g;
+if(m.tier>=4||m.rar===2){const col=new THREE.Color('#9ad0ff');const b=new THREE.Mesh(new THREE.CylinderGeometry(.16,.4,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b}
+chime([587,880],.08)}
+function mapOrb(m,k){if(!(P.orbs[k]>0))return false;let ok=false;
+if(k==='trans'&&m.rar===0){m.rar=1;rollMapMods(m);ok=true}else if(k==='alt'&&m.rar===1){rollMapMods(m);ok=true}
+else if(k==='aug'&&m.rar===1&&m.mods.length<2){const pool=MAPMODS.map(x=>x.k).filter(x=>!m.mods.includes(x));m.mods.push(pick(pool));ok=true}
+else if(k==='regal'&&m.rar===1){m.rar=2;const pool=MAPMODS.map(x=>x.k).filter(x=>!m.mods.includes(x));m.mods.push(pick(pool));ok=true}
+else if(k==='chaos'&&m.rar===2){rollMapMods(m);ok=true}else if(k==='scour'&&m.rar>0){m.rar=0;m.mods=[];ok=true}
+if(!ok){toast('Эта сфера сюда не подходит',1.5);return false}P.orbs[k]--;snd(1000,.1,'triangle',.08);return true}
+function atlasHTML(){const L=(P.maps||[]).map((m,i)=>({m,i})).sort((a,b)=>b.m.tier-a.m.tier||b.m.rar-a.m.rar);const done=P.atlas||[];
+let h=`<h4 class="ph">Атлас Кошмара</h4><div class="atl">`+Array.from({length:MAXT},(_,i)=>`<i class="${done.includes(i+1)?'on':''}" title="Тир ${i+1}">${i+1}</i>`).join('')+`</div><p class="muted" style="margin:4px 0 10px">Покорено тиров: ${done.length}/${MAXT} · бонус к количеству предметов на картах +${atlasBonus()}%. Карты выпадают с монстров на картах; стражи роняют карты выше тиром.</p>`;
+h+='<div class="mapgrid">'+L.map(({m,i})=>`<button class="mapc r${m.rar} ${AT.sel===i?'sel':''}" data-mp="${i}"><b>${m.tier}</b><span>${esc(ZONES[m.zi].n)}</span>${m.mods.length?`<small>+${mapQ(m)}% предм.</small>`:''}</button>`).join('')+`<button class="mapc free" data-free="1"><b>1</b><span>Простая карта</span><small>бесплатно</small></button></div>`;
+const m=AT.sel!=null&&P.maps[AT.sel];
+if(m){const RCm=['#c8c8c8','#8888ff','#ffd84a'];h+=`<div class="tdet"><h4 style="color:${RCm[m.rar]}">${esc(m.name)}</h4><div class="sub">${['Обычная','Магическая','Редкая'][m.rar]} карта · тир ${m.tier} · монстры ${8+m.tier} уровня</div><ul>${m.mods.map(k=>`<li class="aff">${MAPMODS.find(x=>x.k===k).n}</li>`).join('')||'<li class="muted">Без модификаторов</li>'}</ul>
+<div class="cmp">Количество предметов: <b style="color:#7cf08e">+${mapQ(m)+atlasBonus()}%</b>${m.rar?` · редкость предметов: <b style="color:#7cf08e">+${[0,10,25][m.rar]}%</b>`:''}</div>
+<div class="sect" style="margin-top:10px"><span>Изменить карту сферами</span></div><div class="orbacts">${['trans','alt','aug','regal','chaos','scour'].map(k=>`<button class="ob" data-mo="${k}" style="--c:${ORBS[k].c}" ${P.orbs[k]>0?'':'disabled'}>${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n.replace('Сфера ','')} (${P.orbs[k]||0})</button>`).join('')}</div>
+<div class="acts" style="margin-top:10px"><button class="ab" data-go="1">Открыть карту</button></div></div>`}
+return h}
