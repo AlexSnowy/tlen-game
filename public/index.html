@@ -268,6 +268,13 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 .sock.on{border-style:solid;color:#bff5c9;background:rgba(40,160,70,.16)}.sock.op{outline:2px solid #5ee07a}
 .sockl{display:flex;flex-direction:column;gap:4px;margin:4px 0}.gemc{text-align:left;border-radius:9px!important}.gemc b{color:#7cf08e;font-weight:600}.gemc small{color:#a99f8f}
 .loot.gm{color:#7cf08e;border-color:#5ee07a;border-width:2px;font-weight:600;background:rgba(8,30,14,.9)}
+#banner{position:fixed;left:50%;top:22%;transform:translate(-50%,0) scale(.96);text-align:center;pointer-events:none;z-index:5;opacity:0;transition:opacity .6s,transform .8s;width:min(92vw,720px)}
+#banner.on{opacity:1;transform:translate(-50%,0) scale(1)}
+#banner b{display:block;font:400 clamp(26px,6vw,48px) 'Ruslan Display',serif;color:#ffe3a8;text-shadow:0 2px 0 #000,0 0 28px rgba(255,170,60,.55);letter-spacing:.03em}
+#banner small{display:block;font:500 clamp(12px,2.6vw,15px) Rubik;color:#d9c9a8;margin-top:4px;text-shadow:0 1px 3px #000}
+#banner i{display:block;height:1px;margin:8px auto;width:60%;background:linear-gradient(90deg,transparent,#d8b56a,transparent)}
+#banner.boss b{color:#ff8a6a;text-shadow:0 2px 0 #000,0 0 30px rgba(255,60,30,.7)}#banner.boss i{background:linear-gradient(90deg,transparent,#ff5a3a,transparent)}
+body.bn #toast{opacity:0!important}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -297,7 +304,7 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
   <button id="interact"></button>
   <div class="xp"><i id="xpFill"></i><span id="lvlTxt"></span></div>
 </div>
-<div id="toast"></div>
+<div id="banner"></div><div id="toast"></div>
 <div class="joy" id="joy"><i id="knob"></i></div>
 
 <div class="panel" id="pInv"><div class="pw">
