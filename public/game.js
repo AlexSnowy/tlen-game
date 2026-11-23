@@ -316,7 +316,7 @@ gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathF
 const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
 if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35)dropFrag(p);if(M.boss&&S.pin)pinReward(p)}
 else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
-if(M.boss){if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;bossDown()}
+if(M.boss){if(S.zi>=0&&Math.random()<.22){const U=UNIQUES.find(u=>u.n===BOSS_U[S.zi]);if(U)dropItem(p,makeUnique(U,L+1))}if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;bossDown()}
 else if(M.rare){if(Math.random()<.12*q)dropGem(p);dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
 else{const mg=M.magic?2.5:1;if(Math.random()<.004*q*mg)dropGem(p);if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
 function hurtHero(d,src){if(H.inv>0||S.mode!=='zone'||H.leap)return;const dr=ST.armor/(ST.armor+40+S.L*25);d*=(1-dr)*(1+ST.dmgTaken/100);
@@ -470,8 +470,7 @@ function rollAff(it,n){it.aff=[];for(let i=0;i<n;i++)addAff(it)}
 function nameIt(it){const MS=['силы','пламени','жизни','ворона','бури','теней','рассвета','волка','стужи','гнева'],RA=['Гибель','Шёпот','Клык','Пепел','Зов','Коготь','Слеза','Венец','Жало','Плач','Рок','Дар'],RB=['Ворона','Бездны','Тлена','Бури','Мёртвых','Зари','Змея','Короля','Волков','Луны','Ночи'];
 it.name=it.rar===1?it.base+' '+pick(MS):it.rar===2?pick(RA)+' '+pick(RB):it.rar===0?it.base:it.name}
 function genItem(l,minR=0,rarity=0,forceSlot){const C=CLASSES[P.cls];const r=Math.random()*(1-Math.min(.5,rarity/200));
-if(r<.012&&!forceSlot){const pool=UNIQUES.filter(u=>!u.wb||WBASE[u.wb].cls===P.cls);const U=pick(pool);const it={id:uid++,slot:U.slot,base:U.base||WBASE[U.wb].n,name:U.n,rar:3,ilvl:l,upg:0,aff:[],st:{...U.st},lore:U.lore};
-if(U.wb){const W=WBASE[U.wb];it.wb=U.wb;it.dmg=[Math.round((W.dmg[0]+W.dmg[1]*l)*1.15),Math.round((W.dmg[2]+W.dmg[3]*l)*1.15)]}if(ABASE[U.slot]&&ABASE[U.slot].arm)it.armor=Math.round((ABASE[U.slot].arm[0]+ABASE[U.slot].arm[1]*l)*1.2);return it}
+if(r<.012&&!forceSlot){const pool=UNIQUES.filter(u=>!u.wb||WBASE[u.wb].cls===P.cls);return makeUnique(pick(pool),l)}
 let rar=r<.17?2:r<.55?1:0;rar=Math.max(rar,minR);const slot=forceSlot||wpick([['weapon',16],['offhand',9],['helmet',11],['chest',11],['gloves',11],['boots',11],['ring',12],['amulet',9]]);
 const it={id:uid++,slot,rar,ilvl:l,upg:0,aff:[]};
 if(slot==='weapon'){const wb=pick(C.weapons),W=WBASE[wb];it.wb=wb;it.base=W.n;it.dmg=[Math.round((W.dmg[0]+W.dmg[1]*l)*rand(.85,1.15)),Math.round((W.dmg[2]+W.dmg[3]*l)*rand(.85,1.15))]}
@@ -1275,3 +1274,7 @@ function stopMusic(){if(!MUS)return;const M=MUS;MUS=null;M.timers.forEach(clearT
 function musToggle(){musOn=!musOn;try{localStorage.setItem('tlen_mus',musOn?'1':'0')}catch(e){}if(!musOn)stopMusic();else music(S.mode==='town'?'town':S.boss&&S.boss.aggro&&!S.cleared?'boss':'zone');const b=$('bMus');if(b)b.textContent='Музыка: '+(musOn?'вкл':'выкл')}
 
 $('bMus').onclick=()=>{initAudio();musToggle()};$('bMus').textContent='Музыка: '+(musOn?'вкл':'выкл');
+
+function makeUnique(U,l){const it={id:uid++,slot:U.slot,base:U.base||WBASE[U.wb].n,name:U.n,rar:3,ilvl:l,upg:0,aff:[],st:{...U.st},lore:U.lore};
+if(U.wb){const W=WBASE[U.wb];it.wb=U.wb;it.dmg=[Math.round((W.dmg[0]+W.dmg[1]*l)*1.15),Math.round((W.dmg[2]+W.dmg[3]*l)*1.15)]}if(ABASE[U.slot]&&ABASE[U.slot].arm)it.armor=Math.round((ABASE[U.slot].arm[0]+ABASE[U.slot].arm[1]*l)*1.2);return it}
+const BOSS_U=['Жезл Морга','Ледяной шёпот','Чумной венец','Сердце Пепла','Пасть бездны','Клятва паладина','Корона Тлена','Глаз Атласа'];
