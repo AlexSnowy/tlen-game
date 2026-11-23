@@ -301,7 +301,7 @@ function rollCtx(ctx){const c=Math.random()*100<ST.crit;const base=(ctx.flat??ra
 function dealDmg(M,ctx,dd){if(M.dead||ctx.ghost)return;if(M.boss&&OBJ&&!OBJ.done){if(!ctx.dot&&Math.random()<.3)num(M.g.position.clone().setY(2.6*M.sc),'неуязвим','');return}let d,c=false;if(dd!==undefined)d=dd;else{const r=rollCtx(ctx);d=r.d;c=r.c}
 if(ST.execute&&M.hp<M.max*.35)d*=1+ST.execute/100;if(M.st.shock>0)d*=1.2;if(M.D.block&&!ctx.dot&&Math.random()<M.D.block){d*=.4;num(M.g.position.clone().setY(2.6*M.sc),'блок','')}
 M.hp-=d;if(!ctx.dot&&M.rm&&M.rm.includes('thorns')&&!ctx.ally&&!ctx.fromPeer&&Math.random()<.35)hurtHero(Math.min(d*.06,M.dmg*.5),null);if(!ctx.dot){M.flash=1;wake(M);for(const o of mons)if(!o.aggro&&o.g.position.distanceTo(M.g.position)<9)wake(o);
-const p=M.g.position.clone();p.y=2.3*M.sc;num(p,Math.round(d)+(c?'!':''),c?'crit':'');if(ST.leech&&!ctx.ally&&!ctx.fromPeer)H.hp=Math.min(ST.hp,H.hp+d*ST.leech/100);applyStatus(M,ctx,d)}
+const p=M.g.position.clone();p.y=2.3*M.sc;num(p,Math.round(d)+(c?'!':''),(c?'crit ':'')+'e-'+(ctx.el||'phys'));if(ST.leech&&!ctx.ally&&!ctx.fromPeer)H.hp=Math.min(ST.hp,H.hp+d*ST.leech/100);applyStatus(M,ctx,d)}
 else{M.dotAcc+=d}
 if(isGuest()){if(!ctx.dot||dd!==undefined)nsend({t:'hit',zk:zkey(),id:M.id,d:Math.round(d*10)/10,el:ctx.el,ig:ctx.ignite?1:0,st:ctx.stun?1:0,po:ctx.poison?1:0,bl:ctx.bleed?1:0});if(M.hp<1)M.hp=1}
 else if(M.hp<=0)killMon(M);else if(!ctx.dot&&!M.boss&&M.c.lock<=0&&Math.random()<.3&&M.c.clips['Hit_A'])M.c.play('Hit_A',{once:true,ts:1.4,restart:true,lockK:.7})}
