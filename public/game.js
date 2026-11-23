@@ -685,7 +685,7 @@ function updSkillBar(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id
 
 /* ================= FLOW ================= */
 function rollShop(){S.shop=[];for(let i=0;i<8;i++)S.shop.push(genItem(Math.max(1,P.maxZone>8?8+P.maxMap:P.maxZone),Math.random()<.35?1:0,0,i<2?'weapon':undefined))}
-function enterTown(){S.mode='town';setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
+function enterTown(){S.mode='town';setTimeout(()=>cloudSave(true),1500);setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
 setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');$('bossBar').classList.remove('on');rollShop();save();$('zoneName').textContent='Лагерь у костра';$('zoneSub').textContent=touch?'Торговка, кузнец и портал на севере':'Торговка, кузнец и портал. K — умения, P — пассивы, I — сумка'}
 function enterZone(zi,tier,net,mi){if(isGuest()&&!net){toast('Портал открывает лидер группы',2);return}S.mods=[];S.seed=net?net.seed:Math.floor(RNG0()*1e9);if(zi>=0){S.zi=zi;S.zone=ZONES[zi];S.L=zi+1;S.map=0;S.mapRar=0;S.pin=false}else{const base=mi?ZONES[mi.zi]:pick(ZONES);S.zi=-1;S.map=tier;S.L=8+tier;S.mapRar=mi?mi.rar:0;S.pin=!!(mi&&mi.pin);S.mods=mi?mi.mods.map(k=>MAPMODS.find(m=>m.k===k)).filter(Boolean):[];
 if(net){S.zone=net.zone;S.mods=net.mods}else if(S.pin)S.zone={n:'Обитель Пожирателя',th:3,mons:[['fallen',2],['berserker',2],['necro',1],['brute',1.5]],boss:'Пожиратель Тлена',bt:'brute',obj:{t:'hunt',n:'Убей стражей Обители',c:2},kit:['slam','meteors','spiral','summon','teleport','nova','charge','enrage'],phases:1};else S.zone={n:'Карта: '+base.n,th:base.th,mons:base.mons.concat([['fallen',1],['necro',.6],['berserker',1]]),boss:base.boss+' Кошмара',bt:base.bt,obj:pick(OBJ_POOL),kit:shuffle(Object.keys(BOSS_SK).filter(k=>k!=='enrage')).slice(0,3).concat(tier>=3?['enrage']:[])}}
@@ -1043,7 +1043,7 @@ setInterval(()=>{if(NET.on)renderPartyHud()},700);
 try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'})}catch(e){console.error(e);$('lTxt').textContent='Не удалось загрузить модели. Обнови страницу.';return}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
-S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');renderChars();setPaused();
+S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
 window.__dbg={S,H,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
@@ -1399,3 +1399,19 @@ const g=new THREE.Mesh(new THREE.BoxGeometry(.32,.46,.03),new THREE.MeshStandard
 function divHTML(){P.cards=P.cards||{};const have=DIV.filter(c=>(P.cards[c.id]||0)>0);let h='<div class="sect"><span>Гадальные карты</span><small style="text-transform:none;letter-spacing:0">собери набор — получи награду</small></div>';
 if(!have.length)return h+'<p class="muted" style="font-size:12.5px">Гадальные карты изредка выпадают с монстров, чаще — с редких и стражей. Соберите полный набор, и Вера обменяет его на награду.</p>';
 return h+'<div class="divl">'+have.map(c=>{const n=P.cards[c.id],ok=n>=c.need;return `<div class="divc ${ok?'ok':''}"><b>${esc(c.n)}</b><small>${n}/${c.need}</small><div class="rw">${esc(c.rw)}</div><i>«${esc(c.flav)}»</i>${ok?`<button class="ab" data-dv="${c.id}">Обменять</button>`:''}</div>`}).join('')+'</div>'}
+
+/* ================= ОБЛАЧНОЕ СОХРАНЕНИЕ (Telegram) И ЭКСПОРТ ================= */
+const TGCS=()=>{try{const w=window.Telegram&&Telegram.WebApp;return w&&w.initData&&w.CloudStorage&&w.isVersionAtLeast&&w.isVersionAtLeast('6.9')?w.CloudStorage:null}catch(e){return null}};
+function bundle(){return JSON.stringify({v:1,t:Date.now(),chars:charsGet(),stash:stashLoad()})}
+function unbundle(str){const o=JSON.parse(str);if(!o||!o.chars||!Array.isArray(o.chars.list))throw new Error('bad');charsPut(o.chars);if(o.stash){STASH=o.stash;stashSave()}try{localStorage.setItem('tlen_t',String(o.t||Date.now()))}catch(e){}return o}
+let cloudBusy=false,cloudLast=0;
+function cloudSave(force){const CS=TGCS();if(!CS||cloudBusy)return;const now=Date.now();if(!force&&now-cloudLast<45000)return;cloudLast=now;cloudBusy=true;
+try{const str=bundle(),n=Math.ceil(str.length/3800),t=String(now);let left=n+2;const done=()=>{if(--left<=0)cloudBusy=false};
+for(let i=0;i<n;i++)CS.setItem('sv_'+i,str.slice(i*3800,(i+1)*3800),done);CS.setItem('sv_n',String(n),done);CS.setItem('sv_t',t,done);try{localStorage.setItem('tlen_t',t)}catch(e){}}catch(e){cloudBusy=false}}
+function cloudLoad(cb){const CS=TGCS();if(!CS)return cb(false);CS.getItems(['sv_n','sv_t'],(err,v)=>{if(err||!v||!v.sv_n)return cb(false);const n=+v.sv_n,t=+v.sv_t||0;let lt=0;try{lt=+localStorage.getItem('tlen_t')||0}catch(e){}
+const loc=charsGet();if(lt>=t&&loc.list.length)return cb(false);CS.getItems(Array.from({length:n},(_,i)=>'sv_'+i),(e2,parts)=>{if(e2||!parts)return cb(false);try{unbundle(Array.from({length:n},(_,i)=>parts['sv_'+i]||'').join(''));cb(true)}catch(e){cb(false)}})})}
+setInterval(()=>{if(P)cloudSave()},50000);
+function exportSave(){const code=btoa(unescape(encodeURIComponent(bundle())));try{navigator.clipboard.writeText(code).then(()=>toast('Код сохранения скопирован. Сохраните его в заметках.',3),()=>prompt('Скопируйте код сохранения:',code))}catch(e){prompt('Скопируйте код сохранения:',code)}}
+function importSave(){const code=prompt('Вставьте код сохранения:');if(!code)return;try{unbundle(decodeURIComponent(escape(atob(code.trim()))));toast('Сохранение загружено',2);renderChars()}catch(e){toast('Код не подошёл',2)}}
+
+$('bExp').onclick=exportSave;$('bImp').onclick=importSave;
