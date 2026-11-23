@@ -226,3 +226,17 @@ export const MAPMODS=[{k:'mdmg',n:'Монстры наносят +30% урона
 
 export const OBJ_POOL=[{t:'nests',n:'Выжги гнёзда Кошмара',c:3},{t:'altars',n:'Зажги огни',c:3},{t:'rescue',n:'Освободи пленников',c:3},{t:'hunt',n:'Убей вожаков',c:3},{t:'relics',n:'Собери фрагменты',c:4},{t:'defend',n:'Удержи огонь',c:40},{t:'totems',n:'Разрушь обелиски',c:4}];
 export const BOSS_SK={slam:'Сокрушающий удар',pools:'Ядовитые лужи',summon:'Призыв слуг',barrage:'Веер снарядов',teleport:'Шаг сквозь тень',spiral:'Спираль смерти',meteors:'Дождь огня',charge:'Таранный рывок',spin:'Вихрь клинков',nova:'Ударная волна',enrage:'Ярость'};
+
+UNIQUES.push(
+{n:'Глаз Атласа',slot:'amulet',base:'Талисман',st:{rarity:40,gold:40,dmgP:10},lore:'Кто видел все карты — видит и сокровища.'},
+{n:'Пасть бездны',slot:'gloves',base:'Перчатки',st:{chaosP:35,leech:2,poisonDur:40},lore:'Она голодна всегда.'},
+{n:'Терновый венец',slot:'helmet',base:'Шлем',st:{reflect:40,armorP:30,regen:4},lore:'Боль возвращается к тому, кто её принёс.'},
+{n:'Вечный огонь',slot:'chest',base:'Мантия',st:{fireP:50,manaP:30,burnCh:30,hp:-20},lore:'Тот, кто стал пламенем, не боится холода.'},
+{n:'Поступь великана',slot:'boots',base:'Поножи',st:{slamR:40,hp:50,move:-5,stunCh:10},lore:'От каждого шага дрожит земля.'},
+{n:'Кольцо тысячи стрел',slot:'ring',base:'Кольцо',st:{projAdd:1,projP:25,aspd:6},lore:'Небо темнеет от стрел.'},
+{n:'Петля времени',slot:'ring',base:'Перстень',st:{cdr:30,manaRegen:5,dmgP:-10},lore:'Ещё раз. И ещё.'},
+{n:'Последний вздох',slot:'amulet',base:'Амулет',st:{execute:60,crit:4,critM:30},lore:'Добей. Не оставляй шанса.'},
+{n:'Кромсатель',slot:'weapon',wb:'axe',st:{bleed:40,aspd:15,physP:35},lore:'Каждый взмах оставляет след.'},
+{n:'Посох вечной зимы',slot:'weapon',wb:'staff',st:{coldP:60,chillStr:60,aoeP:20},lore:'Здесь всегда январь.'},
+{n:'Миротворец',slot:'weapon',wb:'gsword',st:{meleeP:45,auraP:30,hpP:10},lore:'Мир наступает после последнего удара.'},
+{n:'Ураган',slot:'weapon',wb:'hxbow',st:{pierce:3,projP:40,move:8},lore:'Он проходит сквозь строй.'});

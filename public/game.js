@@ -509,7 +509,7 @@ hi===3?chime([784,1175,1568,2093],.1):chime([880,1320],.07)}else snd(990,.2,'sin
 function dropGold(p,a){const el=document.createElement('div');el.className='loot g';el.innerHTML=uiI('gold','#ffd774')+a+' золота';const l=lootObj(p,el,{gold:a});l.g.add(prop('coin_stack_small',.55))}
 function tryPick(l){if(l.gem2){P.gems=P.gems||{};P.gems[l.gem2]=(P.gems[l.gem2]||0)+1;toast('Камень поддержки: '+SUPP[l.gem2].n+' (вставь в умение)',2.5);chime([660,880,1100],.08)}else if(l.frag){P.frag=(P.frag||0)+1;toast('Фрагмент Тлена ('+P.frag+'/4)',2);chime([440,660,880],.08)}else if(l.mapIt){P.maps=P.maps||[];P.maps.push(l.mapIt);toast('Подобрано: '+l.mapIt.name+' (тир '+l.mapIt.tier+')',1.6);snd(880,.12,'triangle',.08,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},'#9ad0ff',10,2,.3,.5,2,-2)}else if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
 else if(l.orb){P.orbs[l.orb]=(P.orbs[l.orb]||0)+1;toast('Подобрано: '+ORBS[l.orb].n,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},ORBS[l.orb].c,10,2,.3,.5,2,-2);snd(1100,.12,'triangle',.08,1.4)}
-else{if(P.bag.length>=36){if(S.bagWarn<=0){toast('Сумка полна. Продай лишнее у торговки.',2);S.bagWarn=3}return}P.bag.push(l.it);if(l.it.rar===3)csAdd('u');snd(600,.1,'triangle',.08,1.3);burst({x:l.pos.x,y:.5,z:l.pos.z},RCH[l.it.rar],10,2,.3,.5,2,-2);if(l.it.rar>=2)toast('Подобрано: '+l.it.name,1.6)}
+else{if(P.bag.length>=36){if(S.bagWarn<=0){toast('Сумка полна. Продай лишнее у торговки.',2);S.bagWarn=3}return}P.bag.push(l.it);if(l.it.rar===3){csAdd('u');P.uSeen=P.uSeen||[];if(!P.uSeen.includes(l.it.name)){P.uSeen.push(l.it.name);toast('Новая уникальная вещь в коллекции: '+l.it.name,3)}}snd(600,.1,'triangle',.08,1.3);burst({x:l.pos.x,y:.5,z:l.pos.z},RCH[l.it.rar],10,2,.3,.5,2,-2);if(l.it.rar>=2)toast('Подобрано: '+l.it.name,1.6)}
 l.el.remove();dyn.remove(l.g);loot.splice(loot.indexOf(l),1);if(H.pick===l)H.pick=null}
 function openChest(c){c.open=true;if(NET.on)nsend({t:'chest',zk:zkey(),i:chests.indexOf(c)});const p={x:c.x,y:.8,z:c.z};burst(p,'#ffd060',40,5,.35,.9,2);flash(p,'#ffd060',40,.5);snd(330,.15,'triangle',.12);setTimeout(()=>snd(660,.3,'triangle',.12),120);
 const n=c.gold?3:ri(1,2);for(let i=0;i<n;i++)dropItem(p,genItem(S.L,c.gold&&i===0?2:0,ST.rarity));if(Math.random()<(c.gold?1:.4))dropOrb(p);dropGold(p,Math.round(S.L*rand(8,18)*(c.gold?3:1)*(1+ST.gold/100)));
@@ -1191,6 +1191,7 @@ const CH=[
 {id:'maps5',n:'Картограф',d:'Пройти 5 карт',ic:'treasure-map',p:()=>[cs('m'),5],rw:{regal:2}},
 {id:'at10',n:'Покоритель Атласа',d:'Покорить 10 тиров Атласа',ic:'world',p:()=>[(P.atlas||[]).length,10],rw:{exalt:1,divine:1}},
 {id:'asc',n:'Восхождение',d:'Выбрать путь Восхождения',ic:'angel-wings',p:()=>[P.ascC?1:0,1],rw:{chaos:1}},
+{id:'ucol',n:'Коллекционер',d:'Найти 8 разных уникальных вещей',ic:'crowned-skull',p:()=>[(P.uSeen||[]).length,8],rw:{exalt:1,divine:2}},
 {id:'pin',n:'Пожиратель',d:'Победить Пожирателя Тлена',ic:'fanged-skull',p:()=>[P.pinK||0,1],rw:{exalt:3}}];
 const cs=k=>(P.cs&&P.cs[k])||0;
 function csAdd(k,v=1,max){P.cs=P.cs||{};P.cs[k]=max?Math.max(P.cs[k]||0,v):(P.cs[k]||0)+v;if(frameN%1===0)chBadge()}
@@ -1199,7 +1200,7 @@ function chBadge(){if(!P)return;const n=chReady(),b=$('chB');if(!b)return;b.text
 function renderCh(){const got=P.chc||[];let h=`<div class="chsum"><span>Выполнено: <b style="color:#ffd774">${got.length}</b> из ${CH.length}</span></div><div class="chl">`;
 for(const c of CH){const[a,b]=c.p(),done=a>=b,g=got.includes(c.id);const rw=Object.entries(c.rw).map(([k,v])=>uiI('orb:'+k,ORBS[k].c,'width:14px;height:14px;vertical-align:-2px;filter:none')+'×'+v).join(' ');
 h+=`<div class="chr ${done?'done':''} ${g?'got':''}">${gi(GI[c.ic]?c.ic:'trophy-cup','#ffd774')}<div><b>${c.n}</b><small>${c.d} · ${Math.min(a,b)}/${b}</small><div class="bar"><i style="width:${Math.min(100,a/b*100)}%"></i></div></div><div>${g?'<span class="rw">получено</span>':done?`<button class="ab" data-ch="${c.id}">Забрать</button>`:`<span class="rw">${rw}</span>`}</div></div>`}
-$('chBody').innerHTML=h+'</div>'}
+const us=P.uSeen||[];h+=`</div><div class="sect" style="margin-top:16px"><span>Коллекция уникальных · ${us.length}/${UNIQUES.length}</span></div><div class="ucol">`+UNIQUES.map(u=>us.includes(u.n)?`<span class="on" title="${esc(u.lore||'')}">${esc(u.n)}</span>`:'<span>???</span>').join('')+'</div>';$('chBody').innerHTML=h}
 $('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-ch]');if(!b)return;const c=CH.find(x=>x.id===b.dataset.ch);const[a,n]=c.p();P.chc=P.chc||[];if(a<n||P.chc.includes(c.id))return;P.chc.push(c.id);for(const[k,v]of Object.entries(c.rw))P.orbs[k]=(P.orbs[k]||0)+v;chime([523,659,784,1047],.1);toast('Награда: '+c.n,2);save();renderCh();chBadge()});
 $('bCh').onclick=()=>togglePanel('ch');
 
