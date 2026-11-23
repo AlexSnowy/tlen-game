@@ -139,10 +139,10 @@ export function leaderboard(entry, onList, brokers = BROKERS) {
       const p = d.subarray(j, j + len); i = j + len;
       if (t === 2) {
         ws.send(pkt(0x82, [0, 2, ...str(PFX + 'lb/#'), 0]));
-        if (entry) { const pl = te.encode(JSON.stringify(entry)); ws.send(pkt(0x31, [...str(PFX + 'lb/' + entry.id), ...pl])); }
+        if (entry) { const pl = entry.del ? [] : [...te.encode(JSON.stringify(entry))]; ws.send(pkt(0x31, [...str(PFX + 'lb/' + entry.id), ...pl])); }
       } else if (t === 3) {
         const tl = (p[0] << 8) | p[1];
-        try { const o = JSON.parse(td.decode(p.subarray(2 + tl))); if (o && o.id) { list[o.id] = o; onList(Object.values(list)); } } catch {}
+        try { const raw = td.decode(p.subarray(2 + tl)); if (!raw) continue; const o = JSON.parse(raw); if (o && o.id && !o.del) { list[o.id] = o; onList(Object.values(list)); } } catch {}
       }
     }
   };
