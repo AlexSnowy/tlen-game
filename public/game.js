@@ -583,7 +583,7 @@ if(ctx==='merchant'&&w==='bag')acts+=`<button class="ab" data-a="sell">Прод�
 if(ctx==='smith'){if(it.upg<10){const c=upCost(it);acts+=`<button class="ab" data-a="up" ${P.gold<c?'disabled':''}>Заточить до +${it.upg+1} · ${c} зол. · шанс ${upChance(it)}%</button>`}else acts+='<span class="muted">Заточено до предела</span>'}
 if(!ctx&&w==='bag')acts+=`<button class="ab alt" data-a="drop">Выбросить</button>`;
 if(it.rar<3)acts+='<div class="orbacts">'+ORB_K.filter(k=>P.orbs[k]>0).map(k=>`<button class="ob" data-orb="${k}" style="--c:${ORBS[k].c}" title="${ORBS[k].d}">${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n} (${P.orbs[k]})</button>`).join('')+'</div>'}
-d.innerHTML=`<h4 style="color:${RC[it.rar]}">${esc(it.name)}${it.upg?' +'+it.upg:''}</h4><div class="sub">${RN[it.rar]} · ${esc(it.base)} · ${SLOT_N[it.slot]} · уровень ${it.ilvl}</div><ul>${itemLines(it)}</ul>${w!=='eq'?cmpHTML(it):''}<div class="acts">${acts}</div>`}
+d.innerHTML=`${ttHTML(it)}${w!=='eq'?cmpHTML(it):''}<div class="acts">${acts}</div>`}
 const orbPrice=k=>({trans:25,alt:40,aug:60}[k])*Math.max(1,S.L||1);
 $('lfBtn').onclick=()=>{P.lf=((P.lf|0)+1)%3;save();renderInv();toast(['Показываются все вещи','Обычные вещи сразу превращаются в золото','Обычные и магические превращаются в золото. Вещи лучше надетых всегда видны'][P.lf],2.6)};
 $('pInv').addEventListener('click',e=>{const b=e.target.closest('[data-bag],[data-eq],[data-a],[data-shop],[data-orb],[data-buyorb]');if(!b)return;
@@ -1035,7 +1035,7 @@ function isUpg(it){if(!it||!P.eq||!SLOTS.includes(it.slot))return false;const eq
 return b.dps>a.dps*1.03||(Math.abs(b.dps-a.dps)<a.dps*.01&&(b.hp>a.hp+3||b.armor>a.armor+3))}
 function tcell(it,o={}){const pr=o.pr!=null?`<span class="pr ${o.no?'no':''}">${o.pr}</span>`:'';const up=o.up?'<span class="upb">▲</span>':'';
 return `<button class="cell ${o.cls||''} ${pr?'has-pr':''}" ${o.attr||''} style="color:${RC[it.rar]};border-color:${RC[it.rar]}66;box-shadow:inset 0 0 12px ${RC[it.rar]}22">${itIcon(it)}${it.upg?`<small>+${it.upg}</small>`:''}${up}${pr}</button>`}
-function detHTML(it,acts=''){return `<div class="tdet"><h4 style="color:${RC[it.rar]}">${esc(it.name)}${it.upg?' +'+it.upg:''}</h4><div class="sub">${RN[it.rar]} · ${esc(it.base)} · ${SLOT_N[it.slot]} · уровень ${it.ilvl}</div><ul>${itemLines(it)}</ul>${cmpHTML(it)}${acts?`<div class="acts">${acts}</div>`:''}</div>`}
+function detHTML(it,acts=''){return `<div class="tdet">${ttHTML(it)}${cmpHTML(it)}${acts?`<div class="acts">${acts}</div>`:''}</div>`}
 function renderShop(){$('shGold').innerHTML=goldPill();document.querySelectorAll('#shTabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===T.tab));
 for(const id of [...T.tray])if(!P.bag.some(it=>itId(it)===id))T.tray.delete(id);
 let h='';
@@ -1151,3 +1151,12 @@ if(c){const C=C3(c);for(let i=0;i<(M.boss?50:18);i++){const a=rand(0,6.28);emit(
 const r=new THREE.Mesh(new THREE.RingGeometry(.6,1,48).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color(c).multiplyScalar(2),transparent:true,opacity:.8,toneMapped:false,depthWrite:false,blending:THREE.AdditiveBlending}));r.position.set(p.x,.08,p.z);dyn.add(r);
 const t0=performance.now(),D=M.boss?1.4:.7,R=M.boss?14:5;const tk=()=>{const k=(performance.now()-t0)/1000/D;if(k>=1||!r.parent){dyn.remove(r);r.material.dispose();return}r.scale.setScalar(1+k*R);r.material.opacity=.8*(1-k);requestAnimationFrame(tk)};tk()}}
 function monFx(dt){if(frameN%2)return;for(const M of mons){if(M.dead||!(M.rare||M.magic||M.boss))continue;const p=M.g.position;if(Math.random()<(M.boss?.9:M.rare?.5:.25)){const c=C3(M.boss?S.th.eyes:M.rare?'#ffd84a':'#6a9aff');const a=rand(0,6.28),r=M.r*rand(.8,1.4);emit(p.x+Math.cos(a)*r,rand(.1,.4),p.z+Math.sin(a)*r,0,rand(.6,1.6),0,rand(.5,.9),rand(.06,.12),c[0],c[1],c[2],0,1)}}}
+
+/* подсказка предмета в стиле PoE */
+function ttHTML(it){const u=it.upg,m=1+.1*u,R=['n','m','r','u'][it.rar];const seg=[];
+const base=[];if(it.dmg)base.push(`<div>Урон: <b>${Math.round(it.dmg[0]*m)}–${Math.round(it.dmg[1]*m)}</b></div>`);if(it.wb)base.push(`<div>Ударов в секунду: <b>${WBASE[it.wb].aps}</b></div><div class="g">${WBASE[it.wb].hands===2?'Двуручное':'Одноручное'}</div>`);if(it.armor)base.push(`<div>Броня: <b>${Math.round(it.armor*m)}</b></div>`);if(u)base.push(`<div>Заточка: <b style="color:#ffd774">+${u}</b> <span class="g">(+${u*10}% к свойствам)</span></div>`);
+if(base.length)seg.push(base.join(''));seg.push(`<div class="g">Уровень предмета: <b>${it.ilvl}</b></div>`);
+if(it.imp)seg.push(`<div class="mod">${stLine(it.imp.k,it.imp.v*m)}</div>`);
+const af=it.aff.map(a=>`<div class="mod">${AFF[a.k].t.replace('{v}',fmt(a.v*m,AFF[a.k].i))}</div>`);if(it.st)for(const k in it.st)if(k!=='bloodMagic')af.push(`<div class="mod">${stLine(k,it.st[k])}</div>`);else af.push('<div class="mod">Умения тратят здоровье вместо маны</div>');
+if(af.length)seg.push(af.join(''));if(it.lore)seg.push(`<div class="lore">«${esc(it.lore)}»</div>`);
+const two=it.rar>=2;return `<div class="tt ${R}"><div class="tth"><b>${esc(it.name)}</b>${two?`<span>${esc(it.base)}</span>`:''}</div><div class="ttb">${seg.join('<i class="sep"></i>')}</div></div>`}
