@@ -40,7 +40,7 @@ fragmentShader:'uniform sampler2D tDiffuse;uniform vec3 uTint;uniform float uSat
 composer.addPass(grade);
 const hemi=new THREE.HemisphereLight(0x8090c0,0x3a2a20,1.1);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xffc89a,2.4);sun.castShadow=true;Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20,near:1,far:90});sun.shadow.bias=-.0008;sun.shadow.normalBias=.03;scene.add(sun,sun.target);
-function applyQ(){const pr=Q==='high'?Math.min(devicePixelRatio,1.75):Math.min(devicePixelRatio,1.1);renderer.setPixelRatio(pr);composer.setPixelRatio(pr);
+function applyQ(){if(typeof grade!=='undefined')grade.enabled=Q!=='low';const pr=Q==='high'?Math.min(devicePixelRatio,1.75):Math.min(devicePixelRatio,1.1);renderer.setPixelRatio(pr);composer.setPixelRatio(pr);
 sun.shadow.mapSize.set(Q==='high'?2048:1024,Q==='high'?2048:1024);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}bloom.strength=Q==='high'?.75:.6;resize()}
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);composer.setSize(w,h);camera.aspect=w/h;camera.fov=w<h?58:42;camera.updateProjectionMatrix();pMat.uniforms.uScale.value=h*.5*renderer.getPixelRatio()}
 addEventListener('resize',resize);
