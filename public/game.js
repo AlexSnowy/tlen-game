@@ -1200,9 +1200,9 @@ const CH=[
 {id:'pin',n:'Пожиратель',d:'Победить Пожирателя Тлена',ic:'fanged-skull',p:()=>[P.pinK||0,1],rw:{exalt:3}}];
 const cs=k=>(P.cs&&P.cs[k])||0;
 function csAdd(k,v=1,max){P.cs=P.cs||{};P.cs[k]=max?Math.max(P.cs[k]||0,v):(P.cs[k]||0)+v;if(frameN%1===0)chBadge()}
-function chReady(){return CH.filter(c=>{const[a,b]=c.p();return a>=b&&!(P.chc||[]).includes(c.id)}).length}
+function chReady(){let d=0;try{const D=dailyGet();d=D.t.filter(t=>{const x=DPOOL.find(q=>q.k===t.k);return x&&!t.got&&cs(t.k)-t.b>=x.g}).length}catch(e){}return d+CH.filter(c=>{const[a,b]=c.p();return a>=b&&!(P.chc||[]).includes(c.id)}).length}
 function chBadge(){if(!P)return;const n=chReady(),b=$('chB');if(!b)return;b.textContent=n;b.classList.toggle('on',n>0)}
-function renderCh(){const got=P.chc||[];let h=`<div class="chsum"><span>Выполнено: <b style="color:#ffd774">${got.length}</b> из ${CH.length}</span></div><div class="chl">`;
+function renderCh(){const got=P.chc||[];let h=dailyHTML()+`<div class="sect" style="margin-top:14px"><span>Испытания</span></div><div class="chsum"><span>Выполнено: <b style="color:#ffd774">${got.length}</b> из ${CH.length}</span></div><div class="chl">`;
 for(const c of CH){const[a,b]=c.p(),done=a>=b,g=got.includes(c.id);const rw=Object.entries(c.rw).map(([k,v])=>uiI('orb:'+k,ORBS[k].c,'width:14px;height:14px;vertical-align:-2px;filter:none')+'×'+v).join(' ');
 h+=`<div class="chr ${done?'done':''} ${g?'got':''}">${gi(GI[c.ic]?c.ic:'trophy-cup','#ffd774')}<div><b>${c.n}</b><small>${c.d} · ${Math.min(a,b)}/${b}</small><div class="bar"><i style="width:${Math.min(100,a/b*100)}%"></i></div></div><div>${g?'<span class="rw">получено</span>':done?`<button class="ab" data-ch="${c.id}">Забрать</button>`:`<span class="rw">${rw}</span>`}</div></div>`}
 const us=P.uSeen||[];h+=`</div><div class="sect" style="margin-top:16px"><span>Коллекция уникальных · ${us.length}/${UNIQUES.length}</span></div><div class="ucol">`+UNIQUES.map(u=>us.includes(u.n)?`<span class="on" title="${esc(u.lore||'')}">${esc(u.n)}</span>`:'<span>???</span>').join('')+'</div>';const lo=(P.lore||[]).filter(i=>ZONES[i]&&ZONES[i].lore);h+=`<div class="sect" style="margin-top:16px"><span>Летопись · ${lo.length}/8</span></div>`+(lo.length?lo.sort((a,b)=>a-b).map(i=>`<div class="lore1"><b>${i+1}. ${esc(ZONES[i].n)} — ${esc(ZONES[i].boss)}</b><p>${esc(ZONES[i].lore)}</p></div>`).join(''):'<p class="muted">Победи стражей кампании, чтобы узнать историю Тлена.</p>');$('chBody').innerHTML=h}
@@ -1321,3 +1321,13 @@ if(d<2){sh.used=true;sh.el.remove();sh.gl.visible=false;H.buffs=H.buffs.filter(b
 
 $('tree').addEventListener('click',e=>{const b=e.target.closest('[data-tz]');if(!b)return;e.stopPropagation();const el=$('tree');const old=S.treeZ||1;const z=Math.max(1,Math.min(3,old+(+b.dataset.tz)*.5));if(z===old)return;
 const cx=(el.scrollLeft+el.clientWidth/2)/el.scrollWidth,cy=(el.scrollTop+el.clientHeight/2)/el.scrollHeight;S.treeZ=z;renderPas();requestAnimationFrame(()=>{el.scrollLeft=cx*el.scrollWidth-el.clientWidth/2;el.scrollTop=cy*el.scrollHeight-el.clientHeight/2})},true);
+
+/* ежедневные задания */
+const DPOOL=[{k:'k',n:'Убить 150 монстров',g:150,rw:{alt:3}},{k:'r',n:'Убить 10 редких монстров',g:10,rw:{chaos:1}},{k:'b',n:'Победить 2 стражей',g:2,rw:{regal:1}},{k:'rift',n:'Закрыть разлом',g:1,rw:{chaos:1,aug:2}},{k:'shr',n:'Активировать 2 святилища',g:2,rw:{trans:4}},{k:'m',n:'Пройти 2 карты',g:2,rw:{chaos:2},atlas:1},{k:'u',n:'Подобрать уникальную вещь',g:1,rw:{exalt:1},hard:1}];
+const today=()=>new Date().toISOString().slice(0,10);
+function dailyGet(){const d=today();if(!P.daily||P.daily.date!==d){let pool=DPOOL.filter(x=>(!x.atlas||P.maxZone>8));const seed=[...d].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7);const r=mulberry(seed);pool=pool.sort(()=>r()-.5).slice(0,3);P.daily={date:d,t:pool.map(x=>({k:x.k,b:cs(x.k),got:0}))};save()}return P.daily}
+function dailyHTML(){const D=dailyGet();let h=`<div class="sect"><span>Задания дня</span><small style="text-transform:none;letter-spacing:0">обновятся завтра</small></div><div class="chl">`;
+for(let i=0;i<D.t.length;i++){const t=D.t[i],x=DPOOL.find(q=>q.k===t.k);if(!x)continue;const v=Math.min(x.g,cs(t.k)-t.b),done=v>=x.g;const rw=Object.entries(x.rw).map(([k,n])=>uiI('orb:'+k,ORBS[k].c,'width:14px;height:14px;vertical-align:-2px;filter:none')+'×'+n).join(' ');
+h+=`<div class="chr ${done?'done':''} ${t.got?'got':''}">${gi('sun','#ffb35a')}<div><b>${x.n}</b><small>${v}/${x.g}</small><div class="bar"><i style="width:${v/x.g*100}%"></i></div></div><div>${t.got?'<span class="rw">получено</span>':done?`<button class="ab" data-dl="${i}">Забрать</button>`:`<span class="rw">${rw}</span>`}</div></div>`}
+return h+'</div>'}
+$('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-dl]');if(!b)return;const D=dailyGet(),t=D.t[+b.dataset.dl],x=DPOOL.find(q=>q.k===t.k);if(!t||t.got||cs(t.k)-t.b<x.g)return;t.got=1;for(const[k,v]of Object.entries(x.rw))P.orbs[k]=(P.orbs[k]||0)+v;chime([523,659,784,1047],.1);toast('Задание дня выполнено!',2);save();renderCh();chBadge()});
