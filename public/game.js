@@ -321,13 +321,13 @@ gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathF
 const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
 if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35)dropFrag(p);if(M.boss&&S.pin)pinReward(p)}
 else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
-if(M.boss){if(S.zi>=0&&Math.random()<.22){const U=UNIQUES.find(u=>u.n===BOSS_U[S.zi]);if(U)dropItem(p,makeUnique(U,L+1))}if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;bossDown()}
+if(M.boss){if(S.zi>=0&&Math.random()<.22){const U=UNIQUES.find(u=>u.n===BOSS_U[S.zi]);if(U)dropItem(p,makeUnique(U,L+1))}if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;haptic('heavy');bossDown()}
 else if(M.rare){if(Math.random()<.12*q)dropGem(p);dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
 else{const mg=M.magic?2.5:1;if(Math.random()<.004*q*mg)dropGem(p);if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
 function hurtHero(d,src){if(H.inv>0||S.mode!=='zone'||H.leap)return;const dr=ST.armor/(ST.armor+40+S.L*25);d*=(1-dr)*(1+ST.dmgTaken/100);
 if(H.es>0){const a=Math.min(H.es,d);H.es-=a;d-=a;if(a>0)burst(H.g.position.clone().setY(1.4),'#7fb8ff',4,2,.3,.3,2)}
 if(src&&ST.reflect&&src.hp>0&&!src.dead&&Math.hypot(src.g.position.x-H.g.position.x,src.g.position.z-H.g.position.z)<4)dealDmg(src,{el:'phys',dot:0,m:0,flat:0},d*ST.reflect/100*4+1);
-H.hp-=d;const p=H.g.position.clone();p.y=2.6;if(d>=1)num(p,'-'+Math.round(d),'hurt');S.shake=Math.max(S.shake,.12);S.hurtV=1;noise(.12,.1,500);
+H.hp-=d;const p=H.g.position.clone();p.y=2.6;if(d>=1)num(p,'-'+Math.round(d),'hurt');S.shake=Math.max(S.shake,.12);S.hurtV=1;noise(.12,.1,500);if(d>ST.hp*.12)haptic(d>ST.hp*.25?'heavy':'medium');
 if(H.hp<=0){if(H.immortal>0){H.hp=1}else{H.hp=0;die()}}}
 function enemyHitAlly(a,d){a.hp-=d;burst(a.g.position.clone().setY(1.2),'#ff5a4a',5,2,.25,.3,1.5)}
 function gainXp(x){P.xp+=x;while(P.xp>=need(P.lvl)){P.xp-=need(P.lvl);P.lvl++;P.spts++;P.ppts++;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);const p=H.g.position.clone();p.y=2.8;num(p,'Уровень '+P.lvl,'lvl');
@@ -500,7 +500,7 @@ function dropItem(p,it){const up=P&&isUpg(it);if(P&&!up&&((P.lf>=1&&it.rar===0)|
 const el=document.createElement('div');el.className='loot t'+it.rar;el.style.color=RCH[it.rar];el.innerHTML=(up?'<b class="lup">▲</b>':'')+itIcon(it)+esc(it.name)+(it.upg?' +'+it.upg:'');const l=lootObj(p,el,{it,hi:it.rar>=2||up});
 const col=new THREE.Color(RCH[it.rar]);const gem=new THREE.Mesh(gemG,new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:it.rar>=2?2.5:1.2,roughness:.3,metalness:.3}));gem.position.y=.35;l.g.add(gem);l.gem=gem;
 if(it.rar>=2){const b=new THREE.Mesh(new THREE.CylinderGeometry(.18,.45,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b}
-if(it.rar===3){chime([523,784,1047,1568],.11);l.beam&&(l.beam.scale.x=l.beam.scale.z=1.6)}else if(it.rar===2)chime([660,990],.08)}
+if(it.rar===3){haptic('ok');chime([523,784,1047,1568],.11);l.beam&&(l.beam.scale.x=l.beam.scale.z=1.6)}else if(it.rar===2)chime([660,990],.08)}
 function layoutLoot(){const V=loot.filter(l=>l.vis);V.sort((a,b)=>(b.hi|0)-(a.hi|0)||a.sy-b.sy);const placed=[];
 for(const l of V){if(!l.w){l.el.style.display='block';l.w=l.el.offsetWidth||90;l.h=l.el.offsetHeight||18}let y=l.sy,tries=0;const x0=l.sx-l.w/2,x1=l.sx+l.w/2;
 for(;tries<14;tries++){const hit=placed.find(q=>x0<q.x1&&x1>q.x0&&y-l.h<q.y&&y>q.y-q.h);if(!hit)break;y=hit.y-hit.h-2}
@@ -1345,3 +1345,6 @@ function itemFromEl(el){const d=el.dataset;if(d.bag!==undefined)return P.bag[+d.
 if(matchMedia('(hover:hover)').matches){const tf=document.createElement('div');tf.id='ttf';document.body.appendChild(tf);
 document.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'){tf.style.display='none';return}const el=e.target.closest&&e.target.closest('[data-bag],[data-sb],[data-sbg],[data-eq],[data-buy],[data-shop],[data-st],[data-tr]');const it=el&&P&&itemFromEl(el);
 if(!it){tf.style.display='none';tf._it=null;return}if(tf._it!==it){tf._it=it;tf.innerHTML=ttHTML(it)+(SLOTS.includes(it.slot)&&!el.dataset.eq?cmpHTML(it):'')}tf.style.display='block';const w=tf.offsetWidth,h=tf.offsetHeight;let x=e.clientX+18,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-18;if(y+h>innerHeight-8)y=innerHeight-h-8;tf.style.left=x+'px';tf.style.top=Math.max(8,y)+'px'})}
+
+/* вибрация на телефоне */
+let hapT=0;function haptic(k){const now=performance.now();if(now-hapT<120)return;hapT=now;try{const T=window.Telegram&&Telegram.WebApp&&Telegram.WebApp.HapticFeedback;if(T&&Telegram.WebApp.initData){k==='ok'?T.notificationOccurred('success'):T.impactOccurred(k==='heavy'?'heavy':k==='light'?'light':'medium');return}if(navigator.vibrate)navigator.vibrate(k==='heavy'?60:k==='ok'?[30,40,30]:k==='light'?12:25)}catch(e){}}
