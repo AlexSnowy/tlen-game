@@ -858,8 +858,9 @@ for(const pr of zonePeers()){const d=Math.hypot(pr.g.position.x-q.x,pr.g.positio
 function hurtTarget(t,d,src){if(t.peer)nsend({t:'hurt',to:t.peer.id,d});else hurtHero(d,src)}
 function myLook(){const w=P.eq.weapon,o=P.eq.offhand,C=CLASSES[P.cls];return{w:w?WBASE[w.wb].mesh:null,wr:w?w.rar:0,o:o&&!(w&&WBASE[w.wb].hands===2)?o.mesh:null,hat:!!P.eq.helmet,cape:P.eq.chest?P.eq.chest.rar:-1}}
 function sendInfo(){if(!P)return;nsend({t:'info',name:NET.name||CLASSES[P.cls].n,cls:P.cls,lvl:P.lvl,look:myLook()})}
+const WSBASE=/workers\.dev$|^localhost|^127\./.test(location.hostname)?(location.protocol==='https:'?'wss://':'ws://')+location.host:'wss://tlen-game.zemlitlena.workers.dev';
 function netConnect(code){netLeave(true);code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length<4){toast('Код группы — 4–8 символов',2);return}
-const ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws/'+code);NET.ws=ws;NET.room=code;
+const ws=new WebSocket(WSBASE+'/ws/'+code);NET.ws=ws;NET.room=code;
 ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}onNet(m)};
 ws.onclose=()=>{if(NET.ws!==ws)return;NET.on=false;NET.ws=null;for(const id in NET.peers)dropPeer(id);NET.host=true;toast('Связь с группой потеряна',2.5);renderParty()};
 ws.onerror=()=>{if(NET.ws===ws)toast('Не удалось подключиться к группе',2.5)}}
