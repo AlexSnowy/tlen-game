@@ -146,7 +146,7 @@ function calc(eq=P.eq){const C=CLASSES[P.cls],s={};for(const k of KEYS)s[k]=0;s.
 let min=0,max=0,aps=1.2,range=C.ranged?10:2.2;const w=eq.weapon;
 if(w){const m=1+.1*w.upg,WB=WBASE[w.wb];min=w.dmg[0]*m;max=w.dmg[1]*m;aps=WB.aps;range=WB.range}else{min=1;max=3}
 for(const k of SLOTS){const it=eq[k];if(!it)continue;const m=1+.1*it.upg;if(it.cimp)s[it.cimp.k]+=it.cimp.v;if(it.armor)s.armor+=it.armor*m;if(it.imp)s[it.imp.k]+=it.imp.v*m;for(const a of it.aff)s[a.k]+=a.v*m;if(it.st)addSt(s,it.st)}
-for(const id of P.pas)addSt(s,TREE.nodes[id].st);ascSt(s);
+for(const id of P.pas)addSt(s,TREE.nodes[id].st);ascSt(s);panSt(s);
 for(const id in P.sk){const sk=SKILLS[id];if(sk&&sk.kind==='mod'&&P.sk[id]>0)addSt(s,sk.st,P.sk[id])}
 for(const b of H.buffs)addSt(s,b.st);
 for(const id of activeAuras())addSt(s,SKILLS[id].p.st,(1+s.auraP/100)*(1+.12*(skLvl(id)-1)));
@@ -659,7 +659,7 @@ if(!tot)h+=`<p class="muted">${ASC_SRC}</p>`;
 else if(!a)h+=`<p class="muted" style="margin:4px 0 8px">Выберите путь — навсегда для этого героя.</p><div class="ascc">`+ASC[P.cls].map(x=>`<button class="ascb" data-asc="${x.id}" style="--c:${x.c}">${gi(x.ic,x.c,'width:34px;height:34px')}<b>${x.n}</b><small>${x.d}</small><ul>${x.nodes.map(n=>`<li>${n.k?'★ ':''}${n.n}: ${Object.entries(n.st).map(([k,v])=>stLine(k,v)).join(', ')}</li>`).join('')}</ul></button>`).join('')+'</div>';
 else h+=`<div class="ascn" style="--c:${a.c}">${gi(a.ic,a.c,'width:30px;height:30px')}<b style="color:${a.c}">${a.n}</b></div><div class="ascl">`+a.nodes.map((n,i)=>{const on=(P.asc||[]).includes(i);return `<button class="ascnode ${on?'on':''} ${n.k?'key':''}" data-an="${i}" ${on||free<=0?'disabled':''} style="--c:${a.c}"><b>${n.k?'★ ':''}${n.n}</b><small>${Object.entries(n.st).map(([k,v])=>stLine(k,v)).join(', ')}</small>${on?'<i>изучено</i>':free>0?'<i>изучить</i>':''}</button>`}).join('')+`</div>${tot<4?`<p class="muted" style="font-size:12px;margin:6px 0 0">${ASC_SRC}</p>`:''}`;
 return h+'</div>'}
-function renderPas(){$('ascBox').innerHTML=ascHTML();$('pasP').textContent=`Пассивных очков: ${P.ppts}. Изучай узлы, соединённые с уже изученными. Большие узлы — сильные эффекты, кольца — ключевые.`;
+function renderPas(){$('ascBox').innerHTML=ascHTML()+panHTML();$('pasP').textContent=`Пассивных очков: ${P.ppts}. Изучай узлы, соединённые с уже изученными. Большие узлы — сильные эффекты, кольца — ключевые.`;
 const cls=P.cls;let lines='',nodes='';const done=new Set();
 for(const n of TREE.list)for(const l of n.links){const k=[n.id,l].sort().join('|');if(done.has(k))continue;done.add(k);const m=TREE.nodes[l];const on=P.pas.includes(n.id)&&P.pas.includes(l);lines+=`<line x1="${n.x}" y1="${n.y}" x2="${m.x}" y2="${m.y}" class="${on?'on':''}"/>`}
 for(const n of TREE.list){const on=P.pas.includes(n.id),av=canAlloc(n.id);const r=n.t==='start'?16:n.t==='key'?15:n.t==='notable'?12:7;const col=n.cls?CLASSES[n.cls].col:'#bbb';
@@ -1361,6 +1361,7 @@ const GUIDE=[['Управление','Телефон: коснись экран�
 ['Заточка','Каждая ступень +10% ко всем свойствам вещи. С +1 оружие мерцает, с +6 появляется аура, на +10 — лучи. При неудаче сгорает золото, вещь остаётся.'],
 ['Умения и камни','У каждого класса 21 умение в трёх ветках, с собой — три. В каждое умение можно вставить 2 камня поддержки: больше снарядов, цепь, область, урон и другие. Камни падают с редких монстров и стражей.'],
 ['Восхождение','Победа над стражами «Лагеря культистов», «Затопленных руин», «Сердца Тлена» и первая карта 5-го тира дают очки Восхождения. Выбери один из двух подклассов в окне «Пассивы».'],
+['Пантеон','Победа над стражами «Пепельного леса» и «Затопленных руин» открывает силы Пантеона (окно «Пассивы»): одну великую и одну малую. Их можно менять когда угодно.'],
 ['Атлас','После кампании открываются карты: тир 1–12, редкость и модификаторы. Больше модификаторов — больше добычи. Каждый покорённый тир даёт +3% к количеству предметов. Стражи карт 4+ тира роняют Фрагменты Тлена — 4 фрагмента открывают Обитель Пожирателя.'],
 ['Гадальные карты','Редкие карты с монстров. Соберите полный набор — Торговка Вера (вкладка «Купить») обменяет его на уникальную вещь, сферы, камни или карту высокого тира.'],
 ['Эссенции','Иногда в зоне стоит кристалл эссенции. Подойди — из него выйдет сильный страж. С него падает эссенция: на верстаке она добавляет вещи мощное свойство (на 30% сильнее лучшего броска), а обычную вещь делает редкой.'],
@@ -1463,3 +1464,15 @@ return `<div class="sect" style="margin-top:16px"><span>Статистика г�
 function enterAbyss(d){const n=Math.min(MAPMODS.length,1+Math.floor(d/3));const mods=shuffle(MAPMODS.map(m=>m.k)).slice(0,n);
 enterZone(-1,d,null,{zi:Math.floor(Math.random()*8),tier:d,rar:2,mods,abyss:d});S.zone.n='Бездна · глубина '+d;$('zoneName').textContent=S.zone.n}
 function abyssHTML(){const best=P.abyssBest||0,ck=P.abyssCk||1;return `<div class="pin aby"><div>${gi('magic-portal','#b06aff','width:34px;height:34px')}</div><div><b>Бездна</b><small>Бесконечный спуск: каждая глубина сильнее и с большим числом модификаторов. Портал стража ведёт глубже. Каждые 5 глубин — контрольная точка и сферы. Рекорд: <b style="color:#d0a0ff">${best}</b></small></div><div style="display:flex;flex-direction:column;gap:4px"><button class="ab" data-aby="${ck}">${ck>1?'С глубины '+ck:'Начать'}</button>${ck>1?'<button class="ab alt" data-aby="1">С 1</button>':''}</div></div>`}
+
+/* ================= ПАНТЕОН ================= */
+const PAN={maj:[{id:'sol',n:'Душа Солнца',st:{dmgTaken:-8,armorP:15},d:'−8% получаемого урона, +15% брони'},{id:'lun',n:'Душа Луны',st:{move:10,aspd:6},d:'+10% скорости бега, +6% скорости атак'},{id:'gai',n:'Душа Земли',st:{regen:5,hpP:8},d:'+5 здоровья в сек., +8% здоровья'}],
+min:[{id:'vam',n:'Душа Голода',st:{leech:1},d:'+1% вампиризма'},{id:'gol',n:'Душа Алчности',st:{rarity:12,gold:15},d:'+12% редкости, +15% золота'},{id:'tim',n:'Душа Времени',st:{cdr:8},d:'+8% к скорости перезарядки'}]};
+function panSt(s){if(!P||!P.pan)return;for(const k of ['maj','min']){const x=PAN[k].find(p=>p.id===P.pan[k]);if(x&&panOpen(k))addSt(s,x.st)}}
+const panOpen=k=>(P.lore||[]).includes(k==='maj'?3:5);
+function panHTML(){let h='<div class="asc" style="border-color:rgba(150,200,255,.3);background:linear-gradient(180deg,rgba(120,170,255,.07),rgba(0,0,0,.15))"><div class="asch"><b style="color:#a8d0ff">Пантеон</b><span style="font-size:12px;color:#a99f8f">можно менять в любой момент</span></div>';
+for(const k of ['maj','min']){const open=panOpen(k);h+=`<div class="sect" style="margin-top:6px"><span>${k==='maj'?'Великая сила':'Малая сила'}</span></div>`;
+if(!open){h+=`<p class="muted" style="font-size:12.5px;margin:0">Откроется после победы над стражем «${ZONES[k==='maj'?3:5].n}».</p>`;continue}
+h+='<div class="ascl" style="grid-template-columns:repeat(3,minmax(0,1fr))">'+PAN[k].map(p=>`<button class="ascnode ${P.pan&&P.pan[k]===p.id?'on':''}" data-pan="${k}:${p.id}" style="--c:#a8d0ff"><b>${p.n}</b><small>${p.d}</small></button>`).join('')+'</div>'}
+return h+'</div>'}
+$('ascBox').addEventListener('click',e=>{const b=e.target.closest('[data-pan]');if(!b)return;const[k,id]=b.dataset.pan.split(':');P.pan=P.pan||{};P.pan[k]=id;chime([587,784],.07);recalc();save();renderPas()});
