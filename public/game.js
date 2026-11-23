@@ -880,8 +880,8 @@ if(exitP&&Math.hypot(exitP.position.x-p.x,exitP.position.z-p.z)<2){enterTown();t
 
 /* ================= MINIMAP ================= */
 const mc=$('mini').getContext('2d');
-function drawMini(){const W=140,s=W/40;mc.clearRect(0,0,W,W);if(S.mode!=='zone')return;const hx=H.g.position.x,hz=H.g.position.z;const tx=x=>(x-hx)*s+W/2,tz=z=>(z-hz)*s+W/2;
-mc.save();mc.beginPath();mc.arc(W/2,W/2,W/2,0,7);mc.clip();mc.fillStyle='rgba(255,255,255,.12)';for(const o of zoneObs){if(Math.abs(o.x-hx)>22||Math.abs(o.z-hz)>22)continue;mc.beginPath();mc.arc(tx(o.x),tz(o.z),Math.max(1.2,o.r*s*.7),0,7);mc.fill()}
+function drawMini(){const W=mc.canvas.width,s=W/(S.bigMap?110:40);mc.clearRect(0,0,W,W);if(S.mode!=='zone')return;const hx=H.g.position.x,hz=H.g.position.z;const tx=x=>(x-hx)*s+W/2,tz=z=>(z-hz)*s+W/2;
+mc.save();mc.beginPath();mc.arc(W/2,W/2,W/2,0,7);mc.clip();mc.fillStyle='rgba(255,255,255,.12)';for(const o of zoneObs){if(Math.abs(o.x-hx)>(S.bigMap?60:22)||Math.abs(o.z-hz)>(S.bigMap?60:22))continue;mc.beginPath();mc.arc(tx(o.x),tz(o.z),Math.max(1.2,o.r*s*.7),0,7);mc.fill()}
 for(const c of chests)if(!c.open){mc.fillStyle='#d8b56a';mc.fillRect(tx(c.x)-2.5,tz(c.z)-2.5,5,5)}
 for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':l.mapIt?'#9ad0ff':l.frag?'#ff5a8a':l.gem2?'#5ee07a':RCH[l.it.rar];mc.fillStyle=c;const r=l.hi?2.6:1.5;mc.fillRect(tx(l.pos.x)-r,tz(l.pos.z)-r,r*2,r*2);if(l.hi){mc.strokeStyle=c;mc.lineWidth=1;mc.beginPath();mc.arc(tx(l.pos.x),tz(l.pos.z),5+2*Math.sin(performance.now()/200),0,7);mc.stroke()}}
 for(const a of allies){mc.fillStyle='#5ad06a';mc.beginPath();mc.arc(tx(a.g.position.x),tz(a.g.position.z),2,0,7);mc.fill()}
@@ -1278,3 +1278,5 @@ $('bMus').onclick=()=>{initAudio();musToggle()};$('bMus').textContent='Музы�
 function makeUnique(U,l){const it={id:uid++,slot:U.slot,base:U.base||WBASE[U.wb].n,name:U.n,rar:3,ilvl:l,upg:0,aff:[],st:{...U.st},lore:U.lore};
 if(U.wb){const W=WBASE[U.wb];it.wb=U.wb;it.dmg=[Math.round((W.dmg[0]+W.dmg[1]*l)*1.15),Math.round((W.dmg[2]+W.dmg[3]*l)*1.15)]}if(ABASE[U.slot]&&ABASE[U.slot].arm)it.armor=Math.round((ABASE[U.slot].arm[0]+ABASE[U.slot].arm[1]*l)*1.2);return it}
 const BOSS_U=['Жезл Морга','Ледяной шёпот','Чумной венец','Сердце Пепла','Пасть бездны','Клятва паладина','Корона Тлена','Глаз Атласа'];
+
+$('mini').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();S.bigMap=!S.bigMap;const c=$('mini');c.width=c.height=S.bigMap?230:140;c.classList.toggle('big',S.bigMap);drawMini()});
