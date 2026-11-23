@@ -1097,9 +1097,9 @@ anv+=`<div class="chance"><div class="bar"><i style="width:${ch}%;background:${c
 anv+=`<div class="risk">${ch>=100?'Без риска.':`При неудаче золото сгорит, вещь останется +${u}.`}</div>`;
 anv+=`<button class="ab" data-a="upgo" ${P.gold<c?'disabled':''}>Заточить · ${c} зол.</button>${P.gold<c?`<div class="risk" style="color:#ff7a6a;margin-top:6px">Не хватает ${c-P.gold} зол.</div>`:''}`}
 anv+=`<p class="res ${T.res?T.res.k:''}">${T.res?T.res.t:''}</p>`}
-anv+='</div>';$('smBody').innerHTML=list+anv;
+anv+='</div>'+benchHTML(it);$('smBody').innerHTML=list+'<div>'+anv+'</div>';
 if(T.res&&T.res.fresh){T.res.fresh=false;const a=$('smBody').querySelector('.anvil');a.classList.add(T.res.k)}}
-$('pSmith').addEventListener('click',e=>{const b=e.target.closest('[data-sm],[data-a]');if(!b)return;
+$('pSmith').addEventListener('click',e=>{const bc=e.target.closest('[data-bench]');if(bc){benchDo(bc.dataset.bench);return}const b=e.target.closest('[data-sm],[data-a]');if(!b)return;
 if(b.dataset.sm){const [w,k]=b.dataset.sm.split(':');T.sm=w==='eq'?P.eq[k]:P.bag[+k];T.res=null}
 else if(b.dataset.a==='upgo'){const it=T.sm;if(!it||it.upg>=10)return;const c=upCost(it);if(P.gold<c)return;P.gold-=c;
 if(Math.random()*100<upChance(it)){it.upg++;csAdd('up',it.upg,1);T.res={k:'ok',t:'Успех! Теперь +'+it.upg,fresh:true};snd(660,.12,'triangle',.15);setTimeout(()=>snd(990,.25,'triangle',.15),100);npcChars[1]&&npcChars[1].play('Cheer',{once:true,restart:true})}
@@ -1170,7 +1170,7 @@ function ttHTML(it){const u=it.upg,m=1+.1*u,R=['n','m','r','u'][it.rar];const se
 const base=[];if(it.dmg)base.push(`<div>Урон: <b>${Math.round(it.dmg[0]*m)}–${Math.round(it.dmg[1]*m)}</b></div>`);if(it.wb)base.push(`<div>Ударов в секунду: <b>${WBASE[it.wb].aps}</b></div><div class="g">${WBASE[it.wb].hands===2?'Двуручное':'Одноручное'}</div>`);if(it.armor)base.push(`<div>Броня: <b>${Math.round(it.armor*m)}</b></div>`);if(u)base.push(`<div>Заточка: <b style="color:#ffd774">+${u}</b> <span class="g">(+${u*10}% к свойствам)</span></div>`);
 if(base.length)seg.push(base.join(''));seg.push(`<div class="g">Уровень предмета: <b>${it.ilvl}</b></div>`);
 if(it.imp)seg.push(`<div class="mod">${stLine(it.imp.k,it.imp.v*m)}</div>`);
-const af=it.aff.map(a=>`<div class="mod">${AFF[a.k].t.replace('{v}',fmt(a.v*m,AFF[a.k].i))}</div>`);if(it.st)for(const k in it.st)if(k!=='bloodMagic')af.push(`<div class="mod">${stLine(k,it.st[k])}</div>`);else af.push('<div class="mod">Умения тратят здоровье вместо маны</div>');
+const af=it.aff.map(a=>`<div class="mod${a.cr?' cr':''}">${AFF[a.k].t.replace('{v}',fmt(a.v*m,AFF[a.k].i))}${a.cr?' <small>(создано)</small>':''}</div>`);if(it.st)for(const k in it.st)if(k!=='bloodMagic')af.push(`<div class="mod">${stLine(k,it.st[k])}</div>`);else af.push('<div class="mod">Умения тратят здоровье вместо маны</div>');
 if(af.length)seg.push(af.join(''));if(it.lore)seg.push(`<div class="lore">«${esc(it.lore)}»</div>`);
 const two=it.rar>=2;return `<div class="tt ${R}"><div class="tth"><b>${esc(it.name)}</b>${two?`<span>${esc(it.base)}</span>`:''}</div><div class="ttb">${seg.join('<i class="sep"></i>')}</div></div>`}
 
@@ -1295,3 +1295,15 @@ el.innerHTML='<div class="sect" style="justify-content:center"><span>Ваши г
 $('charList').addEventListener('click',e=>{const pl=e.target.closest('[data-play]'),dl=e.target.closest('[data-del]');
 if(pl){const s=load(+pl.dataset.play);if(s)startGame(s)}
 if(dl){const i=+dl.dataset.del,c=charsGet();if(!dl.dataset.armed){dl.dataset.armed=1;dl.textContent='Удалить?';setTimeout(()=>{if(dl.isConnected){delete dl.dataset.armed;dl.textContent='×'}},2500);return}c.list.splice(i,1);c.cur=0;charsPut(c);renderChars()}});
+
+/* верстак: гарантированное свойство за золото и сферу */
+const crIdx=it=>it.aff.findIndex(a=>a.cr);
+const benchCost=it=>Math.round(40*it.ilvl+60);
+function benchHTML(it){if(!it||!SLOTS.includes(it.slot))return'';let h='<div class="bench"><div class="sect"><span>Верстак</span><small style="text-transform:none;letter-spacing:0">одно созданное свойство на вещь</small></div>';
+if(it.rar===0||it.rar===3)return h+`<p class="muted" style="font-size:12.5px">${it.rar===3?'Уникальные вещи нельзя изменить.':'Сначала сделайте вещь магической (Сфера превращения).'}</p></div>`;
+if(crIdx(it)>=0){const a=it.aff[crIdx(it)];return h+`<p style="font-size:13px">Создано: <span style="color:#b8a0ff">${a?AFF[a.k].t.replace('{v}',fmt(a.v,AFF[a.k].i)):''}</span></p><button class="ab alt" data-bench="rm">Убрать созданное свойство</button></div>`}
+const full=it.aff.length>=(it.rar===1?2:6);if(full)return h+'<p class="muted" style="font-size:12.5px">Нет свободных мест для свойства.</p></div>';
+const have=it.aff.map(a=>a.k);const pool=itemPool(it.slot).filter(k=>!have.includes(k));const c=benchCost(it),orbs=P.orbs.aug||0;
+h+=`<p class="muted" style="font-size:12.5px;margin:0 0 6px">Цена: ${c} зол. + 1 ${ORBS.aug.n.toLowerCase()} (у вас ${orbs}).</p><div class="benchl">`+pool.map(k=>{const[a,b]=AFF[k].r(it.ilvl),v=(a+b)/2;return `<button class="chip" data-bench="${k}" ${P.gold<c||orbs<1?'disabled':''}>${AFF[k].t.replace('{v}',fmt(v,AFF[k].i))}</button>`}).join('')+'</div></div>';return h}
+function benchDo(k){const it=T.sm;if(!it)return;if(k==='rm'){const i=crIdx(it);if(i>=0){it.aff.splice(i,1);recalc();save();renderSmith()}return}
+const c=benchCost(it);if(P.gold<c||!(P.orbs.aug>0))return;const[a,b]=AFF[k].r(it.ilvl);P.gold-=c;P.orbs.aug--;it.aff.push({k,v:(a+b)/2,cr:1});snd(800,.12,'triangle',.1);chime([523,784],.07);recalc();save();renderSmith()}
