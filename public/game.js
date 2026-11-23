@@ -208,14 +208,14 @@ npcChars=[mer,smi,kn];
 NPCS=[{id:'stash',name:'Хранилище',x:-5.4,z:3.4,lx:-5.4,lz:3.4,ly:1.9},{id:'merchant',name:'Торговка Вера',x:-8.2,z:-1.4,lx:-8.6,lz:-2.6,ly:2.9},{id:'smith',name:'Кузнец Гром',x:8.8,z:-1.5,lx:9.2,lz:-2.8,ly:3.1},{id:'portal',name:'Портал',x:0,z:-19.6,lx:0,lz:-22,ly:5.6}];
 for(const n of NPCS){const el=document.createElement('div');el.className='npcn';el.textContent=n.name;$('npcl').appendChild(el);n.el=el}}
 let zGround=null,zGrass=null;
-function clearZone(){zone.remove(dyn);for(const m of mons)m.c.mats.forEach(x=>x.dispose());mons=[];for(const a of allies)a.c&&a.c.mats.forEach(x=>x.dispose());allies=[];for(const l of loot)l.el.remove();loot=[];
+function clearZone(){if(S.rift&&S.rift.el)S.rift.el.remove();S.rift=null;if(S.shrines)for(const sh of S.shrines)sh.el.remove();S.shrines=[];zone.remove(dyn);for(const m of mons)m.c.mats.forEach(x=>x.dispose());mons=[];for(const a of allies)a.c&&a.c.mats.forEach(x=>x.dispose());allies=[];for(const l of loot)l.el.remove();loot=[];
 for(const arr of[projs,grounds,pending,traps,bolts2])for(const o of arr)if(o.m)scene.remove(o.m);projs=[];grounds=[];pending=[];traps=[];bolts2=[];
 for(const r of rings){scene.remove(r.m);r.m.material.dispose()}rings=[];for(const d of decals){scene.remove(d.m);d.m.material.dispose()}decals=[];chests=[];exitP=null;zoneObs=[];if(OBJ)for(const e of OBJ.ents)e.el&&e.el.remove();OBJ=null;
 emitters=emitters.filter(e=>e.w!==zone);lights=lights.filter(l=>l.w==='town');if(zGround){zone.remove(zGround);zGround.geometry.dispose();zGround.material.map.dispose();zGround.material.dispose();zGround=null}
 if(zGrass){zone.remove(zGrass);zGrass.geometry.dispose();zGrass.material.dispose();zGrass=null}dyn=new THREE.Group();zone.add(dyn);H.whirl=H.leap=H.charge=H.barrage=null;H.queue=[]}
 const mod=k=>S.mods.some(m=>m.k===k);
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?.5:.3))makeRift()}finally{Math.random=RNG0;S.building=false}}
+function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?.5:.3))makeRift();S.shrines=[];for(let i=0;i<(Math.random()<.6?1:0)+(Math.random()<.3?1:0);i++)makeShrine()}finally{Math.random=RNG0;S.building=false}}
 function buildZone0(){const Z=S.zone,th=THEMES[Z.th];S.th=th;
 zGround=makeGround(130,noiseTex(th.g[0],th.g[1],th.g[2],{tiles:th.tiles}),th.tiles?26:18,zone);
 const start={x:0,z:46},bossP={x:0,z:-44};const near=(x,z,r)=>Math.hypot(x-start.x,z-start.z)<r||Math.hypot(x-bossP.x,z-bossP.z)<r+3;
@@ -802,7 +802,7 @@ return false}
 
 /* ================= UPDATE ================= */
 let time=0;
-function update(dt){updEnchant(dt);monFx(dt);updRift(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
+function update(dt){updEnchant(dt);monFx(dt);updRift(dt);updShrines(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
 if(!H.leap&&!H.charge)H.face=angLerp(H.face,H.faceT,1-Math.pow(.0005,dt));H.c.root.rotation.y=H.face;
 for(let i=0;i<3;i++)H.cds[i]=Math.max(0,H.cds[i]-dt);H.dashCd=Math.max(0,H.dashCd-dt);H.inv=Math.max(0,H.inv-dt);S.bagWarn-=dt;H.castT-=dt;H.c.lock-=dt;H.immortal=Math.max(0,H.immortal-dt);H.lastCast=(H.lastCast||0)-dt;H.aimT=(H.aimT||0)-dt;
 for(let i=H.queue.length-1;i>=0;i--){const q=H.queue[i];q.t-=dt;if(q.t<=0){H.queue.splice(i,1);q.f()}}
@@ -1307,3 +1307,13 @@ const have=it.aff.map(a=>a.k);const pool=itemPool(it.slot).filter(k=>!have.inclu
 h+=`<p class="muted" style="font-size:12.5px;margin:0 0 6px">Цена: ${c} зол. + 1 ${ORBS.aug.n.toLowerCase()} (у вас ${orbs}).</p><div class="benchl">`+pool.map(k=>{const[a,b]=AFF[k].r(it.ilvl),v=(a+b)/2;return `<button class="chip" data-bench="${k}" ${P.gold<c||orbs<1?'disabled':''}>${AFF[k].t.replace('{v}',fmt(v,AFF[k].i))}</button>`}).join('')+'</div></div>';return h}
 function benchDo(k){const it=T.sm;if(!it)return;if(k==='rm'){const i=crIdx(it);if(i>=0){it.aff.splice(i,1);recalc();save();renderSmith()}return}
 const c=benchCost(it);if(P.gold<c||!(P.orbs.aug>0))return;const[a,b]=AFF[k].r(it.ilvl);P.gold-=c;P.orbs.aug--;it.aff.push({k,v:(a+b)/2,cr:1});snd(800,.12,'triangle',.1);chime([523,784],.07);recalc();save();renderSmith()}
+
+/* святилища: временные благословения */
+const SHR=[{n:'Святилище ярости',c:'#ff5a3a',st:{dmgP:60},d:'+60% урона'},{n:'Святилище ветра',c:'#7cf0e0',st:{move:35,aspd:25},d:'+35% скорости бега, +25% скорости атак'},{n:'Святилище камня',c:'#c9b8a0',st:{dmgTaken:-40,armorP:60},d:'−40% получаемого урона'},{n:'Святилище жизни',c:'#5ee07a',st:{regen:25,leech:3},d:'Сильная регенерация и вампиризм'},{n:'Святилище удачи',c:'#ffd774',st:{rarity:80,gold:80},d:'+80% редкости добычи и золота'}];
+function makeShrine(){const s=freeSpot(-30,34,3),k=Math.floor(Math.random()*SHR.length),D=SHR[k];const g=new THREE.Group();g.position.set(s.x,0,s.z);const o=prop('shrine',1.2);g.add(o);
+const gl=new THREE.Mesh(new THREE.SphereGeometry(.45,16,12),new THREE.MeshBasicMaterial({color:new THREE.Color(D.c).multiplyScalar(2.2),toneMapped:false}));gl.position.y=2.1;g.add(gl);dyn.add(g);zoneObs.push({x:s.x,z:s.z,r:.9});
+const el=objLabel();el.innerHTML=`<b style="color:${D.c}">${D.n}</b>`;S.shrines.push({x:s.x,z:s.z,g,gl,el,k,used:false})}
+function updShrines(dt){if(!S.shrines||S.mode!=='zone')return;const t=performance.now()/1000;for(const sh of S.shrines){if(sh.used)continue;const D=SHR[sh.k];sh.gl.position.y=2.1+Math.sin(t*2+sh.x)*.15;
+if(Math.random()<.25){const c=C3(D.c);emit(sh.x+rand(-.5,.5),rand(1.4,2.6),sh.z+rand(-.5,.5),0,rand(.3,.9),0,rand(.5,.9),rand(.06,.12),c[0],c[1],c[2],0,1)}
+const d=Math.hypot(sh.x-H.g.position.x,sh.z-H.g.position.z);if(d<26&&proj(cp.set(sh.x,3,sh.z),sp)){sh.el.style.display='block';sh.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else sh.el.style.display='none';
+if(d<2){sh.used=true;sh.el.remove();sh.gl.visible=false;H.buffs=H.buffs.filter(b=>!b.shr);H.buffs.push({n:['Ярость','Ветер','Камень','Жизнь','Удача'][sh.k],t:25,st:D.st,shr:1});recalc();toast(D.n+': '+D.d+' на 25 секунд',3);chime([440,660,880,1320],.09);burst({x:sh.x,y:1.5,z:sh.z},D.c,40,5,.4,.8,2);csAdd('shr')}}}
