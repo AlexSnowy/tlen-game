@@ -897,7 +897,7 @@ mc.restore();mc.fillStyle='#fff';mc.beginPath();mc.arc(W/2,W/2,3,0,7);mc.fill()}
 
 /* ================= LOOP ================= */
 let last=performance.now(),orbit=0,frameN=0,lightT=0;const camT=new THREE.Vector3(),cp=new THREE.Vector3();
-function updEmitters(dt){const hp=H.g.position;for(const e of emitters){if((e.w===town&&!town.visible)||(e.w===zone&&!zone.visible))continue;if(Math.abs(e.x-hp.x)>26||Math.abs(e.z-hp.z)>26)continue;
+function updEmitters(dt){const hp=H.g.position;if(zone.visible&&S.th&&S.th.water&&S.mode==='zone'){const n=Q==='low'?4:12;for(let i=0;i<n;i++)emit(hp.x+rand(-16,16),rand(7,10),hp.z+rand(-14,12),-.8,-16,0,.55,.13,.7,.8,1.1,0,0);S.ltT=(S.ltT||rand(12,25))-dt;if(S.ltT<=0){S.ltT=rand(14,30);skyFlash()}}for(const e of emitters){if((e.w===town&&!town.visible)||(e.w===zone&&!zone.visible))continue;if(Math.abs(e.x-hp.x)>26||Math.abs(e.z-hp.z)>26)continue;
 if(e.kind==='fire'){for(let i=0;i<3;i++)emit(e.x+rand(-.4,.4),e.y,e.z+rand(-.4,.4),rand(-.2,.2),rand(1.5,3),rand(-.2,.2),rand(.5,.9),rand(.5,.9),3,rand(.9,1.4),.25,.5,.5);if(Math.random()<.3)emit(e.x,e.y+.5,e.z,rand(-.5,.5),rand(2,4),rand(-.5,.5),rand(1,2),.12,3,1.5,.4,0,.2)}
 else if(e.kind==='torch'){if(Math.random()<.7)emit(e.x+rand(-.08,.08),e.y,e.z+rand(-.08,.08),0,rand(.8,1.4),0,rand(.25,.45),rand(.3,.45),3,1.2,.3,.3,.3)}
 else if(e.kind==='lamp'){if(Math.random()<.2)emit(e.x,e.y,e.z,0,.05,0,.5,.45,1.5,1,.35,0,0)}
@@ -1331,3 +1331,5 @@ for(let i=0;i<D.t.length;i++){const t=D.t[i],x=DPOOL.find(q=>q.k===t.k);if(!x)co
 h+=`<div class="chr ${done?'done':''} ${t.got?'got':''}">${gi('sun','#ffb35a')}<div><b>${x.n}</b><small>${v}/${x.g}</small><div class="bar"><i style="width:${v/x.g*100}%"></i></div></div><div>${t.got?'<span class="rw">получено</span>':done?`<button class="ab" data-dl="${i}">Забрать</button>`:`<span class="rw">${rw}</span>`}</div></div>`}
 return h+'</div>'}
 $('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-dl]');if(!b)return;const D=dailyGet(),t=D.t[+b.dataset.dl],x=DPOOL.find(q=>q.k===t.k);if(!t||t.got||cs(t.k)-t.b<x.g)return;t.got=1;for(const[k,v]of Object.entries(x.rw))P.orbs[k]=(P.orbs[k]||0)+v;chime([523,659,784,1047],.1);toast('Задание дня выполнено!',2);save();renderCh();chBadge()});
+
+function skyFlash(){const old=hemi.intensity;hemi.intensity=old*3.5;setTimeout(()=>hemi.intensity=old,90);setTimeout(()=>{hemi.intensity=old*2.4;setTimeout(()=>hemi.intensity=old,70)},170);setTimeout(()=>{noise(1.6,.12,180);snd(50,1.4,'sawtooth',.06,.5)},500+Math.random()*900)}
