@@ -278,6 +278,8 @@ body.bn #toast{opacity:0!important}
 .ucol{display:flex;flex-wrap:wrap;gap:5px}.ucol span{font-size:12px;padding:4px 8px;border-radius:7px;border:1px solid var(--line);color:#5a5248}.ucol span.on{color:#e0864a;border-color:#7a3e16;background:rgba(64,32,10,.4)}
 #mini{cursor:pointer;pointer-events:auto}#mini.big{position:fixed!important;left:50%!important;top:50%!important;right:auto!important;transform:translate(-50%,-50%);width:min(86vw,420px)!important;height:min(86vw,420px)!important;opacity:.82;z-index:4;background:rgba(6,6,8,.6)}
 @media (pointer:coarse){.hb kbd,#hud kbd,.sk em{display:none!important}}
+#charList{display:grid;gap:6px;margin:6px auto 12px;max-width:420px}.chc{display:flex;gap:6px}.chp{flex:1;display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;border:1px solid var(--c);background:rgba(0,0,0,.3);color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+.chp b{display:block;font-size:15.5px;color:var(--c)}.chp small{color:#a99f8f;font-size:12.5px}.chd{min-width:44px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:#c98a7a;cursor:pointer;font:600 13px Rubik}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -358,7 +360,7 @@ body.bn #toast{opacity:0!important}
   <p>Тысячу лет Тлен спал под Вальмором. Теперь мёртвые встают из могил, и уцелел только лагерь у старого костра.</p>
   <p>Выбери героя, пройди восемь земель Тлена, сразись с его Стражами и узнай, кто разбудил древнее зло. А потом — бесконечные карты Кошмара.</p>
   <p class="muted" id="ctlHint">Ходить: WASD, клик мышью или палец. Атака по ближайшему врагу — сама. Умения: Q, E, R. Рывок: пробел. Флакон: F. Умения — K, пассивное дерево — P, сумка — I.</p>
-  <button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn alt" id="bNew">Новый герой</button>
+  <div id="charList"></div><button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn alt" id="bNew">Новый герой</button>
   <p class="muted" style="font-size:12px!important;margin-top:14px">3D-модели: Kay Lousberg, KayKit (CC0) · Иконки: game-icons.net (CC BY 3.0)</p>
   <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><div class="seg" id="qSeg"><button data-q="high">Графика: высокая</button><button data-q="low">Экономная</button></div><button class="btn alt" id="bMus" style="padding:8px 14px;font-size:14px">Музыка: вкл</button></div>
 </div></div>

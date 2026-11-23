@@ -113,8 +113,11 @@ geo.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));tex.repeat.se
 /* ================= SAVE / PLAYER ================= */
 let uid=1,P=null,ST=null;
 const SAVE='tlen3_save';
-function save(){try{if(P)localStorage.setItem(SAVE,JSON.stringify(P))}catch(e){}}
-function load(){try{const s=JSON.parse(localStorage.getItem(SAVE));if(s&&s.cls&&CLASSES[s.cls]){s.eq=s.eq||{};s.bag=s.bag||[];s.lore=s.lore||[];s.sk=s.sk||{};s.slots=s.slots||[null,null,null];s.pas=s.pas||[];s.orbs=s.orbs||{};s.auraOff=s.auraOff||[];s.maxMap=s.maxMap||0;
+const CHARS_KEY='tlen3_chars';let CUR=0;
+function charsGet(){let c=null;try{c=JSON.parse(localStorage.getItem(CHARS_KEY))}catch(e){}if(!c||!Array.isArray(c.list)){c={list:[],cur:0};try{const o=JSON.parse(localStorage.getItem(SAVE));if(o&&o.cls)c.list.push(o)}catch(e){}}return c}
+function charsPut(c){try{localStorage.setItem(CHARS_KEY,JSON.stringify(c))}catch(e){}}
+function save(){if(!P)return;const c=charsGet();c.list[CUR]=P;c.cur=CUR;charsPut(c)}
+function load(i){try{const c=charsGet();if(i==null)i=c.cur||0;const s=c.list[i];if(s&&s.cls&&CLASSES[s.cls]){CUR=i;s.eq=s.eq||{};s.bag=s.bag||[];s.lore=s.lore||[];s.sk=s.sk||{};s.slots=s.slots||[null,null,null];s.pas=s.pas||[];s.orbs=s.orbs||{};s.auraOff=s.auraOff||[];s.maxMap=s.maxMap||0;
 uid=1+Math.max(0,...s.bag.map(i=>i.id),...Object.values(s.eq).map(i=>i.id));return s}}catch(e){}return null}
 const START_W={mage:'wand',knight:'sword',rogue:'xbow',barbarian:'axe'},START_SK={mage:'fireball',knight:'cleave',rogue:'volley',barbarian:'heavystrike'};
 function freshP(cls){const wb=WBASE[START_W[cls]];const w={id:uid++,slot:'weapon',wb:START_W[cls],base:'Старый '+wb.n.toLowerCase(),name:'Старый '+wb.n.toLowerCase(),rar:0,ilvl:1,upg:0,dmg:[wb.dmg[0]+1,wb.dmg[2]+1],aff:[]};
@@ -701,7 +704,7 @@ $('ovLoad').classList.remove('on');$('hud').classList.add('on');updSkillBar();en
 $('bCont').onclick=()=>{const s=load();if(s)startGame(s)};
 $('bNew').onclick=()=>{$('ovTitle').classList.remove('on');$('ovClass').classList.add('on');renderClasses();setPaused()};
 function renderClasses(){$('classList').innerHTML=Object.entries(CLASSES).map(([k,c])=>`<button class="clc" data-cls="${k}" style="--c:${c.col}"><b>${uiI('cls:'+k,c.col,'width:30px;height:30px;vertical-align:-7px;margin-right:6px')}${c.n}</b><span>${c.role}</span><small>Ветки: ${c.branches.join(' · ')}</small><small>Оружие: ${c.weapons.map(w=>WBASE[w].n).join(', ')}</small></button>`).join('')}
-$('classList').addEventListener('click',e=>{const b=e.target.closest('[data-cls]');if(!b)return;const had=load();if(had&&!b.dataset.armed){document.querySelectorAll('.clc').forEach(x=>delete x.dataset.armed);b.dataset.armed=1;b.querySelector('b').textContent=CLASSES[b.dataset.cls].n+' — нажми ещё раз: старый герой будет удалён';return}startGame(freshP(b.dataset.cls))});
+$('classList').addEventListener('click',e=>{const b=e.target.closest('[data-cls]');if(!b)return;const c=charsGet();if(c.list.length>=8){toast('Максимум 8 героев. Удалите одного на титульном экране.',3);return}CUR=c.list.length;startGame(freshP(b.dataset.cls))});
 $('bBack').onclick=()=>{$('ovClass').classList.remove('on');$('ovTitle').classList.add('on');setPaused()};
 
 /* ================= OBJECTIVES ================= */
@@ -1033,7 +1036,7 @@ setInterval(()=>{if(NET.on)renderPartyHud()},700);
 try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'})}catch(e){console.error(e);$('lTxt').textContent='Не удалось загрузить модели. Обнови страницу.';return}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
-S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');const s=load();if(s){$('bCont').style.display='inline-block';$('bCont').textContent='Продолжить: '+CLASSES[s.cls].n+', ур. '+s.lvl}setPaused();
+S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');renderChars();setPaused();
 window.__dbg={S,H,dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
@@ -1286,3 +1289,9 @@ $('mini').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagatio
 const QUOTES={merchant:['«Покупаю всё, что принесёшь из земель Тлена. И продаю кое-что.»','«Опять с полной сумкой? Вываливай, посмотрим.»','«Сферы нынче дороги. Но для тебя — почти даром.»','«Говорят, на картах Кошмара падает настоящее золото.»','«Не продавай то, что лучше надетого. Я серьёзно.»'],
 smith:['«Каждая ступень делает вещь на 10% сильнее. Чем выше заточка — тем больше риск.»','«После шестой ступени металл начинает светиться. Красиво, а?»','«Десятка — это уже легенда. Лучи видно за милю.»','«Сгорит золото — не беда. Вещь-то цела.»']};
 function npcQuote(k){return pick(QUOTES[k])}
+
+function renderChars(){const c=charsGet(),el=$('charList');if(!el)return;if(!c.list.length){el.innerHTML='';return}
+el.innerHTML='<div class="sect" style="justify-content:center"><span>Ваши герои</span></div>'+c.list.map((p,i)=>p&&p.cls?`<div class="chc" style="--c:${CLASSES[p.cls].col}"><button class="chp" data-play="${i}">${uiI('cls:'+p.cls,CLASSES[p.cls].col,'width:30px;height:30px')}<span><b>${CLASSES[p.cls].n}${p.ascC&&ASC[p.cls]?' · '+ASC[p.cls].find(a=>a.id===p.ascC).n:''}</b><small>Уровень ${p.lvl} · ${p.maxZone>8?'Атлас: '+((p.atlas||[]).length)+' тиров':'Зона '+Math.min(8,p.maxZone)}</small></span></button><button class="chd" data-del="${i}" title="Удалить">×</button></div>`:'').join('')}
+$('charList').addEventListener('click',e=>{const pl=e.target.closest('[data-play]'),dl=e.target.closest('[data-del]');
+if(pl){const s=load(+pl.dataset.play);if(s)startGame(s)}
+if(dl){const i=+dl.dataset.del,c=charsGet();if(!dl.dataset.armed){dl.dataset.armed=1;dl.textContent='Удалить?';setTimeout(()=>{if(dl.isConnected){delete dl.dataset.armed;dl.textContent='×'}},2500);return}c.list.splice(i,1);c.cur=0;charsPut(c);renderChars()}});
