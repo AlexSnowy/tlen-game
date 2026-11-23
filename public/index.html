@@ -181,6 +181,18 @@ h2{font:700 clamp(30px,6vw,42px)/1.08 Philosopher,serif;margin:0 0 12px;color:va
 .objl i{display:block;height:4px;margin-top:3px;border-radius:2px;background:linear-gradient(90deg,#ffd774 var(--p),rgba(255,255,255,.15) var(--p))}
 .num.cast{color:#ff9ad8;font:700 19px Philosopher,serif}
 @media (max-width:600px) and (orientation:portrait){.tl{top:calc(max(12px,env(safe-area-inset-top)) + 54px);max-width:58vw}}
+@media (max-width:600px) and (orientation:portrait){
+.tl{max-width:calc(100vw - 130px)}.tl b{font-size:17px}.tl small{font-size:12.5px}
+#mini{width:84px;height:84px}
+#toast{top:30%;max-width:86vw;font-size:14px}
+#bossBar{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 178px);width:80vw}
+.ov{place-items:start center;overflow-y:auto;padding:16px 12px calc(16px + env(safe-area-inset-bottom))}
+.ov .card{width:100%;max-width:100%;margin:auto 0}
+.cls{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.clc{min-height:0;padding:10px;gap:4px}.clc b{font-size:19px}.clc span{font-size:12.5px}.clc small{font-size:11.5px}
+h2{font-size:28px}
+}
+svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8)) drop-shadow(0 0 6px color-mix(in srgb,currentColor 35%,transparent))}.cell svg.gi{width:72%;height:72%}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -243,14 +255,15 @@ h2{font:700 clamp(30px,6vw,42px)/1.08 Philosopher,serif;margin:0 0 12px;color:va
   <h1>Земли Тлена</h1>
   <p>Тысячу лет Тлен спал под Вальмором. Теперь мёртвые встают из могил, и уцелел только лагерь у старого костра.</p>
   <p>Выбери героя, пройди восемь земель Тлена, сразись с его Стражами и узнай, кто разбудил древнее зло. А потом — бесконечные карты Кошмара.</p>
-  <p class="muted">Ходить: WASD, клик мышью или палец. Атака по ближайшему врагу — сама. Умения: Q, E, R. Рывок: пробел. Флакон: F. Умения — K, пассивное дерево — P, сумка — I.</p>
+  <p class="muted" id="ctlHint">Ходить: WASD, клик мышью или палец. Атака по ближайшему врагу — сама. Умения: Q, E, R. Рывок: пробел. Флакон: F. Умения — K, пассивное дерево — P, сумка — I.</p>
   <button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn alt" id="bNew">Новый герой</button>
-  <p class="muted" style="font-size:12px!important;margin-top:14px">3D-модели: Kay Lousberg, KayKit (CC0)</p>
+  <p class="muted" style="font-size:12px!important;margin-top:14px">3D-модели: Kay Lousberg, KayKit (CC0) · Иконки: game-icons.net (CC BY 3.0)</p>
   <div><div class="seg" id="qSeg"><button data-q="high">Графика: высокая</button><button data-q="low">Экономная</button></div></div>
 </div></div>
 <div class="ov" id="ovClass"><div class="card"><h2>Выбери класс</h2><p>У каждого класса три ветки по 7 умений и свой вход в общее пассивное дерево.</p><div class="cls" id="classList"></div><button class="btn alt" id="bBack">Назад</button></div></div>
 <div class="ov" id="ovDead"><div class="card"><h2>Ты пал</h2><p>Тлен забрал тело, но костёр лагеря вернул тебя назад. Добыча при тебе.</p><button class="btn" id="bRevive">Очнуться у костра</button></div></div>
 <div class="ov" id="ovLore"><div class="card"><h2 id="loreH">Страж пал</h2><p id="loreP"></p><p class="muted" id="loreM"></p><button class="btn" id="bLore">Собрать добычу</button></div></div>
+<script>if(matchMedia("(pointer:coarse)").matches){document.addEventListener("DOMContentLoaded",()=>{const e=document.getElementById("ctlHint");if(e)e.textContent="Коснись экрана и веди пальцем — герой идёт. Рядом с врагом он атакует сам. Умения — круглые кнопки справа, рывок — синяя (в сторону движения). Сумка, умения и пассивы — кнопки сверху."})}</script>
 <script type="module" src="./game.js"></script>
 </body>
 </html>
