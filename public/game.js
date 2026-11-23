@@ -243,7 +243,7 @@ if(D.w)for(const[b,w]of D.w)c.attach(b,w,1);if(D.ghost)for(const m of c.mats){m.
 if(o.rare||boss||o.magic){const r=new THREE.Mesh(new THREE.RingGeometry(.75,1,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color(boss?th.eyes:o.rare?'#ffd84a':'#5a8aff').multiplyScalar(2),transparent:true,opacity:.6,toneMapped:false,depthWrite:false}));r.position.y=.05;r.scale.setScalar(sc);g.add(r)}
 const[bg,fg]=hpBar(g,2.5*sc+.3,o.rare?hpRareM:hpFgM);bg.visible=fg.visible=false;dyn.add(g);
 if(D.sk){const a=c.play('Skeletons_Awaken_Standing',{once:true,lock:false});if(a){a.time=0;a.paused=true}}else c.play('Idle');
-let hm=(1+.6*(partyN()-1))*Math.pow(1.3,L-1)*(o.rare?3.5:o.magic?1.7:1)*(boss?(D.sc?14:22)*(S.pin?2.5:1):1)*(mod('mhp')?1.4:1),dm=Math.pow(1.2,L-1)*(o.rare?1.4:1)*(boss?2.6:1)*(mod('mdmg')?1.3:1);
+let hm=(1+.6*(partyN()-1))*Math.pow(1.3,Math.min(L,8)-1)*Math.pow(1.24,Math.max(0,L-8))*(o.rare?3.5:o.magic?1.7:1)*(boss?(D.sc?14:22)*(S.pin?1.8:1):1)*(mod('mhp')?1.4:1),dm=Math.pow(1.2,Math.min(L,8)-1)*Math.pow(1.15,Math.max(0,L-8))*(o.rare?1.4:1)*(boss?2.6:1)*(mod('mdmg')?1.3:1);
 const rmods=o.rare?shuffle(RAREMODS.slice()).slice(0,ri(1,2)):[];if(rmods.some(m=>m.k==='tough'))hm*=2;
 const name=boss?S.zone.boss:o.rare?rmods.map(m=>m.n).join(' ')+' '+D.n.toLowerCase():o.magic?pick(['Свирепый','Проворный','Яростный','Стойкий','Гниющий'])+' '+D.n.toLowerCase():D.n;
 let spd=D.spd*(o.rare?1.1:1)*(mod('mspd')?1.25:1)*(rmods.some(m=>m.k==='fast')?1.4:1);
@@ -1045,7 +1045,7 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
-window.__dbg={S,H,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={S,H,recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
 const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
