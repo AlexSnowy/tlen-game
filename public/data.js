@@ -201,7 +201,7 @@ necro:{n:'Некромант',model:'skeleton_mage',hp:30,dmg:7,spd:2.2,range:10
 cultist:{n:'Культист',model:'merchant',hp:20,dmg:6,spd:3,range:9,cd:1.8,xp:1.2,ranged:'knife',tint:'#8a5aa8',show:['Knife'],atk:'Throw',run:'Running_A',rs:5,hum:1},
 berserker:{n:'Берсерк Тлена',model:'barbarian',hp:32,dmg:9,spd:3.6,range:1.9,cd:1.2,xp:1.5,tint:'#a04a3a',show:['2H_Axe'],atk:'2H_Melee_Attack_Chop',run:'Running_A',rs:5,hum:1},
 fallen:{n:'Павший рыцарь',model:'knight',hp:55,dmg:10,spd:2.3,range:1.9,cd:1.6,xp:2,tint:'#6a6a80',show:['1H_Sword','Spike_Shield','Knight_Helmet'],atk:'1H_Melee_Attack_Slice_Diagonal',run:'Walking_B',rs:2.4,block:.3,hum:1}};
-export const RAREMODS=[{k:'fast',n:'Быстрый'},{k:'tough',n:'Каменный'},{k:'fiery',n:'Огненный'},{k:'vamp',n:'Вампир'},{k:'summon',n:'Повелитель'},{k:'frost',n:'Ледяной'}];
+export const RAREMODS=[{k:'fast',n:'Быстрый'},{k:'tough',n:'Каменный'},{k:'fiery',n:'Огненный'},{k:'vamp',n:'Вампир'},{k:'summon',n:'Повелитель'},{k:'frost',n:'Ледяной'},{k:'volatile',n:'Взрывной'},{k:'thorns',n:'Шипастый'}];
 
 export const THEMES=[
 {g:['#2b3524','#3a4a2a','#1b2216'],grass:'#5d7a36',gn:9000,fog:'#16211c',fd:.034,moon:'#a8d8b8',mi:3,hs:'#5a8070',tint:'#a8c8a0',eyes:'#5aff8a',light:'lantern_standing',

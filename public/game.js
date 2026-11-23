@@ -299,7 +299,7 @@ function noise(d,v=.15,f=800){if(!AC)return;try{const t=AC.currentTime,b=AC.crea
 function rollCtx(ctx){const c=Math.random()*100<ST.crit;const base=(ctx.flat??rand(ST.min,ST.max)*ctx.m)*(ctx.sup||1);return{d:base*(1+inc(ST,ctx.el,ctx)/100)*(c?ST.critM/100:1),c}}
 function dealDmg(M,ctx,dd){if(M.dead||ctx.ghost)return;if(M.boss&&OBJ&&!OBJ.done){if(!ctx.dot&&Math.random()<.3)num(M.g.position.clone().setY(2.6*M.sc),'неуязвим','');return}let d,c=false;if(dd!==undefined)d=dd;else{const r=rollCtx(ctx);d=r.d;c=r.c}
 if(ST.execute&&M.hp<M.max*.35)d*=1+ST.execute/100;if(M.st.shock>0)d*=1.2;if(M.D.block&&!ctx.dot&&Math.random()<M.D.block){d*=.4;num(M.g.position.clone().setY(2.6*M.sc),'блок','')}
-M.hp-=d;if(!ctx.dot){M.flash=1;wake(M);for(const o of mons)if(!o.aggro&&o.g.position.distanceTo(M.g.position)<9)wake(o);
+M.hp-=d;if(!ctx.dot&&M.rm&&M.rm.includes('thorns')&&!ctx.ally&&!ctx.fromPeer&&Math.random()<.35)hurtHero(Math.min(d*.06,M.dmg*.5),null);if(!ctx.dot){M.flash=1;wake(M);for(const o of mons)if(!o.aggro&&o.g.position.distanceTo(M.g.position)<9)wake(o);
 const p=M.g.position.clone();p.y=2.3*M.sc;num(p,Math.round(d)+(c?'!':''),c?'crit':'');if(ST.leech&&!ctx.ally&&!ctx.fromPeer)H.hp=Math.min(ST.hp,H.hp+d*ST.leech/100);applyStatus(M,ctx,d)}
 else{M.dotAcc+=d}
 if(isGuest()){if(!ctx.dot||dd!==undefined)nsend({t:'hit',zk:zkey(),id:M.id,d:Math.round(d*10)/10,el:ctx.el,ig:ctx.ignite?1:0,st:ctx.stun?1:0,po:ctx.poison?1:0,bl:ctx.bleed?1:0});if(M.hp<1)M.hp=1}
@@ -314,6 +314,7 @@ function aoeHit(x,z,R,ctx,f){let n=0;for(const M of mons.slice())if(!M.dead&&Mat
 function killMon(M){if(M.dead)return;M.dead=.01;if(NET.on&&NET.host&&!M.netKill)nsend({t:'kill',zk:zkey(),id:M.id});if(M.silent){M.dead=2.9;return}if(M.leader&&OBJ){const e=OBJ.ents.find(e=>e.M===M);if(e&&!e.done){e.done=true;objStep(M.g.position)}}const L=S.L,p=M.g.position.clone();p.y=1.2;M.c.play(M.c.clips['Death_C_Skeletons']?'Death_C_Skeletons':'Death_A',{once:true,restart:true,ts:1.2});
 burst(p,M.boss?S.th.eyes:M.rare?'#ffd84a':'#d8cfb4',M.boss?70:22,M.boss?8:4.5,.4,.8,1.6);flash(p,M.boss?S.th.eyes:'#ffb060',M.boss?120:25,.35);noise(.25,.12,1600);snd(M.boss?90:170,.3,'sawtooth',.05,.4);
 if(M.rm.includes('fiery')&&!isGuest())tele(p.x,p.z,3,.6,M.dmg*1.5,'#ff5a1a');
+if(M.rm.includes('volatile')&&!isGuest())for(let i=0;i<3;i++){const a=i*2.1+rand(0,1);tele(p.x+Math.cos(a)*2.5,p.z+Math.sin(a)*2.5,2.2,1+i*.25,M.dmg*1.3,'#ffb03a')}
 if(ST.spreadPoison&&M.st.poison.length){for(const o of mons)if(o!==M&&!o.dead&&o.g.position.distanceTo(M.g.position)<4.5){o.st.poison.push(...M.st.poison.map(x=>({dps:x.dps,t:x.t})));burst(o.g.position.clone().setY(1),'#7aff5a',6,2)}}
 gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathFx(M,p);riftKill(p);if(M.rare&&!M.boss&&!(S.slow>0))S.slow=.14;if(!M.netKill||true){csAdd('k');if(M.rare)csAdd('r');if(M.boss){csAdd('b');if(S.zi<0&&!S.pin)csAdd('m')}}H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
 const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
