@@ -321,9 +321,9 @@ gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathF
 const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
 if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35)dropFrag(p);if(M.boss&&S.pin)pinReward(p)}
 else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
-if(M.boss){if(S.zi>=0&&Math.random()<.22){const U=UNIQUES.find(u=>u.n===BOSS_U[S.zi]);if(U)dropItem(p,makeUnique(U,L+1))}if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;haptic('heavy');bossDown()}
-else if(M.rare){if(Math.random()<.12*q)dropGem(p);dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
-else{const mg=M.magic?2.5:1;if(Math.random()<.004*q*mg)dropGem(p);if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
+if(M.boss){if(Math.random()<.2)dropDiv(p);if(S.zi>=0&&Math.random()<.22){const U=UNIQUES.find(u=>u.n===BOSS_U[S.zi]);if(U)dropItem(p,makeUnique(U,L+1))}if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;haptic('heavy');bossDown()}
+else if(M.rare){if(Math.random()<.03*q)dropDiv(p);if(Math.random()<.12*q)dropGem(p);dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
+else{const mg=M.magic?2.5:1;if(Math.random()<.004*q*mg)dropGem(p);if(Math.random()<.003*q*mg)dropDiv(p);if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
 function hurtHero(d,src){if(H.inv>0||S.mode!=='zone'||H.leap)return;const dr=ST.armor/(ST.armor+40+S.L*25);d*=(1-dr)*(1+ST.dmgTaken/100);
 if(H.es>0){const a=Math.min(H.es,d);H.es-=a;d-=a;if(a>0)burst(H.g.position.clone().setY(1.4),'#7fb8ff',4,2,.3,.3,2)}
 if(src&&ST.reflect&&src.hp>0&&!src.dead&&Math.hypot(src.g.position.x-H.g.position.x,src.g.position.z-H.g.position.z)<4)dealDmg(src,{el:'phys',dot:0,m:0,flat:0},d*ST.reflect/100*4+1);
@@ -511,7 +511,7 @@ const m=new THREE.Mesh(orbG,new THREE.MeshStandardMaterial({color:ORBS[k].c,emis
 const hi={exalt:3,divine:3,chaos:2,regal:2}[k]||0;if(hi){el.classList.add('h'+hi);l.hi=true;const col=new THREE.Color(hi===3?'#fff6d8':'#ffd36a');const b=new THREE.Mesh(new THREE.CylinderGeometry(.16,.4,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b;
 hi===3?chime([784,1175,1568,2093],.1):chime([880,1320],.07)}else snd(990,.2,'sine',.06,1.3)}
 function dropGold(p,a){const el=document.createElement('div');el.className='loot g';el.innerHTML=uiI('gold','#ffd774')+a+' золота';const l=lootObj(p,el,{gold:a});l.g.add(prop('coin_stack_small',.55))}
-function tryPick(l){if(l.gem2){P.gems=P.gems||{};P.gems[l.gem2]=(P.gems[l.gem2]||0)+1;toast('Камень поддержки: '+SUPP[l.gem2].n+' (вставь в умение)',2.5);chime([660,880,1100],.08)}else if(l.frag){P.frag=(P.frag||0)+1;toast('Фрагмент Тлена ('+P.frag+'/4)',2);chime([440,660,880],.08)}else if(l.mapIt){P.maps=P.maps||[];P.maps.push(l.mapIt);toast('Подобрано: '+l.mapIt.name+' (тир '+l.mapIt.tier+')',1.6);snd(880,.12,'triangle',.08,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},'#9ad0ff',10,2,.3,.5,2,-2)}else if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
+function tryPick(l){if(l.div){P.cards=P.cards||{};P.cards[l.div]=(P.cards[l.div]||0)+1;const C=DIV.find(c=>c.id===l.div);toast('Гадальная карта: '+C.n+' ('+P.cards[l.div]+'/'+C.need+')',2.5);chime([988,1319,1568],.07)}else if(l.gem2){P.gems=P.gems||{};P.gems[l.gem2]=(P.gems[l.gem2]||0)+1;toast('Камень поддержки: '+SUPP[l.gem2].n+' (вставь в умение)',2.5);chime([660,880,1100],.08)}else if(l.frag){P.frag=(P.frag||0)+1;toast('Фрагмент Тлена ('+P.frag+'/4)',2);chime([440,660,880],.08)}else if(l.mapIt){P.maps=P.maps||[];P.maps.push(l.mapIt);toast('Подобрано: '+l.mapIt.name+' (тир '+l.mapIt.tier+')',1.6);snd(880,.12,'triangle',.08,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},'#9ad0ff',10,2,.3,.5,2,-2)}else if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
 else if(l.orb){P.orbs[l.orb]=(P.orbs[l.orb]||0)+1;toast('Подобрано: '+ORBS[l.orb].n,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},ORBS[l.orb].c,10,2,.3,.5,2,-2);snd(1100,.12,'triangle',.08,1.4)}
 else{if(P.bag.length>=36){if(S.bagWarn<=0){toast('Сумка полна. Продай лишнее у торговки.',2);S.bagWarn=3}return}P.bag.push(l.it);if(l.it.rar===3){csAdd('u');P.uSeen=P.uSeen||[];if(!P.uSeen.includes(l.it.name)){P.uSeen.push(l.it.name);toast('Новая уникальная вещь в коллекции: '+l.it.name,3)}}snd(600,.1,'triangle',.08,1.3);burst({x:l.pos.x,y:.5,z:l.pos.z},RCH[l.it.rar],10,2,.3,.5,2,-2);if(l.it.rar>=2)toast('Подобрано: '+l.it.name,1.6)}
 l.el.remove();dyn.remove(l.g);loot.splice(loot.indexOf(l),1);if(H.pick===l)H.pick=null}
@@ -892,7 +892,7 @@ const mc=$('mini').getContext('2d');
 function drawMini(){const W=mc.canvas.width,s=W/(S.bigMap?110:40);mc.clearRect(0,0,W,W);if(S.mode!=='zone')return;const hx=H.g.position.x,hz=H.g.position.z;const tx=x=>(x-hx)*s+W/2,tz=z=>(z-hz)*s+W/2;
 mc.save();mc.beginPath();mc.arc(W/2,W/2,W/2,0,7);mc.clip();mc.fillStyle='rgba(255,255,255,.12)';for(const o of zoneObs){if(Math.abs(o.x-hx)>(S.bigMap?60:22)||Math.abs(o.z-hz)>(S.bigMap?60:22))continue;mc.beginPath();mc.arc(tx(o.x),tz(o.z),Math.max(1.2,o.r*s*.7),0,7);mc.fill()}
 for(const c of chests)if(!c.open){mc.fillStyle='#d8b56a';mc.fillRect(tx(c.x)-2.5,tz(c.z)-2.5,5,5)}
-for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':l.mapIt?'#9ad0ff':l.frag?'#ff5a8a':l.gem2?'#5ee07a':RCH[l.it.rar];mc.fillStyle=c;const r=l.hi?2.6:1.5;mc.fillRect(tx(l.pos.x)-r,tz(l.pos.z)-r,r*2,r*2);if(l.hi){mc.strokeStyle=c;mc.lineWidth=1;mc.beginPath();mc.arc(tx(l.pos.x),tz(l.pos.z),5+2*Math.sin(performance.now()/200),0,7);mc.stroke()}}
+for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':l.mapIt?'#9ad0ff':l.frag?'#ff5a8a':l.gem2?'#5ee07a':l.div?'#cfe8ff':RCH[l.it.rar];mc.fillStyle=c;const r=l.hi?2.6:1.5;mc.fillRect(tx(l.pos.x)-r,tz(l.pos.z)-r,r*2,r*2);if(l.hi){mc.strokeStyle=c;mc.lineWidth=1;mc.beginPath();mc.arc(tx(l.pos.x),tz(l.pos.z),5+2*Math.sin(performance.now()/200),0,7);mc.stroke()}}
 for(const a of allies){mc.fillStyle='#5ad06a';mc.beginPath();mc.arc(tx(a.g.position.x),tz(a.g.position.z),2,0,7);mc.fill()}
 for(const M of mons){if(M.dead)continue;mc.fillStyle=M.boss?'#d04fff':M.rare?'#ffd84a':'#e0483c';const r=M.boss?4.5:M.rare?3:2;mc.beginPath();mc.arc(tx(M.g.position.x),tz(M.g.position.z),r,0,7);mc.fill()}
 if(OBJ)for(const e of OBJ.ents){if(e.done)continue;const ex=e.M?e.M.g.position.x:e.x,ez=e.M?e.M.g.position.z:e.z;let X=tx(ex),Z=tz(ez);const dd=Math.hypot(X-W/2,Z-W/2);if(dd>W/2-7){X=W/2+(X-W/2)/dd*(W/2-7);Z=W/2+(Z-W/2)/dd*(W/2-7)}mc.save();mc.translate(X,Z);mc.rotate(Math.PI/4);mc.fillStyle=e.M?'#ff5a3a':'#ffd774';mc.strokeStyle='#000';mc.fillRect(-4,-4,8,8);mc.strokeRect(-4,-4,8,8);mc.restore()}
@@ -1044,7 +1044,7 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');renderChars();setPaused();
-window.__dbg={S,H,dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={S,H,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
 const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
@@ -1069,9 +1069,9 @@ h+='</div>';const L=T.last!=null&&P.bag.find(it=>itId(it)===T.last);if(L)h+=detH
 else{h+=`<div class="sect"><span>Снаряжение</span><span style="text-transform:none;letter-spacing:0">цена × уровень зоны</span></div><div class="bag">`+
 (S.shop.length?S.shop.map((it,i)=>{const pr=price(it)*4;return tcell(it,{pr,no:P.gold<pr,up:isUpg(it),cls:T.buySel===i?'sel':'',attr:`data-buy="${i}"`})}).join(''):'<div class="muted">Товар раскуплен — загляни после следующего похода.</div>')+'</div>';
 const B=T.buySel!=null&&S.shop[T.buySel];if(B){const pr=price(B)*4;h+=detHTML(B,`<button class="ab" data-a="buygo" ${P.gold<pr||P.bag.length>=36?'disabled':''}>Купить за ${pr} зол.</button>${P.bag.length>=36?'<span class="muted">Сумка полна</span>':''}`)}
-h+='<div class="sect"><span>Сферы</span></div>'+['trans','alt','aug'].map(k=>{const pr=orbPrice(k);return `<div class="orbrow">${uiI('orb:'+k,ORBS[k].c)}<div><b style="color:${ORBS[k].c}">${ORBS[k].n} <small style="display:inline;color:#a99f8f">· у вас ${P.orbs[k]||0}</small></b><small>${ORBS[k].d}</small></div><button class="ab" data-bo="${k}" ${P.gold<pr?'disabled':''}>${pr} зол.</button></div>`}).join('')}
+h+=divHTML();h+='<div class="sect"><span>Сферы</span></div>'+['trans','alt','aug'].map(k=>{const pr=orbPrice(k);return `<div class="orbrow">${uiI('orb:'+k,ORBS[k].c)}<div><b style="color:${ORBS[k].c}">${ORBS[k].n} <small style="display:inline;color:#a99f8f">· у вас ${P.orbs[k]||0}</small></b><small>${ORBS[k].d}</small></div><button class="ab" data-bo="${k}" ${P.gold<pr?'disabled':''}>${pr} зол.</button></div>`}).join('')}
 $('shBody').innerHTML=h}
-$('pShop').addEventListener('click',e=>{const b=e.target.closest('[data-tab],[data-sb],[data-tr],[data-q],[data-a],[data-buy],[data-bo]');if(!b)return;const d=b.dataset;
+$('pShop').addEventListener('click',e=>{const dv=e.target.closest('[data-dv]');if(dv){const C=DIV.find(c=>c.id===dv.dataset.dv);if(C&&(P.cards[C.id]||0)>=C.need){P.cards[C.id]-=C.need;C.f();toast('Обмен: '+C.rw,3);chime([523,659,784,1047,1319],.1);haptic('ok');save();renderShop()}return}const b=e.target.closest('[data-tab],[data-sb],[data-tr],[data-q],[data-a],[data-buy],[data-bo]');if(!b)return;const d=b.dataset;
 if(d.tab){T.tab=d.tab;T.buySel=null}
 else if(d.sb!==undefined){const it=P.bag[+d.sb];if(!it)return;const id=itId(it);T.tray.has(id)?T.tray.delete(id):T.tray.add(id);T.last=id;snd(900,.04,'square',.03)}
 else if(d.tr!==undefined){T.tray.delete(+d.tr);T.last=+d.tr}
@@ -1359,6 +1359,7 @@ const GUIDE=[['Управление','Телефон: коснись экран�
 ['Умения и камни','У каждого класса 21 умение в трёх ветках, с собой — три. В каждое умение можно вставить 2 камня поддержки: больше снарядов, цепь, область, урон и другие. Камни падают с редких монстров и стражей.'],
 ['Восхождение','Победа над стражами «Лагеря культистов», «Затопленных руин», «Сердца Тлена» и первая карта 5-го тира дают очки Восхождения. Выбери один из двух подклассов в окне «Пассивы».'],
 ['Атлас','После кампании открываются карты: тир 1–12, редкость и модификаторы. Больше модификаторов — больше добычи. Каждый покорённый тир даёт +3% к количеству предметов. Стражи карт 4+ тира роняют Фрагменты Тлена — 4 фрагмента открывают Обитель Пожирателя.'],
+['Гадальные карты','Редкие карты с монстров. Соберите полный набор — Торговка Вера (вкладка «Купить») обменяет его на уникальную вещь, сферы, камни или карту высокого тира.'],
 ['События','Разлом: подойди, и круг наполнится тварями — убивай внутри, чтобы продлить время, в конце сокровища. Святилища дают сильное благословение на 25 секунд.'],
 ['Группа','До 3 игроков. Кнопка «Группа» → «Создать группу» и отправьте ссылку другу, или отметьте «Открытая группа» — тогда вас увидят все в списке «Открытые группы». У каждого своя добыча, вещи можно передавать союзнику из сумки.']];
 function guideHTML(){return '<div class="guide">'+GUIDE.map(([t,d],i)=>`<details ${i===0?'open':''}><summary>${t}</summary><p>${d}</p></details>`).join('')+'</div>'}
@@ -1378,3 +1379,23 @@ const send=()=>{if(ADV&&ADV.readyState===1)ADV.send(JSON.stringify({t:'adv',room
 setInterval(()=>{advTick();if(LOB)lobbyRender()},4000);
 
 function BRK(){const m=location.search.match(/[?&]broker=([^&]+)/);return m?[decodeURIComponent(m[1])]:undefined}
+
+/* ================= ГАДАЛЬНЫЕ КАРТЫ ================= */
+const DIV=[
+{id:'wolf',n:'Волчья тропа',need:5,rw:'Уникальная вещь «Кольцо тысячи стрел»',f:()=>giveU('Кольцо тысячи стрел'),flav:'Стая всегда находит добычу.'},
+{id:'ash',n:'Пепел и пламя',need:4,rw:'Уникальная вещь «Сердце Пепла»',f:()=>giveU('Сердце Пепла'),flav:'Из пепла встаёт новое пламя.'},
+{id:'crown',n:'Ноша короля',need:6,rw:'Уникальная вещь «Корона Тлена»',f:()=>giveU('Корона Тлена'),flav:'Тяжела корона мёртвых.'},
+{id:'exalt',n:'Возвышение',need:7,rw:'3 сферы возвышения',f:()=>giveO('exalt',3),flav:'Лишь избранным дано подняться.'},
+{id:'chaos',n:'Безумный торговец',need:4,rw:'10 сфер хаоса',f:()=>giveO('chaos',10),flav:'Он платит, не глядя.'},
+{id:'divine',n:'Божья искра',need:6,rw:'4 божественные сферы',f:()=>giveO('divine',4),flav:'Совершенство — в мелочах.'},
+{id:'gems',n:'Ювелир',need:3,rw:'3 случайных камня поддержки',f:()=>{for(let i=0;i<3;i++){const k=pick(SUPK);P.gems=P.gems||{};P.gems[k]=(P.gems[k]||0)+1}},flav:'Каждый камень — история.'},
+{id:'map',n:'Картограф',need:5,rw:'Редкая карта 10-го тира',f:()=>{const m=genMap(10);m.rar=2;rollMapMods(m);P.maps=P.maps||[];P.maps.push(m)},flav:'Он видел края мира.'},
+{id:'frag',n:'Голод Пожирателя',need:5,rw:'4 Фрагмента Тлена',f:()=>{P.frag=(P.frag||0)+4},flav:'Оно ждёт в Обители.'},
+{id:'storm',n:'Око бури',need:4,rw:'Уникальная вещь «Ураган» или «Посох вечной зимы»',f:()=>giveU(pick(['Ураган','Посох вечной зимы'])),flav:'В центре бури — тишина.'}];
+function giveU(n){const U=UNIQUES.find(u=>u.n===n);if(!U)return;const it=makeUnique(U,Math.max(S.L||1,P.lvl));if(P.bag.length<36)P.bag.push(it);else{stashLoad().tabs[0].push(it);stashSave()}}
+function giveO(k,n){P.orbs[k]=(P.orbs[k]||0)+n}
+function dropDiv(p){const C=pick(DIV);const el=document.createElement('div');el.className='loot dv';el.innerHTML=gi('card-random','#cfe8ff')+esc(C.n);const l=lootObj(p,el,{div:C.id,hi:true});
+const g=new THREE.Mesh(new THREE.BoxGeometry(.32,.46,.03),new THREE.MeshStandardMaterial({color:'#e8f2ff',emissive:'#8ab8ff',emissiveIntensity:1.6}));g.position.y=.4;l.g.add(g);l.gem=g;chime([988,1319],.07)}
+function divHTML(){P.cards=P.cards||{};const have=DIV.filter(c=>(P.cards[c.id]||0)>0);let h='<div class="sect"><span>Гадальные карты</span><small style="text-transform:none;letter-spacing:0">собери набор — получи награду</small></div>';
+if(!have.length)return h+'<p class="muted" style="font-size:12.5px">Гадальные карты изредка выпадают с монстров, чаще — с редких и стражей. Соберите полный набор, и Вера обменяет его на награду.</p>';
+return h+'<div class="divl">'+have.map(c=>{const n=P.cards[c.id],ok=n>=c.need;return `<div class="divc ${ok?'ok':''}"><b>${esc(c.n)}</b><small>${n}/${c.need}</small><div class="rw">${esc(c.rw)}</div><i>«${esc(c.flav)}»</i>${ok?`<button class="ab" data-dv="${c.id}">Обменять</button>`:''}</div>`}).join('')+'</div>'}
