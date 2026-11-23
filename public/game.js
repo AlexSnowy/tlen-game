@@ -239,7 +239,7 @@ const hpBgM=new THREE.SpriteMaterial({color:0x000000,opacity:.75,transparent:tru
 function hpBar(g,hy,mat){const bg=new THREE.Sprite(hpBgM),fg=new THREE.Sprite(mat);bg.position.set(0,hy,0);bg.scale.set(1.3,.15,1);fg.center.set(0,.5);fg.position.set(-.62,hy,0);fg.scale.set(1.24,.09,1);bg.renderOrder=fg.renderOrder=5;g.add(bg,fg);return[bg,fg]}
 function spawnMon(type,x,z,o){if(isGuest()&&!S.building)return null;const D=MON[type],L=S.L,th=S.th;const boss=!!o.boss;const sc=(D.sc||1)*(boss?(D.sc?1.6:2.3):o.rare?1.2:1);
 const c=makeChar(D.model,{eyes:boss?th.eyes:o.rare?'#ffd84a':o.magic?'#6a9aff':th.eyes,tint:o.tint||(boss?th.tint:D.tint),show:D.show||[]});
-if(D.w)for(const[b,w]of D.w)c.attach(b,w,1);const g=new THREE.Group();g.position.set(x,0,z);c.root.scale.setScalar(sc);c.root.rotation.y=rand(0,6.28);g.add(c.root);
+if(D.w)for(const[b,w]of D.w)c.attach(b,w,1);if(D.ghost)for(const m of c.mats){m.transparent=true;m.opacity=.55;m.depthWrite=false}const g=new THREE.Group();g.position.set(x,0,z);c.root.scale.setScalar(sc);c.root.rotation.y=rand(0,6.28);g.add(c.root);
 if(o.rare||boss||o.magic){const r=new THREE.Mesh(new THREE.RingGeometry(.75,1,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color(boss?th.eyes:o.rare?'#ffd84a':'#5a8aff').multiplyScalar(2),transparent:true,opacity:.6,toneMapped:false,depthWrite:false}));r.position.y=.05;r.scale.setScalar(sc);g.add(r)}
 const[bg,fg]=hpBar(g,2.5*sc+.3,o.rare?hpRareM:hpFgM);bg.visible=fg.visible=false;dyn.add(g);
 if(D.sk){const a=c.play('Skeletons_Awaken_Standing',{once:true,lock:false});if(a){a.time=0;a.paused=true}}else c.play('Idle');
@@ -315,6 +315,7 @@ function aoeHit(x,z,R,ctx,f){let n=0;for(const M of mons.slice())if(!M.dead&&Mat
 function killMon(M){if(M.dead)return;M.dead=.01;if(M.lab){M.lab.remove();M.lab=null}if(NET.on&&NET.host&&!M.netKill)nsend({t:'kill',zk:zkey(),id:M.id});if(M.silent){M.dead=2.9;return}if(M.leader&&OBJ){const e=OBJ.ents.find(e=>e.M===M);if(e&&!e.done){e.done=true;objStep(M.g.position)}}const L=S.L,p=M.g.position.clone();p.y=1.2;M.c.play(M.c.clips['Death_C_Skeletons']?'Death_C_Skeletons':'Death_A',{once:true,restart:true,ts:1.2});
 burst(p,M.boss?S.th.eyes:M.rare?'#ffd84a':'#d8cfb4',M.boss?70:22,M.boss?8:4.5,.4,.8,1.6);flash(p,M.boss?S.th.eyes:'#ffb060',M.boss?120:25,.35);noise(.25,.12,1600);snd(M.boss?90:170,.3,'sawtooth',.05,.4);
 if(M.rm.includes('fiery')&&!isGuest())tele(p.x,p.z,3,.6,M.dmg*1.5,'#ff5a1a');
+if(M.D.burst&&!isGuest())tele(p.x,p.z,2.4,.7,M.dmg*1.6,'#7aff3a');
 if(M.rm.includes('volatile')&&!isGuest())for(let i=0;i<3;i++){const a=i*2.1+rand(0,1);tele(p.x+Math.cos(a)*2.5,p.z+Math.sin(a)*2.5,2.2,1+i*.25,M.dmg*1.3,'#ffb03a')}
 if(ST.spreadPoison&&M.st.poison.length){for(const o of mons)if(o!==M&&!o.dead&&o.g.position.distanceTo(M.g.position)<4.5){o.st.poison.push(...M.st.poison.map(x=>({dps:x.dps,t:x.t})));burst(o.g.position.clone().setY(1),'#7aff5a',6,2)}}
 gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathFx(M,p);riftKill(p);if(M.ess){dropEss(p,M.ess);if(Math.random()<.35)dropEss(p,M.ess)}if(M.rare&&!M.boss&&!(S.slow>0))S.slow=.14;if(!M.netKill||true){csAdd('k');if(M.rare)csAdd('r');if(M.boss){csAdd('b');if(S.zi<0&&!S.pin&&!S.abyss)csAdd('m')}}H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
