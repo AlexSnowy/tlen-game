@@ -9,6 +9,7 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 import {EL,CLASSES,WBASE,OBASE,ALLW,SLOTS,SLOT_N,ABASE,AFF,UNIQUES,ORBS,SKILLS,RAYS,STAT_N,MON,RAREMODS,THEMES,ZONES,MAPMODS,OBJ_POOL,BOSS_SK} from './data.js?v=__V__';
 
@@ -33,6 +34,10 @@ const scene=new THREE.Scene();scene.background=new THREE.Color('#1c1a26');scene.
 const camera=new THREE.PerspectiveCamera(42,1,.1,220);
 const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
 const bloom=new UnrealBloomPass(new THREE.Vector2(256,256),.7,.45,.9);composer.addPass(bloom);composer.addPass(new OutputPass());
+const grade=new ShaderPass({uniforms:{tDiffuse:{value:null},uTint:{value:new THREE.Color(1,1,1)},uSat:{value:1.08},uCon:{value:1.06},uVig:{value:.38},uTime:{value:0}},
+vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+fragmentShader:'uniform sampler2D tDiffuse;uniform vec3 uTint;uniform float uSat,uCon,uVig,uTime;varying vec2 vUv;float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233))+uTime)*43758.5453);}void main(){vec4 c=texture2D(tDiffuse,vUv);vec3 col=c.rgb;float l=dot(col,vec3(.299,.587,.114));col=mix(vec3(l),col,uSat);col=(col-.5)*uCon+.5;col*=uTint;vec2 d=vUv-.5;float v=1.-dot(d,d)*uVig*2.2;col*=clamp(v,0.,1.);col+=(h(vUv*800.)-.5)*.018;gl_FragColor=vec4(clamp(col,0.,1.),c.a);}'});
+composer.addPass(grade);
 const hemi=new THREE.HemisphereLight(0x8090c0,0x3a2a20,1.1);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xffc89a,2.4);sun.castShadow=true;Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20,near:1,far:90});sun.shadow.bias=-.0008;sun.shadow.normalBias=.03;scene.add(sun,sun.target);
 function applyQ(){const pr=Q==='high'?Math.min(devicePixelRatio,1.75):Math.min(devicePixelRatio,1.1);renderer.setPixelRatio(pr);composer.setPixelRatio(pr);
@@ -224,7 +229,7 @@ const sz=ri(3,5),rare=mod('rare')?packs%2===1:packs%4===2,magic=!rare&&Math.rand
 S.boss=spawnMon(Z.bt,bossP.x,bossP.z,{boss:1});S.boss.kit=Z.kit||['slam','summon'];S.boss.phases=Z.phases;S.boss.abT=2;S.boss.sumN=0;S.cleared=false;setupObjective();
 const ar=new THREE.Mesh(new THREE.RingGeometry(8.5,9,64).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color(th.eyes).multiplyScalar(1.4),transparent:true,opacity:.35,toneMapped:false}));ar.position.set(bossP.x,.05,bossP.z);dyn.add(ar);
 setEnv(th.fog,th.fd,th.moon,th.mi,th.hs)}
-function setEnv(fog,fd,sunC,si,hs){scene.background.set(fog);scene.fog.color.set(fog);scene.fog.density=fd;sun.color.set(sunC);sun.intensity=si;hemi.color.set(hs);hemi.groundColor.set('#3a3028');hemi.intensity=town.visible?1:1.7;renderer.toneMappingExposure=town.visible?1.05:1.3}
+function setEnv(fog,fd,sunC,si,hs){{const c=new THREE.Color(sunC).lerp(new THREE.Color('#ffffff'),.88);grade.uniforms.uTint.value.copy(c).multiplyScalar(1.06);grade.uniforms.uVig.value=town.visible?.28:.32}scene.background.set(fog);scene.fog.color.set(fog);scene.fog.density=fd;sun.color.set(sunC);sun.intensity=si;hemi.color.set(hs);hemi.groundColor.set('#3a3028');hemi.intensity=town.visible?1:1.7;renderer.toneMappingExposure=town.visible?1.05:1.3}
 
 /* ================= MONSTERS ================= */
 const hpBgM=new THREE.SpriteMaterial({color:0x000000,opacity:.75,transparent:true,depthTest:false}),hpFgM=new THREE.SpriteMaterial({color:0xe03a2e,depthTest:false}),hpRareM=new THREE.SpriteMaterial({color:0xffd84a,depthTest:false}),hpAllyM=new THREE.SpriteMaterial({color:0x5ad06a,depthTest:false});
@@ -899,7 +904,7 @@ if(Math.random()<(S.th.embers&&zone.visible?.9:.35)){const x=hp.x+rand(-14,14),z
 function assignLights(){const hp=H.g.position;const L=(town.visible?lights.filter(l=>l.w==='town'):lights.filter(l=>l.w==='zone')).map(l=>({l,d:Math.hypot(l.x-hp.x,l.z-hp.z)})).sort((a,b)=>a.d-b.d);
 const n=Q==='high'?4:2;torchLights.forEach((tl,i)=>{const x=L[i];if(i<n&&x&&x.d<26){tl.position.set(x.l.x,x.l.y,x.l.z);tl.color.set(x.l.hex);tl.userData.on=true}else{tl.userData.on=false;tl.intensity=0}})}
 const $hp=$('hpFill'),$hpT=$('hpTxt'),$mp=$('mpFill'),$mpT=$('mpTxt'),$xp=$('xpFill'),$lv=$('lvlTxt'),$gold=$('gold'),$es=$('esFill');
-function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/1000);if(S.slow>0){S.slow-=dt;dt*=S.slow>0?.3:1}last=now;time+=dt;frameN++;gU.uTime.value=time;
+function frame(now){requestAnimationFrame(frame);grade.uniforms.uTime.value=(now%1000)/1000;let dt=Math.min(.05,(now-last)/1000);if(S.slow>0){S.slow-=dt;dt*=S.slow>0?.3:1}last=now;time+=dt;frameN++;gU.uTime.value=time;
 if(S.mode==='town'||S.mode==='zone'||S.mode==='dead'){if(!S.paused)update(dt);H.c.mixer.update(S.paused?0:dt)}
 if(town.visible)for(const c of npcChars)c.mixer.update(dt);
 netTick(dt);updParticles(S.paused?0:dt);updFx(dt);updNums(dt);if(!S.paused||S.mode==='title')updEmitters(dt);
