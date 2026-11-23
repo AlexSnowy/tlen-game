@@ -288,7 +288,7 @@ function snd(f,d,type='sine',v=.15,sl=0){if(!AC)return;try{const t=AC.currentTim
 function noise(d,v=.15,f=800){if(!AC)return;try{const t=AC.currentTime,b=AC.createBuffer(1,Math.max(1,AC.sampleRate*d|0),AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*(1-i/a.length);const s=AC.createBufferSource();s.buffer=b;const fl=AC.createBiquadFilter();fl.type='lowpass';fl.frequency.value=f;const g=AC.createGain();g.gain.value=v;s.connect(fl).connect(g).connect(master);s.start(t)}catch(e){}}
 
 /* ================= DAMAGE ================= */
-function rollCtx(ctx){const c=Math.random()*100<ST.crit;const base=ctx.flat??rand(ST.min,ST.max)*ctx.m;return{d:base*(1+inc(ST,ctx.el,ctx)/100)*(c?ST.critM/100:1),c}}
+function rollCtx(ctx){const c=Math.random()*100<ST.crit;const base=(ctx.flat??rand(ST.min,ST.max)*ctx.m)*(ctx.sup||1);return{d:base*(1+inc(ST,ctx.el,ctx)/100)*(c?ST.critM/100:1),c}}
 function dealDmg(M,ctx,dd){if(M.dead||ctx.ghost)return;if(M.boss&&OBJ&&!OBJ.done){if(!ctx.dot&&Math.random()<.3)num(M.g.position.clone().setY(2.6*M.sc),'неуязвим','');return}let d,c=false;if(dd!==undefined)d=dd;else{const r=rollCtx(ctx);d=r.d;c=r.c}
 if(ST.execute&&M.hp<M.max*.35)d*=1+ST.execute/100;if(M.st.shock>0)d*=1.2;if(M.D.block&&!ctx.dot&&Math.random()<M.D.block){d*=.4;num(M.g.position.clone().setY(2.6*M.sc),'блок','')}
 M.hp-=d;if(!ctx.dot){M.flash=1;wake(M);for(const o of mons)if(!o.aggro&&o.g.position.distanceTo(M.g.position)<9)wake(o);
@@ -311,9 +311,9 @@ gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathF
 const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
 if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35)dropFrag(p);if(M.boss&&S.pin)pinReward(p)}
 else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
-if(M.boss){for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;bossDown()}
-else if(M.rare){dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
-else{const mg=M.magic?2.5:1;if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
+if(M.boss){if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;bossDown()}
+else if(M.rare){if(Math.random()<.12*q)dropGem(p);dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
+else{const mg=M.magic?2.5:1;if(Math.random()<.004*q*mg)dropGem(p);if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
 function hurtHero(d,src){if(H.inv>0||S.mode!=='zone'||H.leap)return;const dr=ST.armor/(ST.armor+40+S.L*25);d*=(1-dr)*(1+ST.dmgTaken/100);
 if(H.es>0){const a=Math.min(H.es,d);H.es-=a;d-=a;if(a>0)burst(H.g.position.clone().setY(1.4),'#7fb8ff',4,2,.3,.3,2)}
 if(src&&ST.reflect&&src.hp>0&&!src.dead&&Math.hypot(src.g.position.x-H.g.position.x,src.g.position.z-H.g.position.z)<4)dealDmg(src,{el:'phys',dot:0,m:0,flat:0},d*ST.reflect/100*4+1);
@@ -351,17 +351,19 @@ else{m=new THREE.Mesh(projGeo,pmat(col))}
 m.scale.multiplyScalar(o.size||1);return m}
 function spawnProj(from,dir,o){const m=makeProjMesh(o.el,o);m.position.copy(from);if(!m.userData.wave)m.lookAt(from.x+dir.x,from.y,from.z+dir.z);else m.rotation.y=Math.atan2(dir.x,dir.z);scene.add(m);
 projs.push({m,v:dir.clone().multiplyScalar(o.speed),life:o.life||1,ctx:o.ctx,pierce:o.pierce||0,hit:new Set(),explode:o.explode||0,el:o.el,wobble:o.wobble,team:o.team||'hero',orb:o.orb,tick:0,dmg:o.dmg,size:o.size||1,col:EL[o.el].c,trail:!o.arrow||o.el!=='phys'})}
+let CUR_SUP=1,CUR_MX=1;
 function castProj(sk,lvl,M,o={}){const p=H.g.position,face=aimAt(M);const n=(sk.p.n||1)+ST.projAdd;const spread=(sk.p.spread||(n>1?20+n*4:0))*Math.PI/180;
-const ctx={m:sk.m+sk.mL*(lvl-1),el:sk.el,proj:1,ignite:sk.el==='fire'&&ST.burnCh>=100};
+const ctx={sup:CUR_SUP,m:sk.m+sk.mL*(lvl-1),el:sk.el,proj:1,ignite:sk.el==='fire'&&ST.burnCh>=100};
 for(let i=0;i<n;i++){const a=face+(n>1?(sk.p.spread>=360?i/n*Math.PI*2:-spread/2+spread*i/(n-1)):0);const dir=new THREE.Vector3(Math.sin(a),0,Math.cos(a));
 spawnProj(new THREE.Vector3(p.x+dir.x*.7,1.4,p.z+dir.z*.7),dir,{el:sk.el,speed:sk.p.speed,life:sk.p.life||1.1,pierce:(sk.p.pierce||0)+ST.pierce,explode:sk.p.explode,size:sk.p.size,wobble:sk.p.wobble,ctx,arrow:P.cls==='rogue'&&!sk.p.axe&&sk.el!=='fire'&&sk.el!=='chaos'?1:sk.el==='phys'&&!sk.p.axe&&!sk.p.wave,axe:sk.p.axe,wave:sk.p.wave})}}
-function castSkill(i){if(S.mode!=='zone'||S.paused||H.leap||H.charge)return;const id=P.slots[i];if(!id)return;const sk=SKILLS[id];const lvl=skLvl(id);if(!lvl)return;
+function castSkill(i){const id=P&&P.slots[i];const sp=id&&supOf(id);if(!sp)return castSkill0(i);const st0=ST;ST=sp.st;CUR_SUP=sp.more;CUR_MX=sp.mx;try{castSkill0(i)}finally{ST=st0;CUR_SUP=1;CUR_MX=1}}
+function castSkill0(i){if(S.mode!=='zone'||S.paused||H.leap||H.charge)return;const id=P.slots[i];if(!id)return;const sk=SKILLS[id];const lvl=skLvl(id);if(!lvl)return;
 if(sk.kind==='aura'){const k=P.auraOff.indexOf(id);if(k>=0)P.auraOff.splice(k,1);else P.auraOff.push(id);recalc();toast(sk.n+(k>=0?': включена':': выключена'),1.4);return}
-if(H.cds[i]>0)return;const cost=Math.round((sk.mana||0)*(1+.08*(lvl-1)));
+if(H.cds[i]>0)return;const cost=Math.round((sk.mana||0)*(1+.08*(lvl-1))*CUR_MX);
 if(ST.bloodMagic){if(H.hp<=cost+1){toast('Мало здоровья',1);return}H.hp-=cost}else{if(H.mana<cost){toast('Не хватает маны',1);return}H.mana-=cost}
 if(sk.p&&sk.p.hpCost){H.hp=Math.max(1,H.hp-ST.hp*sk.p.hpCost)}
 H.cds[i]=(sk.cd||0)/(1+ST.cdr/100);H.cdMax=H.cdMax||[1,1,1];H.cdMax[i]=Math.max(.01,H.cds[i]);H.lastCast=.35;
-const M=nearest(sk.p&&sk.p.range||15),p=H.g.position;const ctx={m:(sk.m||0)+(sk.mL||0)*(lvl-1),el:sk.el,melee:['cone','whirl','leap','charge','slam','shadow','wave'].includes(sk.kind),stun:sk.p&&sk.p.stun,stunCh:sk.p&&sk.p.stunCh,bleed:sk.p&&sk.p.bleed,ignite:sk.el==='fire'&&ST.burnCh>=100};
+const M=nearest(sk.p&&sk.p.range||15),p=H.g.position;const ctx={sup:CUR_SUP,m:(sk.m||0)+(sk.mL||0)*(lvl-1),el:sk.el,melee:['cone','whirl','leap','charge','slam','shadow','wave'].includes(sk.kind),stun:sk.p&&sk.p.stun,stunCh:sk.p&&sk.p.stunCh,bleed:sk.p&&sk.p.bleed,ignite:sk.el==='fire'&&ST.burnCh>=100};
 const aoe=1+ST.aoeP/100,ec=EL[sk.el||'phys'].c;if(NET.on){const tg=M?M.g.position:{x:p.x+Math.sin(H.face)*6,z:p.z+Math.cos(H.face)*6};nsend({t:'cast',zk:zkey(),sk:id,f:+(M?Math.atan2(M.g.position.x-p.x,M.g.position.z-p.z):H.face).toFixed(2),tx:+tg.x.toFixed(1),tz:+tg.z.toFixed(1)})}
 switch(sk.kind){
 case'proj':heroAnim(sk.a,1.8);castProj(sk,lvl,M);snd(sk.el==='fire'?320:600,.12,'triangle',.06,1.6);break;
@@ -500,7 +502,7 @@ const m=new THREE.Mesh(orbG,new THREE.MeshStandardMaterial({color:ORBS[k].c,emis
 const hi={exalt:3,divine:3,chaos:2,regal:2}[k]||0;if(hi){el.classList.add('h'+hi);l.hi=true;const col=new THREE.Color(hi===3?'#fff6d8':'#ffd36a');const b=new THREE.Mesh(new THREE.CylinderGeometry(.16,.4,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b;
 hi===3?chime([784,1175,1568,2093],.1):chime([880,1320],.07)}else snd(990,.2,'sine',.06,1.3)}
 function dropGold(p,a){const el=document.createElement('div');el.className='loot g';el.innerHTML=uiI('gold','#ffd774')+a+' золота';const l=lootObj(p,el,{gold:a});l.g.add(prop('coin_stack_small',.55))}
-function tryPick(l){if(l.frag){P.frag=(P.frag||0)+1;toast('Фрагмент Тлена ('+P.frag+'/4)',2);chime([440,660,880],.08)}else if(l.mapIt){P.maps=P.maps||[];P.maps.push(l.mapIt);toast('Подобрано: '+l.mapIt.name+' (тир '+l.mapIt.tier+')',1.6);snd(880,.12,'triangle',.08,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},'#9ad0ff',10,2,.3,.5,2,-2)}else if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
+function tryPick(l){if(l.gem2){P.gems=P.gems||{};P.gems[l.gem2]=(P.gems[l.gem2]||0)+1;toast('Камень поддержки: '+SUPP[l.gem2].n+' (вставь в умение)',2.5);chime([660,880,1100],.08)}else if(l.frag){P.frag=(P.frag||0)+1;toast('Фрагмент Тлена ('+P.frag+'/4)',2);chime([440,660,880],.08)}else if(l.mapIt){P.maps=P.maps||[];P.maps.push(l.mapIt);toast('Подобрано: '+l.mapIt.name+' (тир '+l.mapIt.tier+')',1.6);snd(880,.12,'triangle',.08,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},'#9ad0ff',10,2,.3,.5,2,-2)}else if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
 else if(l.orb){P.orbs[l.orb]=(P.orbs[l.orb]||0)+1;toast('Подобрано: '+ORBS[l.orb].n,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},ORBS[l.orb].c,10,2,.3,.5,2,-2);snd(1100,.12,'triangle',.08,1.4)}
 else{if(P.bag.length>=36){if(S.bagWarn<=0){toast('Сумка полна. Продай лишнее у торговки.',2);S.bagWarn=3}return}P.bag.push(l.it);if(l.it.rar===3)csAdd('u');snd(600,.1,'triangle',.08,1.3);burst({x:l.pos.x,y:.5,z:l.pos.z},RCH[l.it.rar],10,2,.3,.5,2,-2);if(l.it.rar>=2)toast('Подобрано: '+l.it.name,1.6)}
 l.el.remove();dyn.remove(l.g);loot.splice(loot.indexOf(l),1);if(H.pick===l)H.pick=null}
@@ -620,8 +622,8 @@ function renderSk(){const C=CLASSES[P.cls];$('skP').textContent=`Очков ум
 $('slotRow').innerHTML=[0,1,2].map(i=>{const id=P.slots[i],sk=id&&SKILLS[id];return `<div class="slotc">${sk?skIcon(sk):''}<div><small>${['Q','E','R'][i]}</small><b>${sk?sk.n:'пусто'}</b></div></div>`}).join('');
 $('skCols').innerHTML=C.branches.map((bn,b)=>`<section><h4>${bn}</h4>`+branchList(P.cls,b).map(id=>{const sk=SKILLS[id],lv=P.sk[id]||0,max=sk.max||5,av=skAvail(id),act=sk.kind!=='mod';
 return `<div class="skc ${lv?'on':''} ${av?'':'lock'}"><div class="skh">${skIcon(sk)}<div><b>${sk.n}</b><small>${KIND_N[sk.kind]} · ур. ${sk.req}+</small></div><button class="ab" data-up="${id}" ${P.spts&&av&&lv<max?'':'disabled'} aria-label="Изучить">+</button></div>
-<div class="pips">${'◆'.repeat(lv)}${'◇'.repeat(max-lv)}</div><p>${sk.d}</p><p class="nums">${skNums(id,Math.max(1,lv))}</p>${act&&lv?`<div class="slotbtns">${[0,1,2].map(i=>`<button class="sb ${P.slots[i]===id?'on':''}" data-slot="${id}:${i}">${['Q','E','R'][i]}</button>`).join('')}</div>`:''}</div>`}).join('')+'</section>').join('')}
-$('pSk').addEventListener('click',e=>{const u=e.target.closest('[data-up]'),s=e.target.closest('[data-slot]');
+<div class="pips">${'◆'.repeat(lv)}${'◇'.repeat(max-lv)}</div><p>${sk.d}</p><p class="nums">${skNums(id,Math.max(1,lv))}</p>${act&&lv&&sk.kind!=='aura'?sockHTML(id):''}${act&&lv?`<div class="slotbtns">${[0,1,2].map(i=>`<button class="sb ${P.slots[i]===id?'on':''}" data-slot="${id}:${i}">${['Q','E','R'][i]}</button>`).join('')}</div>`:''}</div>`}).join('')+'</section>').join('')}
+$('pSk').addEventListener('click',e=>{const so=e.target.closest('[data-sock],[data-put]');if(so){sockClick(so.dataset);return}const u=e.target.closest('[data-up]'),s=e.target.closest('[data-slot]');
 if(u){const id=u.dataset.up,sk=SKILLS[id];if(!P.spts||!skAvail(id)||(P.sk[id]||0)>=(sk.max||5))return;P.sk[id]=(P.sk[id]||0)+1;P.spts--;if(sk.kind!=='mod'&&P.sk[id]===1){const free=P.slots.indexOf(null);if(free>=0)P.slots[free]=id}recalc();snd(660,.12,'triangle',.12,1.5);save();renderSk();updSkillBar()}
 if(s){const[id,i]=s.dataset.slot.split(':');const j=P.slots.indexOf(id);if(j>=0)P.slots[j]=P.slots[+i]===id?null:P.slots[+i];P.slots[+i]=id;if(j===+i)P.slots[+i]=id;recalc();save();renderSk();updSkillBar()}});
 // ----- passive tree
@@ -877,7 +879,7 @@ const mc=$('mini').getContext('2d');
 function drawMini(){const W=140,s=W/40;mc.clearRect(0,0,W,W);if(S.mode!=='zone')return;const hx=H.g.position.x,hz=H.g.position.z;const tx=x=>(x-hx)*s+W/2,tz=z=>(z-hz)*s+W/2;
 mc.save();mc.beginPath();mc.arc(W/2,W/2,W/2,0,7);mc.clip();mc.fillStyle='rgba(255,255,255,.12)';for(const o of zoneObs){if(Math.abs(o.x-hx)>22||Math.abs(o.z-hz)>22)continue;mc.beginPath();mc.arc(tx(o.x),tz(o.z),Math.max(1.2,o.r*s*.7),0,7);mc.fill()}
 for(const c of chests)if(!c.open){mc.fillStyle='#d8b56a';mc.fillRect(tx(c.x)-2.5,tz(c.z)-2.5,5,5)}
-for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':l.mapIt?'#9ad0ff':l.frag?'#ff5a8a':RCH[l.it.rar];mc.fillStyle=c;const r=l.hi?2.6:1.5;mc.fillRect(tx(l.pos.x)-r,tz(l.pos.z)-r,r*2,r*2);if(l.hi){mc.strokeStyle=c;mc.lineWidth=1;mc.beginPath();mc.arc(tx(l.pos.x),tz(l.pos.z),5+2*Math.sin(performance.now()/200),0,7);mc.stroke()}}
+for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':l.mapIt?'#9ad0ff':l.frag?'#ff5a8a':l.gem2?'#5ee07a':RCH[l.it.rar];mc.fillStyle=c;const r=l.hi?2.6:1.5;mc.fillRect(tx(l.pos.x)-r,tz(l.pos.z)-r,r*2,r*2);if(l.hi){mc.strokeStyle=c;mc.lineWidth=1;mc.beginPath();mc.arc(tx(l.pos.x),tz(l.pos.z),5+2*Math.sin(performance.now()/200),0,7);mc.stroke()}}
 for(const a of allies){mc.fillStyle='#5ad06a';mc.beginPath();mc.arc(tx(a.g.position.x),tz(a.g.position.z),2,0,7);mc.fill()}
 for(const M of mons){if(M.dead)continue;mc.fillStyle=M.boss?'#d04fff':M.rare?'#ffd84a':'#e0483c';const r=M.boss?4.5:M.rare?3:2;mc.beginPath();mc.arc(tx(M.g.position.x),tz(M.g.position.z),r,0,7);mc.fill()}
 if(OBJ)for(const e of OBJ.ents){if(e.done)continue;const ex=e.M?e.M.g.position.x:e.x,ez=e.M?e.M.g.position.z:e.z;let X=tx(ex),Z=tz(ez);const dd=Math.hypot(X-W/2,Z-W/2);if(dd>W/2-7){X=W/2+(X-W/2)/dd*(W/2-7);Z=W/2+(Z-W/2)/dd*(W/2-7)}mc.save();mc.translate(X,Z);mc.rotate(Math.PI/4);mc.fillStyle=e.M?'#ff5a3a':'#ffd774';mc.strokeStyle='#000';mc.fillRect(-4,-4,8,8);mc.strokeRect(-4,-4,8,8);mc.restore()}
@@ -1194,3 +1196,30 @@ h+=`<div class="chr ${done?'done':''} ${g?'got':''}">${gi(GI[c.ic]?c.ic:'trophy-
 $('chBody').innerHTML=h+'</div>'}
 $('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-ch]');if(!b)return;const c=CH.find(x=>x.id===b.dataset.ch);const[a,n]=c.p();P.chc=P.chc||[];if(a<n||P.chc.includes(c.id))return;P.chc.push(c.id);for(const[k,v]of Object.entries(c.rw))P.orbs[k]=(P.orbs[k]||0)+v;chime([523,659,784,1047],.1);toast('Награда: '+c.n,2);save();renderCh();chBadge()});
 $('bCh').onclick=()=>togglePanel('ch');
+
+/* ================= КАМНИ ПОДДЕРЖКИ ================= */
+const SUPP={
+multi:{n:'Множественные снаряды',d:'+2 снаряда, урон −25%',st:{projAdd:2},more:.75,k:['proj','barrage']},
+pierce:{n:'Пронзание',d:'Снаряды пронзают ещё 3 цели',st:{pierce:3},k:['proj','barrage']},
+chain:{n:'Цепь',d:'+2 перескока, урон −10%',st:{chainAdd:2},more:.9,k:['chain','proj']},
+area:{n:'Обширная область',d:'+40% к области действия',st:{aoeP:40},k:['nova','aoe','ground','slam','wave','whirl','warcry','leap','orb','cone']},
+conc:{n:'Концентрация',d:'+35% урона, область −25%',st:{aoeP:-25},more:1.35,k:['nova','aoe','ground','slam','wave','whirl','leap','orb','cone']},
+brut:{n:'Жестокость',d:'+30% урона, мана +30%',more:1.3,mx:1.3},
+fast:{n:'Быстрые чары',d:'Перезарядка быстрее на 30%, мана +20%',st:{cdr:30},mx:1.2},
+leech:{n:'Кровопийца',d:'3% урона умения — в здоровье',st:{leech:3}},
+crit:{n:'Меткий удар',d:'+5% шанса и +30% силы крита',st:{crit:5,critM:30}},
+elem:{n:'Сила стихий',d:'+25% урона огнём, холодом и молнией',st:{fireP:25,coldP:25,lightP:25}}};
+const SUPK=Object.keys(SUPP);
+const supFits=(k,sk)=>!SUPP[k].k||SUPP[k].k.includes(sk.kind);
+function supOf(id){const L=(P.links&&P.links[id]||[]).filter(k=>k&&SUPP[k]);if(!L.length)return null;const st=Object.assign({},ST);let more=1,mx=1;
+for(const k of L){const g=SUPP[k];if(g.st)for(const x in g.st)st[x]=(st[x]||0)+g.st[x];if(g.more)more*=g.more;if(g.mx)mx*=g.mx}
+st.crit=Math.min(80,st.crit);st.leech=Math.min(15,st.leech);return{st,more,mx}}
+function gemFree(k){let used=0;for(const id in (P.links||{}))for(const x of P.links[id])if(x===k)used++;return ((P.gems||{})[k]||0)-used}
+function dropGem(p){const k=pick(SUPK);const el=document.createElement('div');el.className='loot gm';el.innerHTML=gi('gem-pendant','#5ee07a')+'Камень: '+esc(SUPP[k].n);const l=lootObj(p,el,{gem2:k,hi:true});
+const g=new THREE.Mesh(new THREE.OctahedronGeometry(.22),new THREE.MeshStandardMaterial({color:'#5ee07a',emissive:'#2ac04a',emissiveIntensity:1.8,roughness:.2}));g.position.y=.35;l.g.add(g);l.gem=g;chime([784,1047],.07)}
+let sockOpen=null;
+function sockHTML(id){P.links=P.links||{};const L=P.links[id]||[null,null],sk=SKILLS[id];let h='<div class="socks">'+[0,1].map(j=>{const k=L[j];return `<button class="sock ${k?'on':''} ${sockOpen===id+':'+j?'op':''}" data-sock="${id}:${j}">${k?gi('gem-pendant','#5ee07a','width:14px;height:14px;filter:none')+SUPP[k].n:'◇ пустое гнездо'}</button>`}).join('')+'</div>';
+if(sockOpen&&sockOpen.startsWith(id+':')){const j=+sockOpen.split(':')[1];const opts=SUPK.filter(k=>supFits(k,sk)&&(gemFree(k)>0||L[j]===k));
+h+='<div class="sockl">'+(L[j]?`<button class="chip" data-put="${id}:${j}:">Вынуть</button>`:'')+(opts.length?opts.map(k=>`<button class="chip gemc" data-put="${id}:${j}:${k}"><b>${SUPP[k].n}</b> <small>${SUPP[k].d} · ×${gemFree(k)}</small></button>`).join(''):'<span class="muted" style="font-size:12.5px">Нет подходящих камней. Камни поддержки выпадают с редких монстров и стражей.</span>')+'</div>'}
+return h}
+function sockClick(d){if(d.sock){sockOpen=sockOpen===d.sock?null:d.sock}else if(d.put!==undefined){const[id,j,k]=d.put.split(':');P.links=P.links||{};const L=P.links[id]=P.links[id]||[null,null];L[+j]=k||null;sockOpen=null;snd(900,.06,'triangle',.06);save()}renderSk()}
