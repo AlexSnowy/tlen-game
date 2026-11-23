@@ -215,7 +215,7 @@ emitters=emitters.filter(e=>e.w!==zone);lights=lights.filter(l=>l.w==='town');if
 if(zGrass){zone.remove(zGrass);zGrass.geometry.dispose();zGrass.material.dispose();zGrass=null}dyn=new THREE.Group();zone.add(dyn);H.whirl=H.leap=H.charge=H.barrage=null;H.queue=[]}
 const mod=k=>S.mods.some(m=>m.k===k);
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?.5:.3))makeRift();S.shrines=[];for(let i=0;i<(Math.random()<.6?1:0)+(Math.random()<.3?1:0);i++)makeShrine();S.ess=null;if(!S.pin&&Math.random()<.28)makeEss()}finally{Math.random=RNG0;S.building=false}}
+function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?(P.atlN&&P.atlN.includes('rift')?.75:.5):.3))makeRift();S.shrines=[];const mapZ=S.zi<0&&P.atlN;for(let i=0;i<(Math.random()<.6?1:0)+(Math.random()<.3?1:0)+(mapZ&&P.atlN.includes('shr')?1:0);i++)makeShrine();S.ess=null;if(!S.pin&&Math.random()<(mapZ&&P.atlN.includes('ess')?.56:.28))makeEss()}finally{Math.random=RNG0;S.building=false}}
 function buildZone0(){const Z=S.zone,th=THEMES[Z.th];S.th=th;
 zGround=makeGround(130,noiseTex(th.g[0],th.g[1],th.g[2],{tiles:th.tiles}),th.tiles?26:18,zone);
 const start={x:0,z:46},bossP={x:0,z:-44};const near=(x,z,r)=>Math.hypot(x-start.x,z-start.z)<r||Math.hypot(x-bossP.x,z-bossP.z)<r+3;
@@ -318,12 +318,12 @@ if(M.rm.includes('fiery')&&!isGuest())tele(p.x,p.z,3,.6,M.dmg*1.5,'#ff5a1a');
 if(M.rm.includes('volatile')&&!isGuest())for(let i=0;i<3;i++){const a=i*2.1+rand(0,1);tele(p.x+Math.cos(a)*2.5,p.z+Math.sin(a)*2.5,2.2,1+i*.25,M.dmg*1.3,'#ffb03a')}
 if(ST.spreadPoison&&M.st.poison.length){for(const o of mons)if(o!==M&&!o.dead&&o.g.position.distanceTo(M.g.position)<4.5){o.st.poison.push(...M.st.poison.map(x=>({dps:x.dps,t:x.t})));burst(o.g.position.clone().setY(1),'#7aff5a',6,2)}}
 gainXp(Math.round(M.D.xp*(6+L*4)*(M.rare?4:M.magic?1.8:1)*(M.boss?12:1)));deathFx(M,p);riftKill(p);if(M.ess){dropEss(p,M.ess);if(Math.random()<.35)dropEss(p,M.ess)}if(M.rare&&!M.boss&&!(S.slow>0))S.slow=.14;if(!M.netKill||true){csAdd('k');if(M.rare)csAdd('r');if(M.boss){csAdd('b');if(S.zi<0&&!S.pin)csAdd('m')}}H.flask=Math.min(3,H.flask+(M.rare?1:M.boss?3:.25));
-const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus():0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
-if(S.zi<0){const t=S.map;const ch=M.boss?1:M.rare?.1:.012;if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35)dropFrag(p);if(M.boss&&S.pin)pinReward(p)}
+const q=1+(S.mods.reduce((a,m)=>a+m.q,0)+(S.zi<0?atlasBonus()+(atl('iiq')?15:0):0))/100,rr=ST.rarity+(S.zi<0?[0,10,25][S.mapRar|0]:0),gm=1+ST.gold/100;
+if(S.zi<0){const t=S.map;const ch=(M.boss?1:M.rare?.1:.012)*(atl('maps')?1.4:1);if(Math.random()<ch*q)dropMap(p,genMap(Math.max(1,Math.min(MAXT,t+(Math.random()<.35?1:0)-(Math.random()<.2?1:0)))));if(M.boss&&Math.random()<.45)dropMap(p,genMap(Math.min(MAXT,t+1)));if(M.boss&&!S.pin&&t>=4&&Math.random()<.35*(atl('frag')?1.5:1))dropFrag(p);if(M.boss&&atl('boss')){dropItem(p,genItem(L+1,2,rr));dropItem(p,genItem(L+1,2,rr))}if(M.boss&&S.pin)pinReward(p)}
 else if(M.boss&&S.zi===7&&!P.atlasGift){P.atlasGift=1;for(let i=0;i<3;i++)dropMap(p,genMap(1))}
-if(M.boss){if(Math.random()<.35)dropDiv(p);if(S.zi>=0&&Math.random()<.22){const U=UNIQUES.find(u=>u.n===BOSS_U[S.zi]);if(U)dropItem(p,makeUnique(U,L+1))}if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;haptic('heavy');bossDown()}
-else if(M.rare){if(Math.random()<.06*q)dropDiv(p);if(Math.random()<.12*q)dropGem(p);dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
-else{const mg=M.magic?2.5:1;if(Math.random()<.004*q*mg)dropGem(p);if(Math.random()<.005*q*mg)dropDiv(p);if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
+if(M.boss){if(Math.random()<.35*(atl('div')?2:1))dropDiv(p);if(S.zi>=0&&Math.random()<.22){const U=UNIQUES.find(u=>u.n===BOSS_U[S.zi]);if(U)dropItem(p,makeUnique(U,L+1))}if(Math.random()<.5)dropGem(p);for(let i=0;i<5;i++)dropItem(p,genItem(L+1,i===0?2:1,rr));for(let i=0;i<3;i++)dropOrb(p);dropGold(p,Math.round(L*rand(40,70)*gm));S.shake=.8;S.slow=1.1;haptic('heavy');bossDown()}
+else if(M.rare){if(Math.random()<.06*q*(atl('div')?2:1))dropDiv(p);if(Math.random()<.12*q)dropGem(p);dropItem(p,genItem(L,1,rr));dropItem(p,genItem(L,1,rr));if(Math.random()<.5)dropItem(p,genItem(L,2,rr));if(Math.random()<.5*q)dropOrb(p);dropGold(p,Math.round(L*rand(10,20)*gm))}
+else{const mg=M.magic?2.5:1;if(Math.random()<.004*q*mg)dropGem(p);if(Math.random()<.005*q*mg*(atl('div')?2:1))dropDiv(p);if(Math.random()<.18*q*mg)dropItem(p,genItem(L,M.magic?1:0,rr));if(Math.random()<.06*q*mg)dropOrb(p);if(Math.random()<.45)dropGold(p,Math.round(L*rand(2,6)*gm))}}
 function hurtHero(d,src){if(H.inv>0||S.mode!=='zone'||H.leap)return;const dr=ST.armor/(ST.armor+40+S.L*25);d*=(1-dr)*(1+ST.dmgTaken/100);
 if(H.es>0){const a=Math.min(H.es,d);H.es-=a;d-=a;if(a>0)burst(H.g.position.clone().setY(1.4),'#7fb8ff',4,2,.3,.3,2)}
 if(src&&ST.reflect&&src.hp>0&&!src.dead&&Math.hypot(src.g.position.x-H.g.position.x,src.g.position.z-H.g.position.z)<4)dealDmg(src,{el:'phys',dot:0,m:0,flat:0},d*ST.reflect/100*4+1);
@@ -671,9 +671,9 @@ $('pPas').addEventListener('click',e=>{const g=e.target.closest('[data-n]');if(g
 if(a.dataset.pa==='add'&&P.ppts&&canAlloc(S.pasSel)){P.pas.push(S.pasSel);P.ppts--;snd(660,.12,'triangle',.12,1.5)}else if(a.dataset.pa==='ref'&&canRefund(S.pasSel)&&P.gold>=20*P.lvl){P.gold-=20*P.lvl;P.pas=P.pas.filter(x=>x!==S.pasSel);P.ppts++}recalc();save();renderPas()});
 // ----- portal
 function renderPortal(){let h='<h4 class="ph">Кампания</h4><div class="zl">';for(let i=0;i<Math.min(P.maxZone,8);i++){const Z=ZONES[i];h+=`<button class="zb" data-z="${i}"><b>${i+1}. ${Z.n}</b><small>Уровень монстров ${i+1}${i+1===P.maxZone?' · новая':''} · Страж: ${Z.boss}</small></button>`}h+='</div>';
-if(P.maxZone>8)h+=atlasHTML();
+if(P.maxZone>8)h+=atlasHTML()+atlTreeHTML();
 $('zoneList').innerHTML=h}
-$('zoneList').addEventListener('click',e=>{const b=e.target.closest('[data-z],[data-mp],[data-mo],[data-go],[data-free],[data-pin]');if(!b)return;const d=b.dataset;
+$('zoneList').addEventListener('click',e=>{const an=e.target.closest('[data-an2]');if(an){if(atlPts()>0){P.atlN=P.atlN||[];if(!P.atlN.includes(an.dataset.an2))P.atlN.push(an.dataset.an2);chime([587,880],.08);save()}renderPortal();return}const b=e.target.closest('[data-z],[data-mp],[data-mo],[data-go],[data-free],[data-pin]');if(!b)return;const d=b.dataset;
 if(d.z!==undefined){closePanels();enterZone(+d.z,0);return}
 if(d.mp!==undefined){AT.sel=+d.mp;renderPortal();return}
 if(d.mo){const m=P.maps[AT.sel];if(m&&mapOrb(m,d.mo))save();renderPortal();return}
@@ -1435,3 +1435,9 @@ function essHTML(it){const E=P.ess||{};const have=ESK.filter(k=>E[k]>0);if(!it||
 if(it.rar===3)return h+'<p class="muted" style="font-size:12.5px">Уникальные вещи нельзя изменить.</p></div>';
 const pool=itemPool(it.slot);h+='<div class="benchl">'+have.map(k=>{const ok=pool.includes(k)&&!it.aff.some(a=>a.k===k);const[a,b]=AFF[k]?AFF[k].r(it.ilvl):[0,0];return `<button class="chip" data-ess="${k}" ${ok?'':'disabled'} style="color:${ESS[k].c}">${ESS[k].n} ×${E[k]}${ok?' → '+AFF[k].t.replace('{v}',fmt(b*1.3,AFF[k].i)):' (не для этой вещи)'}</button>`}).join('')+'</div>';
 return h+'<p class="muted" style="font-size:11.5px;margin:6px 0 0">Обычная вещь станет редкой. Свойство на 30% сильнее лучшего броска.</p></div>'}
+
+/* развитие Атласа */
+const AN=[{id:'rift',n:'Зов разлома',d:'Разломы на картах встречаются на 25% чаще'},{id:'shr',n:'Святые места',d:'+1 святилище на каждой карте'},{id:'maps',n:'Картограф',d:'Карты выпадают на 40% чаще'},{id:'div',n:'Гадалка',d:'Гадальные карты выпадают вдвое чаще'},{id:'ess',n:'Кристаллы',d:'Эссенции встречаются вдвое чаще'},{id:'boss',n:'Богатые стражи',d:'Стражи карт роняют +2 редкие вещи'},{id:'frag',n:'Голод',d:'Фрагменты Тлена выпадают на 50% чаще'},{id:'iiq',n:'Сокровищница',d:'+15% к количеству предметов на картах'}];
+const atl=k=>!!(P&&P.atlN&&P.atlN.includes(k))&&S.zi<0;
+function atlPts(){return (P.atlas||[]).length+(P.pinK||0)-(P.atlN||[]).length}
+function atlTreeHTML(){const pts=atlPts();return `<div class="sect" style="margin-top:12px"><span>Развитие Атласа</span><span style="text-transform:none;letter-spacing:0">очков: <b style="color:#9ad0ff">${pts}</b></span></div><div class="atln">`+AN.map(n=>{const on=(P.atlN||[]).includes(n.id);return `<button class="atlb ${on?'on':''}" data-an2="${n.id}" ${on||pts<=0?'disabled':''}><b>${n.n}</b><small>${n.d}</small></button>`}).join('')+'</div><p class="muted" style="font-size:12px">Очки: 1 за каждый покорённый тир и за каждую победу над Пожирателем. Бонусы действуют только на картах.</p>'}
