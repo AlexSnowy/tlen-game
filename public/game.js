@@ -145,7 +145,7 @@ function addSt(s,st,k=1){for(const key in st)s[key]=(s[key]||0)+st[key]*k}
 function calc(eq=P.eq){const C=CLASSES[P.cls],s={};for(const k of KEYS)s[k]=0;s.hp=C.hp+P.lvl*C.hpL;s.mana=C.mana+P.lvl*C.manaL;s.armor=C.armor;s.crit=5;s.critM=150;s.regen=1+P.lvl*.2;s.manaRegen=3+P.lvl*.15;
 let min=0,max=0,aps=1.2,range=C.ranged?10:2.2;const w=eq.weapon;
 if(w){const m=1+.1*w.upg,WB=WBASE[w.wb];min=w.dmg[0]*m;max=w.dmg[1]*m;aps=WB.aps;range=WB.range}else{min=1;max=3}
-for(const k of SLOTS){const it=eq[k];if(!it)continue;const m=1+.1*it.upg;if(it.armor)s.armor+=it.armor*m;if(it.imp)s[it.imp.k]+=it.imp.v*m;for(const a of it.aff)s[a.k]+=a.v*m;if(it.st)addSt(s,it.st)}
+for(const k of SLOTS){const it=eq[k];if(!it)continue;const m=1+.1*it.upg;if(it.cimp)s[it.cimp.k]+=it.cimp.v;if(it.armor)s.armor+=it.armor*m;if(it.imp)s[it.imp.k]+=it.imp.v*m;for(const a of it.aff)s[a.k]+=a.v*m;if(it.st)addSt(s,it.st)}
 for(const id of P.pas)addSt(s,TREE.nodes[id].st);ascSt(s);
 for(const id in P.sk){const sk=SKILLS[id];if(sk&&sk.kind==='mod'&&P.sk[id]>0)addSt(s,sk.st,P.sk[id])}
 for(const b of H.buffs)addSt(s,b.st);
@@ -485,7 +485,7 @@ rollAff(it,[0,ri(1,2),ri(3,4)][rar]);nameIt(it);return it}
 const price=it=>Math.round((4+it.ilvl*3)*[1,2.2,5,14][it.rar]*(1+it.upg*.4));
 const upCost=it=>Math.round(15*it.ilvl*Math.pow(it.upg+1,1.7));
 const upChance=it=>[100,100,100,90,80,65,50,40,30,20][it.upg]||0;
-function applyOrb(k,it){const o=P.orbs;if(!(o[k]>0))return 'Нет сферы';if(it.rar===3)return 'На уникальные вещи сферы не действуют';
+function applyOrb(k,it){const o=P.orbs;if(!(o[k]>0))return 'Нет сферы';if(it.corr)return 'Осквернённую вещь нельзя изменить';if(k==='vaal'){o[k]--;return vaal(it)}if(it.rar===3)return 'На уникальные вещи сферы не действуют';
 const ok={trans:it.rar===0,alt:it.rar===1,aug:it.rar===1&&it.aff.length<2,regal:it.rar===1,chaos:it.rar===2,exalt:it.rar===2&&it.aff.length<6,divine:it.rar>=1,scour:it.rar>=1}[k];if(!ok)return 'Эта сфера не подходит к этой вещи';
 o[k]--;if(k==='trans'){it.rar=1;rollAff(it,ri(1,2));nameIt(it)}else if(k==='alt'){rollAff(it,ri(1,2));nameIt(it)}else if(k==='aug')addAff(it);else if(k==='regal'){it.rar=2;addAff(it);nameIt(it)}
 else if(k==='chaos'){rollAff(it,ri(3,5));nameIt(it)}else if(k==='exalt')addAff(it);else if(k==='divine'){for(const a of it.aff){const[x,y]=AFF[a.k].r(it.ilvl);a.v=x+(y-x)*Math.random()}}else if(k==='scour'){it.rar=0;it.aff=[];it.name=it.base}
@@ -592,9 +592,9 @@ let acts='';const w=S.sel.w;
 if(w==='shop'){const pr=price(it)*4;acts+=`<button class="ab" data-a="buy" ${P.gold<pr?'disabled':''}>Купить за ${pr} зол.</button>`}
 else{if(w==='bag')acts+=`<button class="ab" data-a="equip">Надеть</button>`;else acts+=`<button class="ab alt" data-a="unequip" ${P.bag.length>=36?'disabled':''}>Снять</button>`;
 if(ctx==='merchant'&&w==='bag')acts+=`<button class="ab" data-a="sell">Продать за ${price(it)} зол.</button>`;
-if(ctx==='smith'){if(it.upg<10){const c=upCost(it);acts+=`<button class="ab" data-a="up" ${P.gold<c?'disabled':''}>Заточить до +${it.upg+1} · ${c} зол. · шанс ${upChance(it)}%</button>`}else acts+='<span class="muted">Заточено до предела</span>'}
+if(ctx==='smith'&&!it.corr){if(it.upg<10){const c=upCost(it);acts+=`<button class="ab" data-a="up" ${P.gold<c?'disabled':''}>Заточить до +${it.upg+1} · ${c} зол. · шанс ${upChance(it)}%</button>`}else acts+='<span class="muted">Заточено до предела</span>'}
 if(!ctx&&w==='bag')acts+=`<button class="ab alt" data-a="drop">Выбросить</button>`;if(w==='bag'&&NET.on)for(const pr of Object.values(NET.peers).filter(x=>x.cls))acts+=`<button class="ab alt" data-a="gift" data-to="${pr.id}">Передать: ${esc(pr.name)}</button>`;
-if(it.rar<3)acts+='<div class="orbacts">'+ORB_K.filter(k=>P.orbs[k]>0).map(k=>`<button class="ob" data-orb="${k}" style="--c:${ORBS[k].c}" title="${ORBS[k].d}">${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n} (${P.orbs[k]})</button>`).join('')+'</div>'}
+if(!it.corr)acts+='<div class="orbacts">'+ORB_K.filter(k=>P.orbs[k]>0&&(it.rar<3||k==='vaal')).map(k=>`<button class="ob" data-orb="${k}" style="--c:${ORBS[k].c}" title="${ORBS[k].d}">${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n} (${P.orbs[k]})</button>`).join('')+'</div>'}
 d.innerHTML=`${ttHTML(it)}${w!=='eq'?cmpHTML(it):''}<div class="acts">${acts}</div>`}
 const orbPrice=k=>({trans:25,alt:40,aug:60}[k])*Math.max(1,S.L||1);
 $('lfBtn').onclick=()=>{P.lf=((P.lf|0)+1)%3;save();renderInv();toast(['Показываются все вещи','Обычные вещи сразу превращаются в золото','Обычные и магические превращаются в золото. Вещи лучше надетых всегда видны'][P.lf],2.6)};
@@ -1094,9 +1094,9 @@ if(!T.sm||!L.some(x=>x.it===T.sm))T.sm=(P.eq.weapon)||(L[0]&&L[0].it)||null;
 let list='<div><div class="sect" style="margin-top:0"><span>Что заточить</span></div><div class="smlist">'+(L.length?L.map(x=>{const it=x.it,mx=it.upg>=10;return `<div role="button" class="smrow ${T.sm===it?'sel':''}" data-sm="${x.w}:${x.k}">${tcell(it).replace(/^<button/,'<span').replace(/<\/button>$/,'</span>')}<span><b style="color:${RC[it.rar]}">${esc(it.name)}</b><small>${x.w==='eq'?'надето · '+SLOT_N[it.slot]:'в сумке · '+SLOT_N[it.slot]}${mx?' · предел':' · шанс '+upChance(it)+'%'}</small></span><span class="lv">+${it.upg}</span></div>`}).join(''):'<p class="muted">Нет вещей.</p>')+'</div></div>';
 let anv='<div class="anvil">';const it=T.sm;
 if(!it)anv+='<p class="muted">Выберите вещь слева.</p>';
-else{const u=it.upg,mx=u>=10;anv+=`<div class="big">${tcell(it)}</div><h4 style="color:${RC[it.rar]}">${esc(it.name)}</h4><div class="lvl">+${u}${mx?'':`<span>→</span>+${u+1}`}</div>`;
+else{const u=it.upg,mx=u>=10||it.corr;anv+=`<div class="big">${tcell(it)}</div><h4 style="color:${RC[it.rar]}">${esc(it.name)}</h4><div class="lvl">+${u}${mx?'':`<span>→</span>+${u+1}`}</div>`;
 anv+='<div class="pips">'+Array.from({length:10},(_,i)=>`<i class="${i<u?'on':i===u&&!mx?'nx':''}"></i>`).join('')+'</div><div class="pipl">'+Array.from({length:10},(_,i)=>`<span>${i===0?'мерцание':i===5?'аура':i===9?'лучи':''}</span>`).join('')+'</div>';
-if(mx)anv+='<p class="res ok">Заточено до предела — оружие сияет лучами.</p>';
+if(mx)anv+=it.corr?'<p class="res fail">Осквернённую вещь нельзя заточить.</p>':'<p class="res ok">Заточено до предела — оружие сияет лучами.</p>';
 else{const c=upCost(it),ch=upChance(it),col=ch>=80?'#5ee07a':ch>=50?'#ffd774':'#ff7a6a';
 anv+='<div class="urows">'+upRows(it).map(r=>`<div><span>${esc(String(r[0]))}</span><span><span class="a">${r[1]}</span> → <span class="b">${r[2]}</span></span></div>`).join('')+'</div>';
 const ng=glowName(u+1);if(ng!==glowName(u))anv+=`<div class="risk" style="color:#ffd774">На +${u+1} появится свечение: ${ng}</div>`;
@@ -1177,9 +1177,9 @@ function monFx(dt){monLabels();if(frameN%2)return;for(const M of mons){if(M.dead
 function ttHTML(it){const u=it.upg,m=1+.1*u,R=['n','m','r','u'][it.rar];const seg=[];
 const base=[];if(it.dmg)base.push(`<div>Урон: <b>${Math.round(it.dmg[0]*m)}–${Math.round(it.dmg[1]*m)}</b></div>`);if(it.wb)base.push(`<div>Ударов в секунду: <b>${WBASE[it.wb].aps}</b></div><div class="g">${WBASE[it.wb].hands===2?'Двуручное':'Одноручное'}</div>`);if(it.armor)base.push(`<div>Броня: <b>${Math.round(it.armor*m)}</b></div>`);if(u)base.push(`<div>Заточка: <b style="color:#ffd774">+${u}</b> <span class="g">(+${u*10}% к свойствам)</span></div>`);
 if(base.length)seg.push(base.join(''));seg.push(`<div class="g">Уровень предмета: <b>${it.ilvl}</b></div>`);
-if(it.imp)seg.push(`<div class="mod">${stLine(it.imp.k,it.imp.v*m)}</div>`);
+if(it.imp||it.cimp)seg.push((it.imp?`<div class="mod">${stLine(it.imp.k,it.imp.v*m)}</div>`:'')+(it.cimp?`<div class="mod" style="color:#ff6a5a">${stLine(it.cimp.k,it.cimp.v)}</div>`:''));
 const af=it.aff.map(a=>`<div class="mod${a.cr?' cr':''}">${AFF[a.k].t.replace('{v}',fmt(a.v*m,AFF[a.k].i))}${a.cr?' <small>(создано)</small>':''}</div>`);if(it.st)for(const k in it.st)if(k!=='bloodMagic')af.push(`<div class="mod">${stLine(k,it.st[k])}</div>`);else af.push('<div class="mod">Умения тратят здоровье вместо маны</div>');
-if(af.length)seg.push(af.join(''));if(it.lore)seg.push(`<div class="lore">«${esc(it.lore)}»</div>`);
+if(af.length)seg.push(af.join(''));if(it.corr)seg.push('<div style="color:#d20000;font-weight:700">Осквернено</div>');if(it.lore)seg.push(`<div class="lore">«${esc(it.lore)}»</div>`);
 const two=it.rar>=2;return `<div class="tt ${R}"><div class="tth"><b>${esc(it.name)}</b>${two?`<span>${esc(it.base)}</span>`:''}</div><div class="ttb">${seg.join('<i class="sep"></i>')}</div></div>`}
 
 function dropFrag(p){const el=document.createElement('div');el.className='loot fr';el.innerHTML=gi('death-skull','#ff5a8a')+'Фрагмент Тлена';const l=lootObj(p,el,{frag:1,hi:true});
@@ -1307,7 +1307,7 @@ if(dl){const i=+dl.dataset.del,c=charsGet();if(!dl.dataset.armed){dl.dataset.arm
 /* верстак: гарантированное свойство за золото и сферу */
 const crIdx=it=>it.aff.findIndex(a=>a.cr);
 const benchCost=it=>Math.round(40*it.ilvl+60);
-function benchHTML(it){return benchHTML0(it)+essHTML(it)}
+function benchHTML(it){if(it&&it.corr)return '<div class="bench"><p class="muted" style="font-size:12.5px;color:#ff6a5a">Осквернённую вещь нельзя изменить на верстаке.</p></div>';return benchHTML0(it)+essHTML(it)}
 function benchHTML0(it){if(!it||!SLOTS.includes(it.slot))return'';let h='<div class="bench"><div class="sect"><span>Верстак</span><small style="text-transform:none;letter-spacing:0">одно созданное свойство на вещь</small></div>';
 if(it.rar===0||it.rar===3)return h+`<p class="muted" style="font-size:12.5px">${it.rar===3?'Уникальные вещи нельзя изменить.':'Сначала сделайте вещь магической (Сфера превращения).'}</p></div>`;
 if(crIdx(it)>=0){const a=it.aff[crIdx(it)];return h+`<p style="font-size:13px">Создано: <span style="color:#b8a0ff">${a?AFF[a.k].t.replace('{v}',fmt(a.v,AFF[a.k].i)):''}</span></p><button class="ab alt" data-bench="rm">Убрать созданное свойство</button></div>`}
@@ -1355,7 +1355,7 @@ let hapT=0;function haptic(k){const now=performance.now();if(now-hapT<120)return
 const GUIDE=[['Управление','Телефон: коснись экрана и веди пальцем — герой идёт и сам бьёт ближайших врагов. Q/E/R — умения, синяя кнопка — рывок в сторону движения, красная — флакон. ПК: WASD или мышь, Q/E/R, пробел, F.'],
 ['Лагерь','Торговка Вера покупает и продаёт вещи и сферы. Кузнец Гром затачивает вещи до +10 и добавляет свойства на верстаке. Хранилище — общий сундук для всех героев. Портал на севере ведёт в земли и на карты.'],
 ['Добыча','Чем ярче подпись и выше столб света, тем ценнее вещь: белые — обычные, синие — магические, жёлтые — редкие, оранжевые — уникальные. ▲ — лучше надетого. Фильтр добычи в сумке превращает мусор в золото.'],
-['Сферы','Превращения: обычная → магическая. Перемен: перебросить магическую. Дополнения: +свойство магической. Царская: магическая → редкая. Хаоса: перебросить редкую. Возвышения: +свойство редкой. Божественная: перебросить значения. Очищения: убрать всё. Сферы работают и на картах.'],
+['Сферы','Превращения: обычная → магическая. Перемен: перебросить магическую. Дополнения: +свойство магической. Царская: магическая → редкая. Хаоса: перебросить редкую. Возвышения: +свойство редкой. Божественная: перебросить значения. Очищения: убрать всё. Ваал: осквернить вещь — может стать сильнее (заточка до +12, особое свойство) или не измениться, но изменить её потом нельзя. Сферы работают и на картах.'],
 ['Заточка','Каждая ступень +10% ко всем свойствам вещи. С +1 оружие мерцает, с +6 появляется аура, на +10 — лучи. При неудаче сгорает золото, вещь остаётся.'],
 ['Умения и камни','У каждого класса 21 умение в трёх ветках, с собой — три. В каждое умение можно вставить 2 камня поддержки: больше снарядов, цепь, область, урон и другие. Камни падают с редких монстров и стражей.'],
 ['Восхождение','Победа над стражами «Лагеря культистов», «Затопленных руин», «Сердца Тлена» и первая карта 5-го тира дают очки Восхождения. Выбери один из двух подклассов в окне «Пассивы».'],
@@ -1441,3 +1441,12 @@ const AN=[{id:'rift',n:'Зов разлома',d:'Разломы на карта
 const atl=k=>!!(P&&P.atlN&&P.atlN.includes(k))&&S.zi<0;
 function atlPts(){return (P.atlas||[]).length+(P.pinK||0)-(P.atlN||[]).length}
 function atlTreeHTML(){const pts=atlPts();return `<div class="sect" style="margin-top:12px"><span>Развитие Атласа</span><span style="text-transform:none;letter-spacing:0">очков: <b style="color:#9ad0ff">${pts}</b></span></div><div class="atln">`+AN.map(n=>{const on=(P.atlN||[]).includes(n.id);return `<button class="atlb ${on?'on':''}" data-an2="${n.id}" ${on||pts<=0?'disabled':''}><b>${n.n}</b><small>${n.d}</small></button>`}).join('')+'</div><p class="muted" style="font-size:12px">Очки: 1 за каждый покорённый тир и за каждую победу над Пожирателем. Бонусы действуют только на картах.</p>'}
+
+/* сфера ваал: осквернение */
+const CIMP=[{k:'skillLvl',v:1,s:['amulet','helmet']},{k:'dmgP',v:25},{k:'hpP',v:12},{k:'crit',v:3},{k:'aspd',v:8},{k:'move',v:8,s:['boots']},{k:'leech',v:2},{k:'cdr',v:10},{k:'rarity',v:20}];
+function vaal(it){it.corr=1;const r=Math.random();let msg;
+if(r<.25){msg='Осквернение: без изменений'}
+else if(r<.5){const pool=CIMP.filter(c=>!c.s||c.s.includes(it.slot));const c=pick(pool);it.cimp={k:c.k,v:c.v};msg='Осквернение: новое свойство — '+stLine(c.k,c.v)}
+else if(r<.75){if(it.rar===3){it.upg=Math.min(12,it.upg+2);msg='Осквернение: заточка +2 (до +'+it.upg+')'}else{it.rar=2;rollAff(it,ri(4,6));nameIt(it);msg='Осквернение: вещь переродилась редкой'}}
+else{it.upg=Math.min(12,it.upg+2);msg='Осквернение: заточка +2 (до +'+it.upg+')'}
+snd(140,.6,'sawtooth',.12,.4);setTimeout(()=>snd(900,.3,'triangle',.08),200);burst(H.g.position.clone().setY(1.5),'#ff2a2a',30,4,.3,.6,2);haptic('heavy');toast(msg,3);return null}
