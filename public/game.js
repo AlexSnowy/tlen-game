@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import {RelaySocket} from './relay.js';
-import {GI,SK_IC,IT_IC} from './icons.js';
+import {GI,SK_IC,IT_IC,UI_IC} from './icons.js';
+const gi=(n,c,st='')=>GI[n]?`<svg class="gi" viewBox="0 0 512 512" style="${c?'color:'+c+';':''}${st}">${GI[n]}</svg>`:'';
+const uiI=(k,c,st)=>gi(UI_IC[k],c,st);
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
@@ -317,7 +319,7 @@ if(H.hp<=0){if(H.immortal>0){H.hp=1}else{H.hp=0;die()}}}
 function enemyHitAlly(a,d){a.hp-=d;burst(a.g.position.clone().setY(1.2),'#ff5a4a',5,2,.25,.3,1.5)}
 function gainXp(x){P.xp+=x;while(P.xp>=need(P.lvl)){P.xp-=need(P.lvl);P.lvl++;P.spts++;P.ppts++;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);const p=H.g.position.clone();p.y=2.8;num(p,'Уровень '+P.lvl,'lvl');
 ringFx(H.g.position.x,H.g.position.z,5,'#ffd774',.8,.1);for(let i=0;i<70;i++){const a=rand(0,6.28),r=rand(0,1.2);emit(H.g.position.x+Math.cos(a)*r,rand(0,.5),H.g.position.z+Math.sin(a)*r,0,rand(3,7),0,rand(.8,1.5),rand(.2,.45),3,2.2,.8,0,.5)}
-flash(H.g.position,'#ffd774',60,.8);snd(523,.15,'triangle',.15);setTimeout(()=>snd(784,.3,'triangle',.15),120);toast('Новый уровень! Есть очко умений (K) и пассивное очко (P).',4)}}
+flash(H.g.position,'#ffd774',60,.8);snd(523,.15,'triangle',.15);setTimeout(()=>snd(784,.3,'triangle',.15),120);toast((touch?'Новый уровень! Есть очко умений и пассивное очко.':'Новый уровень! Есть очко умений (K) и пассивное очко (P).'),4)}}
 
 /* ================= HERO SKILLS ================= */
 const ANIM={cast:'Spellcast_Shoot',raise:'Spellcast_Raise',long:'Spellcast_Long',summon:'Spellcast_Summon',buff:'Use_Item',cry:'Cheer',throw:'Throw',stab:'1H_Melee_Attack_Stab',bash:'Block_Attack',leap:'Jump_Full_Short',spin:'2H_Melee_Attack_Spinning'};
@@ -452,13 +454,13 @@ const gemG=new THREE.OctahedronGeometry(.22,0),orbG=new THREE.SphereGeometry(.18
 const RCH=['#d6d2c8','#8ea2ff','#ffe36b','#d8782e'],RN=['Обычный','Магический','Редкий','Уникальный'];
 function lootObj(p,el,o){const x=p.x+rand(-1.8,1.8),z=p.z+rand(-1.8,1.8),g=new THREE.Group();g.position.set(p.x,1,p.z);dyn.add(g);$('labels').appendChild(el);el.style.display='none';
 const l=Object.assign({g,el,pos:g.position,fly:{t:0,sx:p.x,sz:p.z,tx:x,tz:z}},o);el.onclick=()=>{H.target=new THREE.Vector3(l.fly.tx,0,l.fly.tz);H.pick=l};loot.push(l);return l}
-function dropItem(p,it){const el=document.createElement('div');el.className='loot';el.style.color=RCH[it.rar];el.textContent=it.name;const l=lootObj(p,el,{it});
+function dropItem(p,it){const el=document.createElement('div');el.className='loot';el.style.color=RCH[it.rar];el.innerHTML=itIcon(it)+esc(it.name);const l=lootObj(p,el,{it});
 const col=new THREE.Color(RCH[it.rar]);const gem=new THREE.Mesh(gemG,new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:it.rar>=2?2.5:1.2,roughness:.3,metalness:.3}));gem.position.y=.35;l.g.add(gem);l.gem=gem;
 if(it.rar>=2){const b=new THREE.Mesh(new THREE.CylinderGeometry(.18,.45,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b}
 if(it.rar>=2)snd(it.rar===3?880:660,.5,'triangle',.1,1.5)}
-function dropOrb(p){const k=wpick(ORB_K.map(k=>[k,ORBS[k].w]));const el=document.createElement('div');el.className='loot o';el.textContent=ORBS[k].n;const l=lootObj(p,el,{orb:k});
+function dropOrb(p){const k=wpick(ORB_K.map(k=>[k,ORBS[k].w]));const el=document.createElement('div');el.className='loot o';el.innerHTML=uiI('orb:'+k,ORBS[k].c)+esc(ORBS[k].n);const l=lootObj(p,el,{orb:k});
 const m=new THREE.Mesh(orbG,new THREE.MeshStandardMaterial({color:ORBS[k].c,emissive:ORBS[k].c,emissiveIntensity:1.6,roughness:.2,metalness:.5}));m.position.y=.3;l.g.add(m);l.gem=m;snd(990,.2,'sine',.06,1.3)}
-function dropGold(p,a){const el=document.createElement('div');el.className='loot g';el.textContent=a+' золота';const l=lootObj(p,el,{gold:a});l.g.add(prop('coin_stack_small',.55))}
+function dropGold(p,a){const el=document.createElement('div');el.className='loot g';el.innerHTML=uiI('gold','#ffd774')+a+' золота';const l=lootObj(p,el,{gold:a});l.g.add(prop('coin_stack_small',.55))}
 function tryPick(l){if(l.gold){P.gold+=l.gold;snd(1300,.06,'square',.035);burst({x:l.pos.x,y:.4,z:l.pos.z},'#ffd060',8,2,.25,.4,2,-2)}
 else if(l.orb){P.orbs[l.orb]=(P.orbs[l.orb]||0)+1;toast('Подобрано: '+ORBS[l.orb].n,1.4);burst({x:l.pos.x,y:.4,z:l.pos.z},ORBS[l.orb].c,10,2,.3,.5,2,-2);snd(1100,.12,'triangle',.08,1.4)}
 else{if(P.bag.length>=36){if(S.bagWarn<=0){toast('Сумка полна. Продай лишнее у торговки.',2);S.bagWarn=3}return}P.bag.push(l.it);snd(600,.1,'triangle',.08,1.3);burst({x:l.pos.x,y:.5,z:l.pos.z},RCH[l.it.rar],10,2,.3,.5,2,-2);if(l.it.rar>=2)toast('Подобрано: '+l.it.name,1.6)}
@@ -529,10 +531,10 @@ $('eqList').innerHTML=SLOTS.map(s=>{const it=P.eq[s];const sel=S.sel&&S.sel.w===
 return `<div class="eqrow ${sel?'sel':''}" data-eq="${s}">${it?cellHTML(it):`<button class="cell" style="color:#4a4650">${(n=>n&&GI[n]?`<svg class="gi" style="filter:none" viewBox="0 0 512 512">${GI[n]}</svg>`:`<svg viewBox="0 0 24 24">${ICO[s]}</svg>`)(IT_IC[s==='weapon'?'w:sword':s==='offhand'?'o:shield':s+':0'])}</button>`}<div><small>${SLOT_N[s]}</small><span style="color:${it?RC[it.rar]:'#777'}">${it?esc(it.name)+(it.upg?' +'+it.upg:''):blocked?'занято двуручным':'пусто'}</span></div></div>`}).join('');
 const s=ST;$('statList').innerHTML=[['Урон',Math.round(s.min)+'–'+Math.round(s.max)],['Урон в сек. (атака)',fmt(s.dps,0)],['Скорость атак',fmt(s.aps,0)+'/с'],['Шанс крита',fmt(s.crit,0)+'%'],['Крит. урон',Math.round(s.critM)+'%'],['Здоровье',Math.round(s.hp)],['Мана',Math.round(s.mana)+(s.reserve?` (резерв ${Math.round(s.reserve*100)}%)`:'')],['Броня',Math.round(s.armor)],
 ['Огонь / Холод / Молния',`+${Math.round(s.fireP+s.dmgP)}% / +${Math.round(s.coldP+s.dmgP)}% / +${Math.round(s.lightP+s.dmgP)}%`],['Физ. / Яд / Свет',`+${Math.round(s.physP+s.dmgP)}% / +${Math.round(s.chaosP+s.dmgP)}% / +${Math.round(s.holyP+s.dmgP)}%`],['Регенерация',fmt(s.regen,0)+'/с'],['Вампиризм',fmt(s.leech,0)+'%'],['Скорость бега',(s.move>=0?'+':'')+Math.round(s.move)+'%'],['Редкость добычи','+'+Math.round(s.rarity)+'%']].map(x=>`<dt>${x[0]}</dt><dd>${x[1]}</dd>`).join('');
-$('orbBar').innerHTML=ORB_K.map(k=>`<span class="orb" title="${ORBS[k].n}: ${ORBS[k].d}" style="--c:${ORBS[k].c}"><i></i>${P.orbs[k]||0}</span>`).join('');
+$('orbBar').innerHTML=ORB_K.map(k=>`<span class="orb" title="${ORBS[k].n}: ${ORBS[k].d}" style="--c:${ORBS[k].c}">${uiI('orb:'+k,ORBS[k].c)}${P.orbs[k]||0}</span>`).join('');
 $('bagCount').textContent='Сумка '+P.bag.length+'/36 · '+P.gold+' зол.';$('sellAll').style.display=ctx==='merchant'?'':'none';$('sellEvery').style.display=ctx==='merchant'?'':'none';
 let shop='';if(ctx==='merchant'){shop='<div class="shop"><b>Товары торговки</b><div class="bag">'+S.shop.map((it,i)=>cellHTML(it,S.sel&&S.sel.w==='shop'&&S.sel.k===i?'sel':'',`data-shop="${i}"`)).join('')+'</div><div class="acts">'+
-['trans','alt','aug'].map(k=>`<button class="ab alt" data-buyorb="${k}">${ORBS[k].n} · ${orbPrice(k)} зол.</button>`).join('')+'</div></div>'}$('shopBox').innerHTML=shop;
+['trans','alt','aug'].map(k=>`<button class="ab alt" data-buyorb="${k}">${uiI('orb:'+k,ORBS[k].c,'width:18px;height:18px;vertical-align:-4px;margin-right:6px')}${ORBS[k].n} · ${orbPrice(k)} зол.</button>`).join('')+'</div></div>'}$('shopBox').innerHTML=shop;
 let cells='';for(let i=0;i<36;i++){const it=P.bag[i];const sel=S.sel&&S.sel.w==='bag'&&S.sel.k===i;cells+=it?cellHTML(it,sel?'sel':'',`data-bag="${i}"`):'<button class="cell" disabled style="cursor:default"></button>'}$('bag').innerHTML=cells;
 const it=selItem();const d=$('detail');if(!it){d.innerHTML='<p class="muted" style="margin:0">Нажми на вещь в сумке или в снаряжении.</p>';return}
 let acts='';const w=S.sel.w;
@@ -541,7 +543,7 @@ else{if(w==='bag')acts+=`<button class="ab" data-a="equip">Надеть</button>
 if(ctx==='merchant'&&w==='bag')acts+=`<button class="ab" data-a="sell">Продать за ${price(it)} зол.</button>`;
 if(ctx==='smith'){if(it.upg<10){const c=upCost(it);acts+=`<button class="ab" data-a="up" ${P.gold<c?'disabled':''}>Заточить до +${it.upg+1} · ${c} зол. · шанс ${upChance(it)}%</button>`}else acts+='<span class="muted">Заточено до предела</span>'}
 if(!ctx&&w==='bag')acts+=`<button class="ab alt" data-a="drop">Выбросить</button>`;
-if(it.rar<3)acts+='<div class="orbacts">'+ORB_K.filter(k=>P.orbs[k]>0).map(k=>`<button class="ob" data-orb="${k}" style="--c:${ORBS[k].c}" title="${ORBS[k].d}"><i></i>${ORBS[k].n} (${P.orbs[k]})</button>`).join('')+'</div>'}
+if(it.rar<3)acts+='<div class="orbacts">'+ORB_K.filter(k=>P.orbs[k]>0).map(k=>`<button class="ob" data-orb="${k}" style="--c:${ORBS[k].c}" title="${ORBS[k].d}">${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n} (${P.orbs[k]})</button>`).join('')+'</div>'}
 d.innerHTML=`<h4 style="color:${RC[it.rar]}">${esc(it.name)}${it.upg?' +'+it.upg:''}</h4><div class="sub">${RN[it.rar]} · ${esc(it.base)} · ${SLOT_N[it.slot]} · уровень ${it.ilvl}</div><ul>${itemLines(it)}</ul>${w!=='eq'?cmpHTML(it):''}<div class="acts">${acts}</div>`}
 const orbPrice=k=>({trans:25,alt:40,aug:60}[k])*Math.max(1,S.L||1);
 $('pInv').addEventListener('click',e=>{const b=e.target.closest('[data-bag],[data-eq],[data-a],[data-shop],[data-orb],[data-buyorb]');if(!b)return;
@@ -567,6 +569,7 @@ $('sellAll').onclick=()=>{let g=0;P.bag=P.bag.filter(it=>{if(it.rar<=1&&it.upg==
 const KIND_N={proj:'Снаряд',nova:'Область',aoe:'Область',ground:'Зона',chain:'Цепь',cone:'Удар',slam:'Удар о землю',wave:'Волна',whirl:'Вращение',leap:'Прыжок',charge:'Рывок',shadow:'Телепорт',barrage:'Шквал',orb:'Сфера',buff:'Усиление',warcry:'Клич',aura:'Аура',summon:'Призыв',trap:'Ловушка',totem:'Тотем',mod:'Пассивное'};
 const KIND_I={proj:'<path d="M4 12h12M12 7l5 5-5 5"/>',nova:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="3 2.5"/>',aoe:'<circle cx="12" cy="13" r="6"/><path d="M12 2v6"/>',ground:'<path d="M3 17c3-2 6 2 9 0s6-2 9 0M3 13c3-2 6 2 9 0s6-2 9 0"/>',chain:'<path d="M13 2L5 13h6l-2 9 9-12h-6z"/>',cone:'<path d="M4 20L20 8M6 12c4-6 10-7 14-4"/>',slam:'<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>',wave:'<path d="M3 18l4-4 3 3 4-6 3 3 4-6"/>',whirl:'<path d="M12 12m-2 0a2 2 0 1 0 4 0 4 4 0 1 0-8 0 6 6 0 1 0 12 0"/>',leap:'<path d="M4 18c3-12 13-12 16 0"/><path d="M18 14l2 4 3-2"/>',charge:'<path d="M3 12h10M9 8l4 4-4 4M15 5v14"/>',shadow:'<circle cx="12" cy="9" r="4"/><path d="M5 21c1-5 13-5 14 0"/>',barrage:'<path d="M3 7h10M3 12h12M3 17h10M13 4l4 3-4 3"/>',orb:'<circle cx="12" cy="12" r="5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',buff:'<path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6z"/>',warcry:'<path d="M12 4v10M12 18v2M6 6l-2-2M18 6l2-2"/>',aura:'<circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/>',summon:'<circle cx="12" cy="7" r="3"/><path d="M6 21v-4a6 6 0 0 1 12 0v4"/>',trap:'<path d="M12 4l9 16H3z"/>',totem:'<path d="M9 21V5h6v16M7 5h10"/>',mod:'<path d="M12 3v18M3 12h18"/>'};
 for(const k in SKILLS)SKILLS[k]._k=k;
+{const f=$('sFlask'),d=$('sDash');f.querySelector('svg').outerHTML=uiI('flask','#ff6a5a');d.querySelector('svg').outerHTML=uiI('dash','#8fc0ff');for(const [id,k] of [['bParty','party'],['bInv','inv'],['bSk','sk'],['bPas','pas'],['bTown','town']]){const b=$(id);if(b)b.insertAdjacentHTML('afterbegin',uiI(k,'#e8c98a','width:16px;height:16px;vertical-align:-3px;margin-right:5px;filter:none'))}const g=$('gold');if(g){g.removeAttribute('id');g.innerHTML=uiI('gold','#ffd774','width:16px;height:16px;vertical-align:-3px;margin-right:4px;filter:none')+'<span id="gold">'+g.textContent+'</span>'}}
 const skIcon=sk=>{const n=SK_IC[sk._k];if(n&&GI[n]){const c=sk.el?EL[sk.el].c:sk.kind==='mod'?'#c9c3b8':'#ffd774';return `<svg class="gi" viewBox="0 0 512 512" style="color:${c}">${GI[n]}</svg>`}return skIcon0(sk)};
 const skIcon0=sk=>`<svg viewBox="0 0 24 24" fill="none" stroke="${sk.el?EL[sk.el].c:sk.kind==='aura'?'#ffd774':sk.kind==='mod'?'#bbb':'#ffd774'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${KIND_I[sk.kind]}</svg>`;
 function skNums(id,lv){const sk=SKILLS[id];if(!lv)lv=1;const out=[];if(sk.m)out.push('Урон '+Math.round((sk.m+sk.mL*(lv-1))*100)+'% от оружия');if(sk.mana)out.push('Мана '+Math.round(sk.mana*(1+.08*(lv-1))));if(sk.cd)out.push('Перезарядка '+sk.cd+'с');
@@ -624,7 +627,7 @@ await loadAsset(CLASSES[P.cls].model);if(H.c)H.g.remove(H.c.root);H.c=makeChar(C
 $('ovLoad').classList.remove('on');$('hud').classList.add('on');updSkillBar();enterTown();setPaused();sendInfo();if(NET.pendingJoin){const c=NET.pendingJoin;NET.pendingJoin=null;netConnect(c)}if(P.lvl===1&&P.xp===0)toast(touch?'Подойди к порталу на севере лагеря. Умения и пассивы — кнопки сверху.':'Подойди к порталу на севере лагеря. Умения — K, пассивное дерево — P.',5)}
 $('bCont').onclick=()=>{const s=load();if(s)startGame(s)};
 $('bNew').onclick=()=>{$('ovTitle').classList.remove('on');$('ovClass').classList.add('on');renderClasses();setPaused()};
-function renderClasses(){$('classList').innerHTML=Object.entries(CLASSES).map(([k,c])=>`<button class="clc" data-cls="${k}" style="--c:${c.col}"><b>${c.n}</b><span>${c.role}</span><small>Ветки: ${c.branches.join(' · ')}</small><small>Оружие: ${c.weapons.map(w=>WBASE[w].n).join(', ')}</small></button>`).join('')}
+function renderClasses(){$('classList').innerHTML=Object.entries(CLASSES).map(([k,c])=>`<button class="clc" data-cls="${k}" style="--c:${c.col}"><b>${uiI('cls:'+k,c.col,'width:30px;height:30px;vertical-align:-7px;margin-right:6px')}${c.n}</b><span>${c.role}</span><small>Ветки: ${c.branches.join(' · ')}</small><small>Оружие: ${c.weapons.map(w=>WBASE[w].n).join(', ')}</small></button>`).join('')}
 $('classList').addEventListener('click',e=>{const b=e.target.closest('[data-cls]');if(!b)return;const had=load();if(had&&!b.dataset.armed){document.querySelectorAll('.clc').forEach(x=>delete x.dataset.armed);b.dataset.armed=1;b.querySelector('b').textContent=CLASSES[b.dataset.cls].n+' — нажми ещё раз: старый герой будет удалён';return}startGame(freshP(b.dataset.cls))});
 $('bBack').onclick=()=>{$('ovClass').classList.remove('on');$('ovTitle').classList.add('on');setPaused()};
 
