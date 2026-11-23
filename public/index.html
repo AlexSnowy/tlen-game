@@ -196,6 +196,42 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 .loot svg.gi{width:14px;height:14px;vertical-align:-3px;margin-right:4px;filter:none}.orb svg.gi,.ob svg.gi{width:16px;height:16px;filter:none}
 
 @media (max-width:600px) and (orientation:portrait){.trow{flex-wrap:nowrap;gap:5px}.trow .hb{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10.5px;padding:4px 6px;min-height:44px;min-width:54px;line-height:1.1}.trow .hb svg.gi{width:19px!important;height:19px!important;margin:0 0 2px!important}.trow .gold{font-size:13px;padding:6px 8px}}
+
+.tw header{align-items:flex-start}.gpill{margin-left:auto;margin-right:10px;align-self:center;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font:700 15px Rubik;color:#ffd774;white-space:nowrap}
+.gpill svg.gi{width:16px;height:16px;vertical-align:-3px;margin-right:5px;filter:none}
+.tabs{display:flex;gap:6px;margin:10px 0 12px;border-bottom:1px solid var(--line)}.tabs button{flex:1;background:none;border:0;border-bottom:3px solid transparent;color:#a99f8f;font:600 16px Rubik;padding:10px 6px;cursor:pointer}.tabs button.on{color:var(--gold);border-color:var(--gold)}
+.sect{font:600 13px Rubik;letter-spacing:.06em;text-transform:uppercase;color:#a99f8f;margin:14px 0 8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tray{min-height:76px;border:1px dashed rgba(232,201,138,.45);border-radius:12px;padding:8px;background:rgba(232,201,138,.05)}
+.tray .bag{grid-template-columns:repeat(8,minmax(0,1fr))!important}
+.tray .hint{color:#8a8070;font-size:13.5px;text-align:center;padding:16px 6px}
+.deal{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}.deal .sum{flex:1;font-size:15px}.deal .sum b{color:#ffd774;font:700 20px Rubik}
+.deal .ab{min-width:150px;font-size:16px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:99px;padding:6px 11px;color:var(--ink);font:500 13px Rubik;cursor:pointer;min-height:32px}.chip:hover{border-color:var(--gold)}
+.cell .pr{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.72);color:#ffd774;font:700 10px Rubik;border-radius:0 0 7px 7px;padding:1px 0;text-align:center;line-height:1.3}
+.cell .pr.no{color:#ff7a6a}.cell.has-pr small{bottom:14px}
+.cell .upb{position:absolute;left:3px;top:2px;color:#5ee07a;font:800 13px Rubik;text-shadow:0 1px 2px #000}
+.cell.intray{opacity:.32}.cell.intray::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font:800 26px Rubik;color:#ffd774;opacity:1}
+.tdet{margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.2)}.tdet h4{margin:0 0 2px;font-size:17px}.tdet ul{margin:6px 0;padding-left:18px;font-size:13.5px}.tdet .sub{font-size:12px;color:#a99f8f}
+.orbrow{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;margin-bottom:6px;background:rgba(0,0,0,.18)}.orbrow svg.gi{width:30px;height:30px}.orbrow b{display:block;font-size:15px}.orbrow small{color:#a99f8f;font-size:12.5px;line-height:1.3;display:block}.orbrow .ab{min-height:38px;padding:8px 12px;font-size:14px;white-space:nowrap}
+.smith{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:16px}
+.smlist{display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto;padding-right:4px}
+.smrow{display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;padding:6px 8px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.18);cursor:pointer;text-align:left;color:var(--ink);font:inherit}
+.smrow.sel{border-color:var(--gold);background:rgba(232,201,138,.1)}.smrow .cell{width:46px;display:grid;pointer-events:none}.smrow .cell svg.gi{width:72%;height:72%}.smrow b{display:block;font-size:14.5px}.smrow small{color:#a99f8f;font-size:12px}.smrow .lv{font:800 16px Rubik;color:#ffd774}
+.anvil{border:1px solid var(--line);border-radius:16px;padding:14px;background:radial-gradient(circle at 50% 0%,rgba(255,150,60,.12),rgba(0,0,0,.25) 70%);text-align:center;position:relative;overflow:hidden}
+.anvil .big{width:92px;margin:4px auto 8px}.anvil .big svg.gi{width:74%;height:74%}
+.anvil h4{margin:0;font-size:18px}.lvl{font:800 30px Rubik;margin:6px 0 2px;color:#ffd774}.lvl span{color:#a99f8f;font-weight:500;font-size:20px;margin:0 8px}
+.pips{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0 2px}.pips i{height:9px;border-radius:3px;background:rgba(255,255,255,.1)}.pips i.on{background:linear-gradient(#ffe39a,#d59a2a)}.pips i.nx{background:rgba(255,215,116,.35);animation:pp 1s ease-in-out infinite alternate}
+@keyframes pp{to{background:rgba(255,215,116,.75)}}
+.pipl{display:grid;grid-template-columns:repeat(10,1fr);font-size:10.5px;color:#a99f8f;margin-bottom:10px}.pipl span{white-space:nowrap}
+.urows{text-align:left;font-size:13.5px;margin:8px 0;display:grid;gap:3px}.urows div{display:flex;justify-content:space-between;gap:8px}.urows .a{color:#a99f8f}.urows .b{color:#7cf08e;font-weight:600}
+.chance{display:flex;align-items:center;gap:10px;margin:10px 0 4px}.chance .bar{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.chance .bar i{display:block;height:100%}.chance b{font:800 22px Rubik;min-width:58px;text-align:right}
+.risk{font-size:12.5px;color:#c9b8a0;margin:4px 0 10px;line-height:1.35}
+.anvil .ab{width:100%;font-size:16px;min-height:48px}
+.anvil.ok{animation:aok .9s ease-out}.anvil.fail{animation:afail .5s ease-in-out}
+@keyframes aok{0%{box-shadow:0 0 0 0 rgba(255,215,116,.9)}40%{box-shadow:0 0 40px 8px rgba(255,215,116,.6)}100%{box-shadow:0 0 0 0 rgba(255,215,116,0)}}
+@keyframes afail{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.res{font:700 16px Rubik;margin:6px 0 0;min-height:20px}.res.ok{color:#ffd774}.res.fail{color:#ff7a6a}
+@media (max-width:700px){.smith{grid-template-columns:1fr}.smith .anvil{order:-1}.smlist{max-height:none}.tray .bag{grid-template-columns:repeat(6,minmax(0,1fr))!important}.tw .gpill{font-size:13px;padding:5px 9px}.tw header p{display:none}}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -234,6 +270,15 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
     <section><div id="eqList"></div><dl class="stats" id="statList"></dl></section>
     <section><div id="shopBox"></div><div class="bh"><span id="bagCount"></span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="ab alt" id="sellAll">Продать обычные и магические</button><button class="ab alt" id="sellEvery">Продать всё</button></span></div><div class="bag" id="bag"></div><div class="orbs" id="orbBar"></div><div class="detail" id="detail"></div></section>
   </div>
+</div></div>
+<div class="panel" id="pShop"><div class="pw tw">
+  <header><div><h3>Торговка Вера</h3><p>«Покупаю всё, что принесёшь из земель Тлена. И продаю кое-что.»</p></div><span class="gpill" id="shGold"></span><button class="x" data-close>×</button></header>
+  <div class="tabs" id="shTabs"><button data-tab="sell">Продать</button><button data-tab="buy">Купить</button></div>
+  <div id="shBody"></div>
+</div></div>
+<div class="panel" id="pSmith"><div class="pw tw">
+  <header><div><h3>Кузнец Гром</h3><p>«Каждая ступень делает вещь на 10% сильнее. Чем выше заточка — тем больше риск.»</p></div><span class="gpill" id="smGold"></span><button class="x" data-close>×</button></header>
+  <div class="smith" id="smBody"></div>
 </div></div>
 <div class="panel" id="pSk"><div class="pw">
   <header><div><h3>Умения</h3><p id="skP"></p></div><button class="x" data-close>×</button></header>

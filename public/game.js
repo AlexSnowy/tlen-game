@@ -530,9 +530,9 @@ collide(p,.45);return l>.08}
 /* ================= UI ================= */
 const RC=RCH;
 function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass'].some(x=>$(x).classList.contains('on'))}
-function closePanels(){for(const id of['pInv','pSk','pPas','pPortal','pParty'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
+function closePanels(){for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
-({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()}})[w]();setPaused()}
+({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');T.res=null;renderSmith()}})[w]();setPaused()}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closePanels);
 document.querySelectorAll('.panel').forEach(p=>p.addEventListener('pointerdown',e=>{if(e.target===p)closePanels()}));
 const ICO={weapon:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',wand:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',staff:'<path d="M6 21L18 4"/><circle cx="18" cy="4.5" r="2.5"/><path d="M14 6l3 3"/>',
@@ -647,7 +647,7 @@ save();$('bossBar').classList.remove('on');setTimeout(()=>{if(lore){$('loreH').t
 $('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused()};
 function die(){S.mode='dead';H.whirl=null;hFull('Death_A',1,99);setTimeout(()=>{$('ovDead').classList.add('on');setPaused()},1500);snd(80,1.4,'sawtooth',.15,.4)}
 $('bRevive').onclick=()=>{$('ovDead').classList.remove('on');enterTown();setPaused()};
-function interact(){const n=nearNpc();if(!n)return;if(n.id==='merchant'){npcChars[0].play('Interact',{once:true,restart:true});togglePanel('inv','merchant')}else if(n.id==='smith')togglePanel('inv','smith');else{if(isGuest()){const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z);else toast('Жди, пока лидер группы откроет портал',2);return}togglePanel('portal')}}
+function interact(){const n=nearNpc();if(!n)return;if(n.id==='merchant'){npcChars[0].play('Interact',{once:true,restart:true});togglePanel('shop')}else if(n.id==='smith')togglePanel('smith');else{if(isGuest()){const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z);else toast('Жди, пока лидер группы откроет портал',2);return}togglePanel('portal')}}
 $('interact').onclick=interact;
 function nearNpc(){if(S.mode!=='town')return null;const p=H.g.position;return NPCS.find(n=>Math.hypot(n.x-p.x,n.z-p.z)<3.2)||null}
 async function startGame(p){initAudio();P=p;$('ovClass').classList.remove('on');$('ovTitle').classList.remove('on');$('ovLoad').classList.add('on');$('lTxt').textContent='Призываю героя…';setPaused();
@@ -988,3 +988,70 @@ $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,3
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');const s=load();if(s){$('bCont').style.display='inline-block';$('bCont').textContent='Продолжить: '+CLASSES[s.cls].n+', ур. '+s.lvl}setPaused();
 window.__dbg={S,H,heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+
+/* ================= ТОРГОВКА И КУЗНИЦА ================= */
+const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
+const goldPill=()=>uiI('gold','#ffd774')+P.gold+' зол.';
+const itId=it=>{if(it.id==null)it.id=uid++;return it.id};
+function isUpg(it){if(!it||!P.eq||!SLOTS.includes(it.slot))return false;const eq=Object.assign({},P.eq,{[it.slot]:it});if(it.slot==='weapon'&&WBASE[it.wb]&&WBASE[it.wb].hands===2)delete eq.offhand;const a=ST,b=calc(eq);
+return b.dps>a.dps*1.03||(Math.abs(b.dps-a.dps)<a.dps*.01&&(b.hp>a.hp+3||b.armor>a.armor+3))}
+function tcell(it,o={}){const pr=o.pr!=null?`<span class="pr ${o.no?'no':''}">${o.pr}</span>`:'';const up=o.up?'<span class="upb">▲</span>':'';
+return `<button class="cell ${o.cls||''} ${pr?'has-pr':''}" ${o.attr||''} style="color:${RC[it.rar]};border-color:${RC[it.rar]}66;box-shadow:inset 0 0 12px ${RC[it.rar]}22">${itIcon(it)}${it.upg?`<small>+${it.upg}</small>`:''}${up}${pr}</button>`}
+function detHTML(it,acts=''){return `<div class="tdet"><h4 style="color:${RC[it.rar]}">${esc(it.name)}${it.upg?' +'+it.upg:''}</h4><div class="sub">${RN[it.rar]} · ${esc(it.base)} · ${SLOT_N[it.slot]} · уровень ${it.ilvl}</div><ul>${itemLines(it)}</ul>${cmpHTML(it)}${acts?`<div class="acts">${acts}</div>`:''}</div>`}
+function renderShop(){$('shGold').innerHTML=goldPill();document.querySelectorAll('#shTabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===T.tab));
+for(const id of [...T.tray])if(!P.bag.some(it=>itId(it)===id))T.tray.delete(id);
+let h='';
+if(T.tab==='sell'){const tr=P.bag.filter(it=>T.tray.has(itId(it)));const sum=tr.reduce((a,it)=>a+price(it),0);
+h+=`<div class="sect"><span>Ваше предложение</span></div><div class="chips" style="margin:-2px 0 8px"><button class="chip" data-q="0">+ Обычные</button><button class="chip" data-q="1">+ Магические</button><button class="chip" data-q="2">+ Редкие</button><button class="chip" data-q="all">Всё</button>${tr.length?'<button class="chip" data-q="clr">Очистить</button>':''}</div>`;
+h+=`<div class="tray">${tr.length?'<div class="bag">'+tr.map(it=>tcell(it,{pr:price(it),attr:`data-tr="${itId(it)}"`})).join('')+'</div>':'<div class="hint">Нажимайте на вещи в сумке — они появятся здесь. Нажмите ещё раз, чтобы убрать.</div>'}</div>`;
+const rare=tr.filter(it=>it.rar>=2||it.upg>0).length;
+h+=`<div class="deal"><div class="sum">Вещей: ${tr.length} · вы получите <b>${sum}</b> зол.${rare?`<br><small style="color:#ffb35a">Среди них ${rare} редк./уник./заточенных</small>`:''}</div><button class="ab" data-a="sellgo" ${tr.length?'':'disabled'}>Продать</button></div>`;
+h+=`<div class="sect"><span>Сумка ${P.bag.length}/36</span><small style="text-transform:none;letter-spacing:0">▲ — лучше надетого</small></div><div class="bag">`;
+for(let i=0;i<36;i++){const it=P.bag[i];h+=it?tcell(it,{pr:price(it),up:isUpg(it),cls:T.tray.has(itId(it))?'intray':'',attr:`data-sb="${i}"`}):'<button class="cell" disabled style="cursor:default"></button>'}
+h+='</div>';const L=T.last!=null&&P.bag.find(it=>itId(it)===T.last);if(L)h+=detHTML(L)}
+else{h+=`<div class="sect"><span>Снаряжение</span><span style="text-transform:none;letter-spacing:0">цена × уровень зоны</span></div><div class="bag">`+
+(S.shop.length?S.shop.map((it,i)=>{const pr=price(it)*4;return tcell(it,{pr,no:P.gold<pr,up:isUpg(it),cls:T.buySel===i?'sel':'',attr:`data-buy="${i}"`})}).join(''):'<div class="muted">Товар раскуплен — загляни после следующего похода.</div>')+'</div>';
+const B=T.buySel!=null&&S.shop[T.buySel];if(B){const pr=price(B)*4;h+=detHTML(B,`<button class="ab" data-a="buygo" ${P.gold<pr||P.bag.length>=36?'disabled':''}>Купить за ${pr} зол.</button>${P.bag.length>=36?'<span class="muted">Сумка полна</span>':''}`)}
+h+='<div class="sect"><span>Сферы</span></div>'+['trans','alt','aug'].map(k=>{const pr=orbPrice(k);return `<div class="orbrow">${uiI('orb:'+k,ORBS[k].c)}<div><b style="color:${ORBS[k].c}">${ORBS[k].n} <small style="display:inline;color:#a99f8f">· у вас ${P.orbs[k]||0}</small></b><small>${ORBS[k].d}</small></div><button class="ab" data-bo="${k}" ${P.gold<pr?'disabled':''}>${pr} зол.</button></div>`}).join('')}
+$('shBody').innerHTML=h}
+$('pShop').addEventListener('click',e=>{const b=e.target.closest('[data-tab],[data-sb],[data-tr],[data-q],[data-a],[data-buy],[data-bo]');if(!b)return;const d=b.dataset;
+if(d.tab){T.tab=d.tab;T.buySel=null}
+else if(d.sb!==undefined){const it=P.bag[+d.sb];if(!it)return;const id=itId(it);T.tray.has(id)?T.tray.delete(id):T.tray.add(id);T.last=id;snd(900,.04,'square',.03)}
+else if(d.tr!==undefined){T.tray.delete(+d.tr);T.last=+d.tr}
+else if(d.q){if(d.q==='clr')T.tray.clear();else for(const it of P.bag)if(d.q==='all'||(it.rar===+d.q&&it.upg===0))T.tray.add(itId(it))}
+else if(d.a==='sellgo'){let g=0,n=0;P.bag=P.bag.filter(it=>{if(T.tray.has(itId(it))){g+=price(it);n++;return false}return true});T.tray.clear();T.last=null;P.gold+=g;if(n){toast('Продано '+n+' предм. за '+g+' зол.',2);snd(1200,.08,'square',.05);setTimeout(()=>snd(1500,.08,'square',.05),90)}save()}
+else if(d.buy!==undefined){T.buySel=+d.buy}
+else if(d.a==='buygo'){const it=S.shop[T.buySel];if(!it)return;const pr=price(it)*4;if(P.gold<pr||P.bag.length>=36)return;P.gold-=pr;P.bag.push(it);S.shop.splice(T.buySel,1);T.buySel=null;toast('Куплено: '+it.name,1.5);snd(1200,.08,'square',.05);save()}
+else if(d.bo){const pr=orbPrice(d.bo);if(P.gold<pr)return;P.gold-=pr;P.orbs[d.bo]=(P.orbs[d.bo]||0)+1;snd(1200,.08,'square',.05);save()}
+renderShop()});
+/* кузница */
+function smItems(){const L=[];for(const s of SLOTS)if(P.eq[s])L.push({it:P.eq[s],w:'eq',k:s});P.bag.forEach((it,i)=>L.push({it,w:'bag',k:i}));return L}
+function upRows(it){const a=1+.1*it.upg,b=a+.1,R=[['Сила вещи','+'+it.upg*10+'%','+'+(it.upg+1)*10+'%']],r=Math.round;
+if(it.dmg)R.push(['Урон',`${r(it.dmg[0]*a)}–${r(it.dmg[1]*a)}`,`${r(it.dmg[0]*b)}–${r(it.dmg[1]*b)}`]);
+if(it.armor)R.push(['Броня',r(it.armor*a),r(it.armor*b)]);
+if(it.imp)R.push([STAT_N[it.imp.k]||it.imp.k,fmt(it.imp.v*a,Math.abs(it.imp.v)>=5),fmt(it.imp.v*b,Math.abs(it.imp.v)>=5)]);
+for(const f of it.aff){const A=AFF[f.k];R.push([A.t.replace('{v}','').replace(/^[\s+%]+/,'').trim()||f.k,fmt(f.v*a,A.i),fmt(f.v*b,A.i)])}return R}
+const glowName=u=>u>=10?'лучи':u>=6?'аура':u>=1?'мерцание':'нет';
+function renderSmith(){$('smGold').innerHTML=goldPill();const L=smItems();
+if(!T.sm||!L.some(x=>x.it===T.sm))T.sm=(P.eq.weapon)||(L[0]&&L[0].it)||null;
+let list='<div><div class="sect" style="margin-top:0"><span>Что заточить</span></div><div class="smlist">'+(L.length?L.map(x=>{const it=x.it,mx=it.upg>=10;return `<div role="button" class="smrow ${T.sm===it?'sel':''}" data-sm="${x.w}:${x.k}">${tcell(it).replace(/^<button/,'<span').replace(/<\/button>$/,'</span>')}<span><b style="color:${RC[it.rar]}">${esc(it.name)}</b><small>${x.w==='eq'?'надето · '+SLOT_N[it.slot]:'в сумке · '+SLOT_N[it.slot]}${mx?' · предел':' · шанс '+upChance(it)+'%'}</small></span><span class="lv">+${it.upg}</span></div>`}).join(''):'<p class="muted">Нет вещей.</p>')+'</div></div>';
+let anv='<div class="anvil">';const it=T.sm;
+if(!it)anv+='<p class="muted">Выберите вещь слева.</p>';
+else{const u=it.upg,mx=u>=10;anv+=`<div class="big">${tcell(it)}</div><h4 style="color:${RC[it.rar]}">${esc(it.name)}</h4><div class="lvl">+${u}${mx?'':`<span>→</span>+${u+1}`}</div>`;
+anv+='<div class="pips">'+Array.from({length:10},(_,i)=>`<i class="${i<u?'on':i===u&&!mx?'nx':''}"></i>`).join('')+'</div><div class="pipl">'+Array.from({length:10},(_,i)=>`<span>${i===0?'мерцание':i===5?'аура':i===9?'лучи':''}</span>`).join('')+'</div>';
+if(mx)anv+='<p class="res ok">Заточено до предела — оружие сияет лучами.</p>';
+else{const c=upCost(it),ch=upChance(it),col=ch>=80?'#5ee07a':ch>=50?'#ffd774':'#ff7a6a';
+anv+='<div class="urows">'+upRows(it).map(r=>`<div><span>${esc(String(r[0]))}</span><span><span class="a">${r[1]}</span> → <span class="b">${r[2]}</span></span></div>`).join('')+'</div>';
+const ng=glowName(u+1);if(ng!==glowName(u))anv+=`<div class="risk" style="color:#ffd774">На +${u+1} появится свечение: ${ng}</div>`;
+anv+=`<div class="chance"><div class="bar"><i style="width:${ch}%;background:${col}"></i></div><b style="color:${col}">${ch}%</b></div>`;
+anv+=`<div class="risk">${ch>=100?'Без риска.':`При неудаче золото сгорит, вещь останется +${u}.`}</div>`;
+anv+=`<button class="ab" data-a="upgo" ${P.gold<c?'disabled':''}>Заточить · ${c} зол.</button>${P.gold<c?`<div class="risk" style="color:#ff7a6a;margin-top:6px">Не хватает ${c-P.gold} зол.</div>`:''}`}
+anv+=`<p class="res ${T.res?T.res.k:''}">${T.res?T.res.t:''}</p>`}
+anv+='</div>';$('smBody').innerHTML=list+anv;
+if(T.res&&T.res.fresh){T.res.fresh=false;const a=$('smBody').querySelector('.anvil');a.classList.add(T.res.k)}}
+$('pSmith').addEventListener('click',e=>{const b=e.target.closest('[data-sm],[data-a]');if(!b)return;
+if(b.dataset.sm){const [w,k]=b.dataset.sm.split(':');T.sm=w==='eq'?P.eq[k]:P.bag[+k];T.res=null}
+else if(b.dataset.a==='upgo'){const it=T.sm;if(!it||it.upg>=10)return;const c=upCost(it);if(P.gold<c)return;P.gold-=c;
+if(Math.random()*100<upChance(it)){it.upg++;T.res={k:'ok',t:'Успех! Теперь +'+it.upg,fresh:true};snd(660,.12,'triangle',.15);setTimeout(()=>snd(990,.25,'triangle',.15),100);npcChars[1]&&npcChars[1].play('Cheer',{once:true,restart:true})}
+else{T.res={k:'fail',t:'Металл не выдержал. Золото сгорело, вещь цела.',fresh:true};snd(120,.4,'sawtooth',.12,.5)}recalc();save()}
+renderSmith()});
