@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {RelaySocket} from './relay.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
@@ -860,7 +861,7 @@ function myLook(){const w=P.eq.weapon,o=P.eq.offhand,C=CLASSES[P.cls];return{w:w
 function sendInfo(){if(!P)return;nsend({t:'info',name:NET.name||CLASSES[P.cls].n,cls:P.cls,lvl:P.lvl,look:myLook()})}
 const WSBASE=/workers\.dev$|^localhost|^127\./.test(location.hostname)?(location.protocol==='https:'?'wss://':'ws://')+location.host:'wss://tlen-game.zemlitlena.workers.dev';
 function netConnect(code){netLeave(true);code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length<4){toast('Код группы — 4–8 символов',2);return}
-const ws=new WebSocket(WSBASE+'/ws/'+code);NET.ws=ws;NET.room=code;
+const ws=/[?&]net=cf/.test(location.search)?new WebSocket(WSBASE+'/ws/'+code):new RelaySocket(code,(location.search.match(/[?&]broker=([^&]+)/)||[])[1]?[decodeURIComponent(location.search.match(/[?&]broker=([^&]+)/)[1])]:undefined);NET.ws=ws;NET.room=code;
 ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}onNet(m)};
 ws.onclose=()=>{if(NET.ws!==ws)return;NET.on=false;NET.ws=null;for(const id in NET.peers)dropPeer(id);NET.host=true;toast('Связь с группой потеряна',2.5);renderParty()};
 ws.onerror=()=>{if(NET.ws===ws)toast('Не удалось подключиться к группе',2.5)}}
