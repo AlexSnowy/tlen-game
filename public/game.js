@@ -152,7 +152,7 @@ for(const b of H.buffs)addSt(s,b.st);
 for(const id of activeAuras())addSt(s,SKILLS[id].p.st,(1+s.auraP/100)*(1+.12*(skLvl(id)-1)));
 s.hp=Math.max(10,s.hp*(1+s.hpP/100));s.mana=Math.max(5,s.mana*(1+s.manaP/100));s.armor=Math.max(0,s.armor*(1+s.armorP/100));
 s.min=Math.max(1,min+s.dmgF);s.max=Math.max(s.min+1,max+s.dmgF);s.aps=aps*(1+s.aspd/100);s.range=range;s.crit=Math.min(80,s.crit*(1+s.critX/100));s.critM=Math.max(110,s.critM);
-s.speed=6.2*(1+s.move/100);s.leech=Math.min(12,s.leech);s.reserve=activeAuras().length*.25;s.dmgTaken=Math.max(-75,s.dmgTaken);
+s.speed=6.2*(1+s.move/100);if(P.hc)s.rarity+=25;s.leech=Math.min(12,s.leech);s.reserve=activeAuras().length*.25;s.dmgTaken=Math.max(-75,s.dmgTaken);
 const el=C.basicEl;s.dps=(s.min+s.max)/2*(1+inc(s,el,{melee:!C.ranged,proj:!!C.ranged})/100)*s.aps*(1+s.crit/100*(s.critM/100-1));return s}
 function inc(s,el,t={}){let v=s.dmgP;v+=el==='phys'?s.physP:el==='fire'?s.fireP:el==='cold'?s.coldP:el==='light'?s.lightP:el==='chaos'?s.chaosP:el==='holy'?s.holyP+s.lightP*.3:0;if(t.melee)v+=s.meleeP;if(t.proj)v+=s.projP;return v}
 function recalc(){if(NET.on&&P)setTimeout(sendInfo,0);const hpK=ST?H.hp/ST.hp:1;ST=calc();if(H.hp>ST.hp)H.hp=ST.hp;const mm=ST.mana*(1-ST.reserve);if(H.mana>mm)H.mana=mm;if(P)heroLook()}
@@ -696,8 +696,8 @@ function bossDown(){S.cleared=true;setTimeout(()=>music('zone'),2500);let lore=n
 const p=S.boss.g.position;const g=prop('arch_gate',1);g.position.set(p.x,0,p.z-4);dyn.add(g);const d=new THREE.Mesh(new THREE.CircleGeometry(1.7,40),new THREE.MeshBasicMaterial({color:new THREE.Color('#9a5cff').multiplyScalar(2.2),transparent:true,opacity:.8,side:THREE.DoubleSide,toneMapped:false,map:softTex}));d.position.set(0,1.95,0);g.add(d);exitP=g;emitters.push({x:p.x,y:1.95,z:p.z-4,kind:'portal',w:zone});
 save();$('bossBar').classList.remove('on');setTimeout(()=>{if(lore){$('loreH').textContent=S.zone.boss+' повержен';$('loreP').textContent=lore;$('loreM').textContent=next+' Собери добычу и войди в портал, чтобы вернуться в лагерь.';$('ovLore').classList.add('on');setPaused()}else toast('Страж повержен! '+next,4)},1400)}
 $('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused()};
-function die(){S.mode='dead';H.whirl=null;hFull('Death_A',1,99);setTimeout(()=>{$('ovDead').classList.add('on');setPaused()},1500);snd(80,1.4,'sawtooth',.15,.4)}
-$('bRevive').onclick=()=>{$('ovDead').classList.remove('on');enterTown();setPaused()};
+function die(){if(P.hc){P.dead=1;save();$('deadH').textContent='Герой пал навсегда';$('deadP').textContent='Хардкор не прощает. Его вещи в хранилище остаются для других героев.';$('bRevive').textContent='На титульный экран'}S.mode='dead';H.whirl=null;hFull('Death_A',1,99);setTimeout(()=>{$('ovDead').classList.add('on');setPaused()},1500);snd(80,1.4,'sawtooth',.15,.4)}
+$('bRevive').onclick=()=>{$('ovDead').classList.remove('on');if(P&&P.dead){location.reload();return}enterTown();setPaused()};
 function interact(){const n=nearNpc();if(!n)return;if(n.id==='merchant'){npcChars[0].play('Interact',{once:true,restart:true});togglePanel('shop')}else if(n.id==='smith')togglePanel('smith');else if(n.id==='stash')togglePanel('stash');else{if(isGuest()){const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z);else toast('Жди, пока лидер группы откроет портал',2);return}togglePanel('portal')}}
 $('interact').onclick=interact;
 function nearNpc(){if(S.mode!=='town')return null;const p=H.g.position;return NPCS.find(n=>Math.hypot(n.x-p.x,n.z-p.z)<3.2)||null}
@@ -707,7 +707,7 @@ $('ovLoad').classList.remove('on');$('hud').classList.add('on');updSkillBar();en
 $('bCont').onclick=()=>{const s=load();if(s)startGame(s)};
 $('bNew').onclick=()=>{$('ovTitle').classList.remove('on');$('ovClass').classList.add('on');renderClasses();setPaused()};
 function renderClasses(){$('classList').innerHTML=Object.entries(CLASSES).map(([k,c])=>`<button class="clc" data-cls="${k}" style="--c:${c.col}"><b>${uiI('cls:'+k,c.col,'width:30px;height:30px;vertical-align:-7px;margin-right:6px')}${c.n}</b><span>${c.role}</span><small>Ветки: ${c.branches.join(' · ')}</small><small>Оружие: ${c.weapons.map(w=>WBASE[w].n).join(', ')}</small></button>`).join('')}
-$('classList').addEventListener('click',e=>{const b=e.target.closest('[data-cls]');if(!b)return;const c=charsGet();if(c.list.length>=8){toast('Максимум 8 героев. Удалите одного на титульном экране.',3);return}CUR=c.list.length;startGame(freshP(b.dataset.cls))});
+$('classList').addEventListener('click',e=>{const b=e.target.closest('[data-cls]');if(!b)return;const c=charsGet();if(c.list.length>=8){toast('Максимум 8 героев. Удалите одного на титульном экране.',3);return}CUR=c.list.length;const np=freshP(b.dataset.cls);if($('hcChk').checked)np.hc=1;startGame(np)});
 $('bBack').onclick=()=>{$('ovClass').classList.remove('on');$('ovTitle').classList.add('on');setPaused()};
 
 /* ================= OBJECTIVES ================= */
@@ -1298,9 +1298,9 @@ smith:['«Каждая ступень делает вещь на 10% сильн�
 function npcQuote(k){return pick(QUOTES[k])}
 
 function renderChars(){const c=charsGet(),el=$('charList');if(!el)return;if(!c.list.length){el.innerHTML='';return}
-el.innerHTML='<div class="sect" style="justify-content:center"><span>Ваши герои</span></div>'+c.list.map((p,i)=>p&&p.cls?`<div class="chc" style="--c:${CLASSES[p.cls].col}"><button class="chp" data-play="${i}">${uiI('cls:'+p.cls,CLASSES[p.cls].col,'width:30px;height:30px')}<span><b>${CLASSES[p.cls].n}${p.ascC&&ASC[p.cls]?' · '+ASC[p.cls].find(a=>a.id===p.ascC).n:''}</b><small>Уровень ${p.lvl} · ${p.maxZone>8?'Атлас: '+((p.atlas||[]).length)+' тиров':'Зона '+Math.min(8,p.maxZone)}</small></span></button><button class="chd" data-del="${i}" title="Удалить">×</button></div>`:'').join('')}
+el.innerHTML='<div class="sect" style="justify-content:center"><span>Ваши герои</span></div>'+c.list.map((p,i)=>p&&p.cls?`<div class="chc" style="--c:${CLASSES[p.cls].col}"><button class="chp" data-play="${i}">${uiI('cls:'+p.cls,CLASSES[p.cls].col,'width:30px;height:30px')}<span><b>${CLASSES[p.cls].n}${p.ascC&&ASC[p.cls]?' · '+ASC[p.cls].find(a=>a.id===p.ascC).n:''}</b><small>${p.hc?'<span style="color:#ff6a5a">'+(p.dead?'☠ пал · ':'Хардкор · ')+'</span>':''}Уровень ${p.lvl} · ${p.maxZone>8?'Атлас: '+((p.atlas||[]).length)+' тиров':'Зона '+Math.min(8,p.maxZone)}</small></span></button><button class="chd" data-del="${i}" title="Удалить">×</button></div>`:'').join('')}
 $('charList').addEventListener('click',e=>{const pl=e.target.closest('[data-play]'),dl=e.target.closest('[data-del]');
-if(pl){const s=load(+pl.dataset.play);if(s)startGame(s)}
+if(pl){const s=load(+pl.dataset.play);if(s&&s.dead){toast('Этот герой пал навсегда',2);return}if(s)startGame(s)}
 if(dl){const i=+dl.dataset.del,c=charsGet();if(!dl.dataset.armed){dl.dataset.armed=1;dl.textContent='Удалить?';setTimeout(()=>{if(dl.isConnected){delete dl.dataset.armed;dl.textContent='×'}},2500);return}c.list.splice(i,1);c.cur=0;charsPut(c);renderChars()}});
 
 /* верстак: гарантированное свойство за золото и сферу */
