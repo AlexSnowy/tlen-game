@@ -196,7 +196,8 @@ const mer=makeChar('merchant',{show:[]});mer.root.position.set(-8.6,0,-2.6);mer.
 const smi=makeChar('barbarian',{show:['1H_Axe']});smi.root.position.set(9.2,0,-2.8);smi.root.rotation.y=-.5;town.add(smi.root);smi.play('1H_Melee_Attack_Chop',{ts:.7});
 const kn=makeChar('knight',{show:['1H_Sword','Badge_Shield','Knight_Helmet']});kn.root.position.set(3.6,0,-19.5);kn.root.rotation.y=-.3;town.add(kn.root);kn.play('Idle');
 npcChars=[mer,smi,kn];
-NPCS=[{id:'merchant',name:'Торговка Вера',x:-8.2,z:-1.4,lx:-8.6,lz:-2.6,ly:2.9},{id:'smith',name:'Кузнец Гром',x:8.8,z:-1.5,lx:9.2,lz:-2.8,ly:3.1},{id:'portal',name:'Портал',x:0,z:-19.6,lx:0,lz:-22,ly:5.6}];
+{const st=place('chest_gold',-5.4,3.4,town,townObs,{s:1.15,ry:.9,r:.8});const sl=new THREE.PointLight(0xffc070,2.2,6,2);sl.position.set(-5.4,1.6,3.4);town.add(sl)}
+NPCS=[{id:'stash',name:'Хранилище',x:-5.4,z:3.4,lx:-5.4,lz:3.4,ly:1.9},{id:'merchant',name:'Торговка Вера',x:-8.2,z:-1.4,lx:-8.6,lz:-2.6,ly:2.9},{id:'smith',name:'Кузнец Гром',x:8.8,z:-1.5,lx:9.2,lz:-2.8,ly:3.1},{id:'portal',name:'Портал',x:0,z:-19.6,lx:0,lz:-22,ly:5.6}];
 for(const n of NPCS){const el=document.createElement('div');el.className='npcn';el.textContent=n.name;$('npcl').appendChild(el);n.el=el}}
 let zGround=null,zGrass=null;
 function clearZone(){zone.remove(dyn);for(const m of mons)m.c.mats.forEach(x=>x.dispose());mons=[];for(const a of allies)a.c&&a.c.mats.forEach(x=>x.dispose());allies=[];for(const l of loot)l.el.remove();loot=[];
@@ -538,9 +539,9 @@ collide(p,.45);return l>.08}
 /* ================= UI ================= */
 const RC=RCH;
 function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass'].some(x=>$(x).classList.contains('on'))}
-function closePanels(){for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
+function closePanels(){for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith','pStash'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
-({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');T.res=null;renderSmith()}})[w]();setPaused()}
+({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');T.res=null;renderSmith()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closePanels);
 document.querySelectorAll('.panel').forEach(p=>p.addEventListener('pointerdown',e=>{if(e.target===p)closePanels()}));
 const ICO={weapon:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',wand:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',staff:'<path d="M6 21L18 4"/><circle cx="18" cy="4.5" r="2.5"/><path d="M14 6l3 3"/>',
@@ -656,10 +657,10 @@ save();$('bossBar').classList.remove('on');setTimeout(()=>{if(lore){$('loreH').t
 $('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused()};
 function die(){S.mode='dead';H.whirl=null;hFull('Death_A',1,99);setTimeout(()=>{$('ovDead').classList.add('on');setPaused()},1500);snd(80,1.4,'sawtooth',.15,.4)}
 $('bRevive').onclick=()=>{$('ovDead').classList.remove('on');enterTown();setPaused()};
-function interact(){const n=nearNpc();if(!n)return;if(n.id==='merchant'){npcChars[0].play('Interact',{once:true,restart:true});togglePanel('shop')}else if(n.id==='smith')togglePanel('smith');else{if(isGuest()){const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z);else toast('Жди, пока лидер группы откроет портал',2);return}togglePanel('portal')}}
+function interact(){const n=nearNpc();if(!n)return;if(n.id==='merchant'){npcChars[0].play('Interact',{once:true,restart:true});togglePanel('shop')}else if(n.id==='smith')togglePanel('smith');else if(n.id==='stash')togglePanel('stash');else{if(isGuest()){const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z);else toast('Жди, пока лидер группы откроет портал',2);return}togglePanel('portal')}}
 $('interact').onclick=interact;
 function nearNpc(){if(S.mode!=='town')return null;const p=H.g.position;return NPCS.find(n=>Math.hypot(n.x-p.x,n.z-p.z)<3.2)||null}
-async function startGame(p){initAudio();P=p;$('ovClass').classList.remove('on');$('ovTitle').classList.remove('on');$('ovLoad').classList.add('on');$('lTxt').textContent='Призываю героя…';setPaused();
+async function startGame(p){initAudio();P=p;stashLoad();$('ovClass').classList.remove('on');$('ovTitle').classList.remove('on');$('ovLoad').classList.add('on');$('lTxt').textContent='Призываю героя…';setPaused();
 await loadAsset(CLASSES[P.cls].model);if(H.c)H.g.remove(H.c.root);H.c=makeChar(CLASSES[P.cls].model,{show:[],keepHead:1,layered:1});H.upT=H.legT=H.fullT=0;H.g.add(H.c.root);H.buffs=[];ST=null;recalc();H.hp=ST.hp;H.mana=ST.mana;
 $('ovLoad').classList.remove('on');$('hud').classList.add('on');updSkillBar();enterTown();setPaused();sendInfo();if(NET.pendingJoin){const c=NET.pendingJoin;NET.pendingJoin=null;netConnect(c)}if(P.lvl===1&&P.xp===0)toast(touch?'Подойди к порталу на севере лагеря. Умения и пассивы — кнопки сверху.':'Подойди к порталу на севере лагеря. Умения — K, пассивное дерево — P.',5)}
 $('bCont').onclick=()=>{const s=load();if(s)startGame(s)};
@@ -889,7 +890,7 @@ $xp.style.width=P.xp/need(P.lvl)*100+'%';$lv.textContent=CLASSES[P.cls].n+' · �
 const sb=$('skB'),pb=$('pasB');sb.textContent=P.spts;sb.classList.toggle('on',P.spts>0);pb.textContent=P.ppts;pb.classList.toggle('on',P.ppts>0);const z=S.mode==='zone';$('bTown').style.display=z?'block':'none';$('mini').style.display=z?'block':'none';
 for(let i=0;i<3;i++)$('s'+i).style.setProperty('--cd',H.cds[i]/((H.cdMax&&H.cdMax[i])||1));$('sDash').style.setProperty('--cd',H.dashCd/(H.dashMax||2.5));$('sFlask').style.setProperty('--cd',1-Math.min(1,H.flask));$('flaskN').textContent=Math.floor(H.flask);
 $('buffs').innerHTML=H.buffs.map(b=>`<span>${b.n} ${Math.ceil(b.t)}с</span>`).join('')+activeAuras().map(id=>`<span class="au">${SKILLS[id].n}</span>`).join('');
-const n=nearNpc(),ib=$('interact');ib.classList.toggle('on',!!n&&!S.paused);if(n)ib.textContent=(n.id==='portal'?'Открыть портал':'Говорить: '+n.name)+(touch?'':' (Enter)');
+const n=nearNpc(),ib=$('interact');ib.classList.toggle('on',!!n&&!S.paused);if(n)ib.textContent=(n.id==='portal'?'Открыть портал':n.id==='stash'?'Открыть хранилище':'Говорить: '+n.name)+(touch?'':' (Enter)');
 S.hurtV=Math.max(0,S.hurtV-dt*2.5);const low=H.hp/ST.hp<.3?.35+Math.sin(time*6)*.15:0;$('vig').style.opacity=Math.max(S.hurtV*.8,low);if(frameN%3===0)drawMini()}
 if(toastT>0){toastT-=dt;if(toastT<=0)$('toast').classList.remove('on')}
 composer.render()}
@@ -1065,3 +1066,21 @@ else if(b.dataset.a==='upgo'){const it=T.sm;if(!it||it.upg>=10)return;const c=up
 if(Math.random()*100<upChance(it)){it.upg++;T.res={k:'ok',t:'Успех! Теперь +'+it.upg,fresh:true};snd(660,.12,'triangle',.15);setTimeout(()=>snd(990,.25,'triangle',.15),100);npcChars[1]&&npcChars[1].play('Cheer',{once:true,restart:true})}
 else{T.res={k:'fail',t:'Металл не выдержал. Золото сгорело, вещь цела.',fresh:true};snd(120,.4,'sawtooth',.12,.5)}recalc();save()}
 renderSmith()});
+
+/* хранилище — общее для всех героев этого браузера */
+const STASH_KEY='tlen3_stash',ST_N=48;let STASH=null,stTab=0;
+function stashLoad(){if(STASH)return STASH;try{STASH=JSON.parse(localStorage.getItem(STASH_KEY))}catch(e){}if(!STASH||!Array.isArray(STASH.tabs))STASH={tabs:[[],[],[],[]],names:['Общая','Оружие','Броня','Ценное']};for(const t of STASH.tabs)for(const it of t)if(it&&it.id!=null&&it.id>=uid)uid=it.id+1;return STASH}
+function stashSave(){try{localStorage.setItem(STASH_KEY,JSON.stringify(STASH))}catch(e){}}
+function renderStash(){const S0=stashLoad(),tab=S0.tabs[stTab];$('stGold').innerHTML=goldPill();
+let h='<div class="tabs">'+S0.names.map((n,i)=>`<button data-stt="${i}" class="${i===stTab?'on':''}">${n} <small style="opacity:.6">${S0.tabs[i].length}</small></button>`).join('')+'</div>';
+h+=`<div class="sect"><span>Вкладка «${S0.names[stTab]}» · ${tab.length}/${ST_N}</span><span class="chips">${stTab===1?'<button class="chip" data-sq="w">Сложить оружие</button>':stTab===2?'<button class="chip" data-sq="a">Сложить броню</button>':stTab===3?'<button class="chip" data-sq="r">Сложить редкие и уник.</button>':'<button class="chip" data-sq="all">Сложить всё</button>'}</span></div><div class="bag stb">`;
+for(let i=0;i<ST_N;i++){const it=tab[i];h+=it?tcell(it,{up:isUpg(it),attr:`data-st="${i}"`}):'<button class="cell" disabled style="cursor:default"></button>'}
+h+=`</div><div class="sect"><span>Сумка ${P.bag.length}/36</span><small style="text-transform:none;letter-spacing:0">нажмите — переложить</small></div><div class="bag">`;
+for(let i=0;i<36;i++){const it=P.bag[i];h+=it?tcell(it,{up:isUpg(it),attr:`data-sbg="${i}"`}):'<button class="cell" disabled style="cursor:default"></button>'}
+h+='</div>';const L=T.last;if(L)h+=detHTML(L);$('stBody').innerHTML=h}
+$('pStash').addEventListener('click',e=>{const b=e.target.closest('[data-stt],[data-st],[data-sbg],[data-sq]');if(!b)return;const d=b.dataset,tab=stashLoad().tabs[stTab];
+if(d.stt){stTab=+d.stt;T.last=null}
+else if(d.st!==undefined){const it=tab[+d.st];if(!it)return;if(P.bag.length>=36){toast('Сумка полна',1.5);return}tab.splice(+d.st,1);P.bag.push(it);T.last=it;snd(700,.05,'triangle',.05)}
+else if(d.sbg!==undefined){const it=P.bag[+d.sbg];if(!it)return;if(tab.length>=ST_N){toast('Вкладка заполнена',1.5);return}P.bag.splice(+d.sbg,1);tab.push(it);T.last=it;snd(500,.05,'triangle',.05)}
+else if(d.sq){const f={w:it=>it.slot==='weapon'||it.slot==='offhand',a:it=>!['weapon','offhand'].includes(it.slot),r:it=>it.rar>=2,all:()=>true}[d.sq];P.bag=P.bag.filter(it=>{if(f(it)&&tab.length<ST_N){tab.push(it);return false}return true})}
+stashSave();save();renderStash()});

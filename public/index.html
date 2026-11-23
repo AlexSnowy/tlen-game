@@ -235,6 +235,7 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 .loot.t1{border-color:#5a6aff88}.loot.t2{border-width:2px;font-weight:600;background:rgba(20,16,4,.9)}.loot.t3{border-width:2px;font:700 13.5px Rubik;background:rgba(40,18,4,.92);box-shadow:0 0 14px rgba(255,140,40,.55);padding:2px 9px}
 .loot.h2{border-width:2px;font-weight:600;color:#ffd36a!important;background:rgba(30,24,6,.92)}.loot.h3{border-width:2px;font:700 13.5px Rubik;color:#fff!important;background:rgba(210,120,30,.85);box-shadow:0 0 16px rgba(255,230,160,.7);padding:2px 9px}
 .loot .lup{color:#5ee07a;margin-right:3px}
+.stb{grid-template-columns:repeat(8,minmax(0,1fr))!important}@media (max-width:700px){.stb{grid-template-columns:repeat(6,minmax(0,1fr))!important}}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -282,6 +283,10 @@ svg.gi{fill:currentColor!important;stroke:none!important;filter:drop-shadow(0 1p
 <div class="panel" id="pSmith"><div class="pw tw">
   <header><div><h3>Кузнец Гром</h3><p>«Каждая ступень делает вещь на 10% сильнее. Чем выше заточка — тем больше риск.»</p></div><span class="gpill" id="smGold"></span><button class="x" data-close>×</button></header>
   <div class="smith" id="smBody"></div>
+</div></div>
+<div class="panel" id="pStash"><div class="pw tw">
+  <header><div><h3>Хранилище</h3><p>Общий сундук: вещи в нём доступны всем вашим героям.</p></div><span class="gpill" id="stGold"></span><button class="x" data-close>×</button></header>
+  <div id="stBody"></div>
 </div></div>
 <div class="panel" id="pSk"><div class="pw">
   <header><div><h3>Умения</h3><p id="skP"></p></div><button class="x" data-close>×</button></header>
