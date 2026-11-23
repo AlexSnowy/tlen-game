@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {RelaySocket} from './relay.js?v=__V__';
+import {RelaySocket,leaderboard} from './relay.js?v=__V__';
 import {GI,SK_IC,IT_IC,UI_IC} from './icons.js?v=__V__';
 const gi=(n,c,st='')=>GI[n]?`<svg class="gi" viewBox="0 0 512 512" style="${c?'color:'+c+';':''}${st}">${GI[n]}</svg>`:'';
 const uiI=(k,c,st)=>gi(UI_IC[k],c,st);
@@ -686,7 +686,7 @@ function updSkillBar(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id
 
 /* ================= FLOW ================= */
 function rollShop(){S.shop=[];for(let i=0;i<8;i++)S.shop.push(genItem(Math.max(1,P.maxZone>8?8+P.maxMap:P.maxZone),Math.random()<.35?1:0,0,i<2?'weapon':undefined))}
-function enterTown(){S.mode='town';setTimeout(()=>cloudSave(true),1500);setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
+function enterTown(){S.mode='town';setTimeout(()=>{try{const n=Date.now();if(P&&n-(window.__lbT||0)>600000){window.__lbT=n;leaderboard(lbEntry(),()=>{},BRK())}}catch(e){}},4000);setTimeout(()=>cloudSave(true),1500);setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
 setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');$('bossBar').classList.remove('on');rollShop();save();$('zoneName').textContent='Лагерь у костра';$('zoneSub').textContent=touch?'Торговка, кузнец и портал на севере':'Торговка, кузнец и портал. K — умения, P — пассивы, I — сумка'}
 function enterZone(zi,tier,net,mi){if(isGuest()&&!net){toast('Портал открывает лидер группы',2);return}S.mods=[];S.seed=net?net.seed:Math.floor(RNG0()*1e9);if(zi>=0){S.zi=zi;S.zone=ZONES[zi];S.L=zi+1;S.map=0;S.mapRar=0;S.pin=false;S.abyss=0}else{const base=mi?ZONES[mi.zi]:pick(ZONES);S.zi=-1;S.map=tier;S.L=8+tier;S.mapRar=mi?mi.rar:0;S.pin=!!(mi&&mi.pin);S.abyss=mi&&mi.abyss||0;S.mods=mi?mi.mods.map(k=>MAPMODS.find(m=>m.k===k)).filter(Boolean):[];
 if(net){S.zone=net.zone;S.mods=net.mods}else if(S.pin)S.zone={n:'Обитель Пожирателя',th:3,mons:[['fallen',2],['berserker',2],['necro',1],['brute',1.5]],boss:'Пожиратель Тлена',bt:'brute',obj:{t:'hunt',n:'Убей стражей Обители',c:2},kit:['slam','meteors','spiral','summon','teleport','nova','charge','enrage'],phases:1};else S.zone={n:'Карта: '+base.n,th:base.th,mons:base.mons.concat([['fallen',1],['necro',.6],['berserker',1]]),boss:base.boss+' Кошмара',bt:base.bt,obj:pick(OBJ_POOL),kit:shuffle(Object.keys(BOSS_SK).filter(k=>k!=='enrage')).slice(0,3).concat(tier>=3?['enrage']:[])}}
@@ -1211,7 +1211,7 @@ const cs=k=>(P.cs&&P.cs[k])||0;
 function csAdd(k,v=1,max){P.cs=P.cs||{};P.cs[k]=max?Math.max(P.cs[k]||0,v):(P.cs[k]||0)+v;if(frameN%1===0)chBadge()}
 function chReady(){let d=0;try{const D=dailyGet();d=D.t.filter(t=>{const x=DPOOL.find(q=>q.k===t.k);return x&&!t.got&&cs(t.k)-t.b>=x.g}).length}catch(e){}return d+CH.filter(c=>{const[a,b]=c.p();return a>=b&&!(P.chc||[]).includes(c.id)}).length}
 function chBadge(){if(!P)return;const n=chReady(),b=$('chB');if(!b)return;b.textContent=n;b.classList.toggle('on',n>0)}
-function renderCh(){const got=P.chc||[];if(S.chTab==='g'){$('chBody').innerHTML=chTabs()+guideHTML();return}let h=chTabs()+dailyHTML()+`<div class="sect" style="margin-top:14px"><span>Испытания</span></div><div class="chsum"><span>Выполнено: <b style="color:#ffd774">${got.length}</b> из ${CH.length}</span></div><div class="chl">`;
+function renderCh(){const got=P.chc||[];if(S.chTab==='r'){$('chBody').innerHTML=chTabs()+lbHTML();lbFetch();return}if(S.chTab==='g'){$('chBody').innerHTML=chTabs()+guideHTML();return}let h=chTabs()+dailyHTML()+`<div class="sect" style="margin-top:14px"><span>Испытания</span></div><div class="chsum"><span>Выполнено: <b style="color:#ffd774">${got.length}</b> из ${CH.length}</span></div><div class="chl">`;
 for(const c of CH){const[a,b]=c.p(),done=a>=b,g=got.includes(c.id);const rw=Object.entries(c.rw).map(([k,v])=>uiI('orb:'+k,ORBS[k].c,'width:14px;height:14px;vertical-align:-2px;filter:none')+'×'+v).join(' ');
 h+=`<div class="chr ${done?'done':''} ${g?'got':''}">${gi(GI[c.ic]?c.ic:'trophy-cup','#ffd774')}<div><b>${c.n}</b><small>${c.d} · ${Math.min(a,b)}/${b}</small><div class="bar"><i style="width:${Math.min(100,a/b*100)}%"></i></div></div><div>${g?'<span class="rw">получено</span>':done?`<button class="ab" data-ch="${c.id}">Забрать</button>`:`<span class="rw">${rw}</span>`}</div></div>`}
 const us=P.uSeen||[];h+=`</div><div class="sect" style="margin-top:16px"><span>Коллекция уникальных · ${us.length}/${UNIQUES.length}</span></div><div class="ucol">`+UNIQUES.map(u=>us.includes(u.n)?`<span class="on" title="${esc(u.lore||'')}">${esc(u.n)}</span>`:'<span>???</span>').join('')+'</div>';const lo=(P.lore||[]).filter(i=>ZONES[i]&&ZONES[i].lore);h+=`<div class="sect" style="margin-top:16px"><span>Летопись · ${lo.length}/8</span></div>`+(lo.length?lo.sort((a,b)=>a-b).map(i=>`<div class="lore1"><b>${i+1}. ${esc(ZONES[i].n)} — ${esc(ZONES[i].boss)}</b><p>${esc(ZONES[i].lore)}</p></div>`).join(''):'<p class="muted">Победи стражей кампании, чтобы узнать историю Тлена.</p>');$('chBody').innerHTML=h+statsHTML()}
@@ -1370,7 +1370,7 @@ const GUIDE=[['Управление','Телефон: коснись экран�
 ['Группа','До 3 игроков. Кнопка «Группа» → «Создать группу» и отправьте ссылку другу, или отметьте «Открытая группа» — тогда вас увидят все в списке «Открытые группы». У каждого своя добыча, вещи можно передавать союзнику из сумки.']];
 function guideHTML(){return '<div class="guide">'+GUIDE.map(([t,d],i)=>`<details ${i===0?'open':''}><summary>${t}</summary><p>${d}</p></details>`).join('')+'</div>'}
 
-function chTabs(){return `<div class="tabs"><button data-cht="c" class="${S.chTab!=='g'?'on':''}">Испытания</button><button data-cht="g" class="${S.chTab==='g'?'on':''}">Справочник</button></div>`}
+function chTabs(){return `<div class="tabs"><button data-cht="c" class="${!S.chTab||S.chTab==='c'?'on':''}">Испытания</button><button data-cht="r" class="${S.chTab==='r'?'on':''}">Рекорды</button><button data-cht="g" class="${S.chTab==='g'?'on':''}">Справка</button></div>`}
 $('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-cht]');if(!b)return;S.chTab=b.dataset.cht;renderCh()});
 
 /* лобби открытых групп */
@@ -1476,3 +1476,12 @@ if(!open){h+=`<p class="muted" style="font-size:12.5px;margin:0">Откроет�
 h+='<div class="ascl" style="grid-template-columns:repeat(3,minmax(0,1fr))">'+PAN[k].map(p=>`<button class="ascnode ${P.pan&&P.pan[k]===p.id?'on':''}" data-pan="${k}:${p.id}" style="--c:#a8d0ff"><b>${p.n}</b><small>${p.d}</small></button>`).join('')+'</div>'}
 return h+'</div>'}
 $('ascBox').addEventListener('click',e=>{const b=e.target.closest('[data-pan]');if(!b)return;const[k,id]=b.dataset.pan.split(':');P.pan=P.pan||{};P.pan[k]=id;chime([587,784],.07);recalc();save();renderPas()});
+
+/* мировые рекорды */
+let LB=null,LBsort='lvl';
+function lbEntry(){if(!P.lbid){P.lbid=Math.random().toString(36).slice(2,10);save()}return{id:P.lbid,n:(NET.name||CLASSES[P.cls].n).slice(0,16),cls:P.cls,lvl:P.lvl,aby:P.abyssBest||0,atl:(P.atlas||[]).length,pin:P.pinK||0,hc:P.hc?1:0,dead:P.dead?1:0,t:Date.now()}}
+function lbFetch(){if(lbFetch.busy)return;lbFetch.busy=true;setTimeout(()=>lbFetch.busy=false,8500);leaderboard(lbEntry(),L=>{LB=L;if(S.panel==='ch'&&S.chTab==='r')$('lbList')&&($('lbList').innerHTML=lbRows())},BRK())}
+function lbRows(){if(!LB)return '<p class="muted">Загружаю рекорды…</p>';const k=LBsort;const L=LB.filter(x=>x&&CLASSES[x.cls]&&typeof x.lvl==='number').sort((a,b)=>(b[k]||0)-(a[k]||0)||b.lvl-a.lvl).slice(0,30);
+return '<table class="lbt"><tr><th>#</th><th>Герой</th><th>Ур.</th><th>Бездна</th><th>Атлас</th></tr>'+L.map((x,i)=>`<tr class="${x.id===P.lbid?'me':''}"><td>${i+1}</td><td>${uiI('cls:'+x.cls,CLASSES[x.cls].col,'width:16px;height:16px;vertical-align:-3px;filter:none')} ${esc(String(x.n).slice(0,16))}${x.hc?' <span style="color:#ff6a5a">'+(x.dead?'☠':'HC')+'</span>':''}${x.pin?' <span title="Пожиратель" style="color:#ff8aa8">★'+x.pin+'</span>':''}</td><td>${x.lvl}</td><td>${x.aby||0}</td><td>${x.atl||0}</td></tr>`).join('')+'</table>'}
+function lbHTML(){return `<div class="chips" style="margin-bottom:8px"><button class="chip" data-lbs="lvl">По уровню</button><button class="chip" data-lbs="aby">По Бездне</button><button class="chip" data-lbs="atl">По Атласу</button></div><div id="lbList">${lbRows()}</div><p class="muted" style="font-size:12px">Ваш герой попадает в таблицу автоматически, когда вы открываете эту вкладку. Имя берётся из окна «Группа».</p>`}
+$('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-lbs]');if(!b)return;LBsort=b.dataset.lbs;$('lbList').innerHTML=lbRows()});

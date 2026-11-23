@@ -124,3 +124,28 @@ export class RelaySocket {
     this.onclose && this.onclose({});
   }
 }
+
+// Глобальная таблица рекордов: retained-сообщения на брокере
+export function leaderboard(entry, onList, brokers = BROKERS) {
+  const list = {}; let ws, done = false; const url = brokers[0];
+  try { ws = new WebSocket(url, 'mqtt'); } catch { return () => {}; }
+  ws.binaryType = 'arraybuffer';
+  ws.onopen = () => { const id = 'lb' + Math.random().toString(36).slice(2, 9); ws.send(pkt(0x10, [...str('MQTT'), 4, 0x02, 0, 30, ...str(id)])); };
+  ws.onmessage = e => {
+    const d = new Uint8Array(e.data); let i = 0;
+    while (i < d.length) {
+      const t = d[i] >> 4; let mul = 1, len = 0, j = i + 1, c;
+      do { c = d[j++]; len += (c & 127) * mul; mul *= 128; } while (c & 128);
+      const p = d.subarray(j, j + len); i = j + len;
+      if (t === 2) {
+        ws.send(pkt(0x82, [0, 2, ...str(PFX + 'lb/#'), 0]));
+        if (entry) { const pl = te.encode(JSON.stringify(entry)); ws.send(pkt(0x31, [...str(PFX + 'lb/' + entry.id), ...pl])); }
+      } else if (t === 3) {
+        const tl = (p[0] << 8) | p[1];
+        try { const o = JSON.parse(td.decode(p.subarray(2 + tl))); if (o && o.id) { list[o.id] = o; onList(Object.values(list)); } } catch {}
+      }
+    }
+  };
+  const stop = () => { if (done) return; done = true; try { ws.send(new Uint8Array([0xE0, 0])); ws.close(); } catch {} };
+  setTimeout(stop, 8000); return stop;
+}
