@@ -1595,11 +1595,13 @@ const rerollCost=()=>Math.round(20*Math.max(1,P.maxZone>8?8+(P.maxMap||1):P.maxZ
 let HUDR=[],hudT=0;
 function hudRects(){HUDR=[];for(const el of document.querySelectorAll('#hud .trow .hb,#hud .gold,#hud .tl,#hud .tl *,#coach.on,#tutArr,#banner b,#banner small,#zoneName,#zoneSub,#objTxt,#mini,#skills .sk,.globe,#bossBar,#toast,#partyHud,#buffs,#bPing,#banner.on b,#feed .fd,#interact,#lvlTxt')){const cs=getComputedStyle(el);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)continue;if(el.closest('[style*="display: none"],[style*="display:none"]'))continue;const r=el.getBoundingClientRect();if(r.width<2||r.height<2)continue;HUDR.push({l:r.left-3,t:r.top-3,r:r.right+3,b:r.bottom+3})}}
 function fitLabels(){const now=performance.now();if(now-hudT>(document.body.classList.contains('bn')||$('toast').style.visibility?120:500)){hudT=now;hudLayout();hudRects()}const vw=innerWidth;
-const placed=[];const LB=$('labels'),kids=LB?[...LB.children]:[];const groups=[[...$('npcl').children],kids.filter(e=>e.classList.contains('loot')),kids.filter(e=>!e.classList.contains('loot')),[...$('nums').children]];for(let gi=0;gi<4;gi++){const host=gi===3?$('nums'):null;const isLoot=gi===1;for(const el of groups[gi]){if(el.style.display==='none')continue;el.style.marginLeft='0px';const r=el.getBoundingClientRect();if(r.width<1)continue;
-let dx=0;if(!isLoot)if(r.left<6)dx=6-r.left;else if(r.right>vw-6)dx=vw-6-r.right;if(dx)el.style.marginLeft=dx+'px';
-const L=r.left+dx,R=r.right+dx;let hit=host!==$('nums')&&(r.bottom>innerHeight-2||r.top<2);for(const h of HUDR)if(L<h.r&&R>h.l&&r.top<h.b&&r.bottom>h.t){hit=true;break}
-if(!hit&&!isLoot&&host!==$('nums'))for(const q of placed)if(L<q.r&&R>q.l&&r.top<q.b&&r.bottom>q.t){hit=true;break}
-if(!hit&&host!==$('nums'))placed.push({l:L-2,r:R+2,t:r.top-2,b:r.bottom+2});el.style.visibility=hit?'hidden':''}}}
+const LB=$('labels'),kids=LB?[...LB.children]:[];const groups=[[...$('npcl').children],kids.filter(e=>e.classList.contains('loot')),kids.filter(e=>!e.classList.contains('loot')),[...$('nums').children]];
+const items=[];for(let gi=0;gi<4;gi++)for(const el of groups[gi]){if(el.style.display==='none')continue;const r=el.getBoundingClientRect();if(r.width<1)continue;const pd=el._dx||0;items.push({el,gi,l:r.left-pd,r:r.right-pd,t:r.top,b:r.bottom})}
+const placed=[],H0=innerHeight;for(const it of items){const isLoot=it.gi===1,isNum=it.gi===3;let dx=0;if(!isLoot){if(it.l<6)dx=6-it.l;else if(it.r>vw-6)dx=vw-6-it.r}
+const L=it.l+dx,R=it.r+dx;let hit=!isNum&&(it.b>H0-2||it.t<2);if(!hit)for(const h of HUDR)if(L<h.r&&R>h.l&&it.t<h.b&&it.b>h.t){hit=true;break}
+if(!hit&&!isLoot&&!isNum)for(const q of placed)if(L<q.r&&R>q.l&&it.t<q.b&&it.b>q.t){hit=true;break}
+if(!hit&&!isNum)placed.push({l:L-2,r:R+2,t:it.t-2,b:it.b+2});it.dx=dx;it.hit=hit}
+for(const it of items){const el=it.el;if((el._dx||0)!==it.dx){el._dx=it.dx;el.style.marginLeft=it.dx?it.dx+'px':''}const v=it.hit?'hidden':'';if(el.style.visibility!==v)el.style.visibility=v}}
 addEventListener('resize',()=>hudT=0);
 
 /* раскладка HUD: заголовок зоны, полоса босса и подсказка не наезжают на кнопки */
