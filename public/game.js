@@ -1163,7 +1163,7 @@ if(m){const RCm=['#c8c8c8','#8888ff','#ffd84a'];h+=`<div class="tdet"><h4 style=
 return h}
 
 $('ascBox').addEventListener('click',e=>{const b=e.target.closest('[data-asc],[data-an]');if(!b)return;
-if(b.dataset.asc){const x=ASC[P.cls].find(a=>a.id===b.dataset.asc);if(!confirm('Выбрать путь «'+x.n+'»? Изменить выбор будет нельзя.'))return;P.ascC=x.id;P.asc=[];toast('Путь Восхождения: '+x.n,2.5);chime([523,659,784,1047],.1)}
+if(b.dataset.asc){const x=ASC[P.cls].find(a=>a.id===b.dataset.asc);if(!b.dataset.armed){document.querySelectorAll('.ascb').forEach(q=>delete q.dataset.armed);b.dataset.armed=1;b.querySelector('b').textContent=x.n+' — нажми ещё раз, чтобы выбрать навсегда';return}P.ascC=x.id;P.asc=[];toast('Путь Восхождения: '+x.n,2.5);chime([523,659,784,1047],.1)}
 else{const i=+b.dataset.an;if(ascTotal()-(P.asc||[]).length<=0)return;P.asc=P.asc||[];if(!P.asc.includes(i))P.asc.push(i);chime([659,988],.09)}
 recalc();save();renderPas()});
 
@@ -1420,8 +1420,9 @@ for(let i=0;i<n;i++)CS.setItem('sv_'+i,str.slice(i*3800,(i+1)*3800),done);CS.set
 function cloudLoad(cb){const CS=TGCS();if(!CS)return cb(false);CS.getItems(['sv_n','sv_t'],(err,v)=>{if(err||!v||!v.sv_n)return cb(false);const n=+v.sv_n,t=+v.sv_t||0;let lt=0;try{lt=+localStorage.getItem('tlen_t')||0}catch(e){}
 const loc=charsGet();if(lt>=t&&loc.list.length)return cb(false);CS.getItems(Array.from({length:n},(_,i)=>'sv_'+i),(e2,parts)=>{if(e2||!parts)return cb(false);try{unbundle(Array.from({length:n},(_,i)=>parts['sv_'+i]||'').join(''));cb(true)}catch(e){cb(false)}})})}
 setInterval(()=>{if(P)cloudSave()},50000);
-function exportSave(){const code=btoa(unescape(encodeURIComponent(bundle())));try{navigator.clipboard.writeText(code).then(()=>toast('Код сохранения скопирован. Сохраните его в заметках.',3),()=>prompt('Скопируйте код сохранения:',code))}catch(e){prompt('Скопируйте код сохранения:',code)}}
-function importSave(){const code=prompt('Вставьте код сохранения:');if(!code)return;try{unbundle(decodeURIComponent(escape(atob(code.trim()))));toast('Сохранение загружено',2);renderChars()}catch(e){toast('Код не подошёл',2)}}
+function exportSave(){const code=btoa(unescape(encodeURIComponent(bundle())));codeModal('Код сохранения','Скопируйте и сохраните в заметках. Вставьте его через «Импорт» на другом устройстве.',code,null);try{navigator.clipboard.writeText(code).then(()=>toast('Код скопирован',2),()=>{})}catch(e){}}
+function importSave(){codeModal('Импорт сохранения','Вставьте код сохранения. Текущие герои будут заменены.','',code=>{try{unbundle(decodeURIComponent(escape(atob(code.trim()))));toast('Сохранение загружено',2);renderChars();return true}catch(e){toast('Код не подошёл',2);return false}})}
+function codeModal(t,d,val,onOk){const o=document.createElement('div');o.className='ov on';o.style.zIndex=60;o.innerHTML=`<div class="card" style="background:rgba(14,12,16,.96);border:1px solid var(--line);border-radius:16px;padding:18px;max-width:min(480px,92vw)"><h2 style="font-size:24px">${t}</h2><p class="muted">${d}</p><textarea style="width:100%;height:120px;background:#0b0a09;color:#e8e0d0;border:1px solid var(--line);border-radius:10px;padding:8px;font:12px monospace">${val}</textarea><div style="display:flex;gap:8px;justify-content:center;margin-top:10px">${onOk?'<button class="btn" data-ok>Загрузить</button>':''}<button class="btn alt" data-x>Закрыть</button></div></div>`;document.body.appendChild(o);const ta=o.querySelector('textarea');if(val){ta.select()}o.addEventListener('click',e=>{if(e.target.closest('[data-x]'))o.remove();if(e.target.closest('[data-ok]')&&onOk(ta.value))o.remove()})}
 
 $('bExp').onclick=exportSave;$('bImp').onclick=importSave;
 
