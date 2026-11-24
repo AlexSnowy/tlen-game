@@ -39,6 +39,11 @@ body.bn #coach{opacity:0!important}
 @media (max-width:520px){.lfrow{flex-direction:column;align-items:stretch;gap:5px}.seg{width:100%}.seg button{flex:1;padding:7px 4px}}
 #updBar{position:fixed;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 4px);transform:translate(-50%,-140%);z-index:60;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#3a2c16,#22190d);border:1px solid #c9a25a;border-radius:12px;padding:8px 10px 8px 14px;color:#f3e6c8;font:500 13px Rubik,system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.6);transition:transform .4s;max-width:92vw}
 #updBar.on{transform:translate(-50%,0)}#updBar span{line-height:1.35}
+#snowC{position:fixed;inset:0;pointer-events:none;z-index:31}
+.nyt{display:none;margin:-2px 0 10px;font:500 13px Rubik,system-ui,sans-serif;color:#cfe6ff;letter-spacing:.3px;text-shadow:0 0 10px rgba(140,190,255,.7)}
+body.ny .nyt{display:block}
+body.ny #ovTitle h1{text-shadow:0 0 22px rgba(160,200,255,.35),0 2px 0 #000}
+.loot.gift{color:#ff9a9a!important;border-color:#ff6a6a!important;background:rgba(60,10,14,.9)!important;border-width:2px;font-weight:600;box-shadow:0 0 14px rgba(255,90,90,.55)}
 </style>
 <link rel="preload" href="fonts/rubik-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -468,12 +473,12 @@ body.bn #toast{opacity:0!important}
 <div class="ov" id="ovDlg"><div class="dlg"><b></b><p></p><button class="btn" id="dlgOk">Дальше</button></div></div>
 <div class="ov" id="ovTitle"><div class="card tcard">
   <h1>Земли Тлена</h1>
-  <p class="tag">Мёртвые встают из могил Вальмора. Уцелел лишь лагерь у старого костра.</p>
+  <p class="tag">Мёртвые встают из могил Вальмора. Уцелел лишь лагерь у старого костра.</p><p class="nyt" id="nyTag">❄ С наступающим Новым годом! ❄</p>
   <div id="charList"></div>
   <div class="tbtns"><button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn" id="bNew">Новый герой</button></div>
   <p class="muted" id="ctlHint" style="display:none"></p>
   <div class="tmore">
-    <details class="news"><summary>Что нового</summary><ul><li><b>Сюжет</b>: пролог, разговоры у костра, слова стражей, финал и «Летопись»</li><li><b>Обучение</b> для новых героев — подсказки сами ведут по первым шагам</li><li>Ровный интерфейс на любых экранах, свои шрифты, подписи добычи не слипаются</li><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details>
+    <details class="news"><summary>Что нового</summary><ul><li><b>Новый год</b>: снег, ёлка, гирлянды, снеговики, подарки с монстров, леденцы и шапки Санты (выключается в настройках)</li><li>Цвет экипировки на герое: золотой шлем — золотая шляпа</li><li>Бездна — кольцо Разлома и Владыка Бездны; фильтр добычи как в PoE</li><li><b>Сюжет</b>: пролог, разговоры у костра, слова стражей, финал и «Летопись»</li><li><b>Обучение</b> для новых героев — подсказки сами ведут по первым шагам</li><li>Ровный интерфейс на любых экранах, свои шрифты, подписи добычи не слипаются</li><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details>
     <details class="news"><summary>Настройки и сохранения</summary><div class="tset">
       <div class="seg" id="qSeg"><button data-q="high">Графика: высокая</button><button data-q="low">Экономная</button></div>
       <button class="btn alt sm" id="bMus">Музыка: вкл</button>
