@@ -573,7 +573,7 @@ helmet:'<path d="M5 16a7 7 0 0 1 14 0v3H5z"/><path d="M12 9v10"/>',chest:'<path 
 const itKey=it=>it.wb?'w:'+it.wb:it.ob?'o:'+it.ob:ABASE[it.slot]?it.slot+':'+Math.max(0,ABASE[it.slot].n.indexOf(it.base)):null;
 const itIcon=it=>{const n=IT_IC[itKey(it)];if(n&&GI[n])return `<svg class="gi" viewBox="0 0 512 512">${GI[n]}</svg>`;return itIcon0(it)};
 const itIcon0=it=>`<svg viewBox="0 0 24 24">${ICO[it.wb||(it.slot==='offhand'?(OBASE[it.ob]&&it.ob==='book'?'book':it.ob==='knife'?'knife':it.ob==='baxe'?'baxe':'offhand'):it.slot)]||ICO[it.slot]}</svg>`;
-const cellHTML=(it,extra='',attr='')=>`<button class="cell ${extra}" ${attr} style="color:${RC[it.rar]};border-color:${RC[it.rar]}66;box-shadow:inset 0 0 12px ${RC[it.rar]}22">${itIcon(it)}${it.upg?`<small>+${it.upg}</small>`:''}</button>`;
+const cellHTML=(it,extra='',attr='')=>`<button class="cell ${extra} ${it.rar===3?'uq':''} ${it.corr?'cr':''}" ${attr} style="color:${RC[it.rar]};border-color:${RC[it.rar]}66;box-shadow:inset 0 0 12px ${RC[it.rar]}22">${itIcon(it)}${it.upg?`<small>+${it.upg}</small>`:''}</button>`;
 const fmt=(v,i)=>i?Math.round(v):Math.round(v*10)/10;
 const stLine=(k,v)=>`${v>0?'+':''}${fmt(v,Math.abs(v)>=5)}${STAT_N[k]||' '+k}`;
 function itemLines(it){const u=it.upg,m=1+.1*u,L=[];if(it.dmg)L.push(`<li>Урон: ${Math.round(it.dmg[0]*m)}–${Math.round(it.dmg[1]*m)}${it.wb?' · '+WBASE[it.wb].aps+' уд/с · '+(WBASE[it.wb].hands===2?'двуручное':'одноручное'):''}</li>`);
@@ -1062,7 +1062,7 @@ const itId=it=>{if(it.id==null)it.id=uid++;return it.id};
 function isUpg(it){if(!it||!P.eq||!SLOTS.includes(it.slot))return false;const eq=Object.assign({},P.eq,{[it.slot]:it});if(it.slot==='weapon'&&WBASE[it.wb]&&WBASE[it.wb].hands===2)delete eq.offhand;const a=ST,b=calc(eq);
 return b.dps>a.dps*1.03||(Math.abs(b.dps-a.dps)<a.dps*.01&&(b.hp>a.hp+3||b.armor>a.armor+3))}
 function tcell(it,o={}){const pr=o.pr!=null?`<span class="pr ${o.no?'no':''}">${o.pr}</span>`:'';const up=o.up?'<span class="upb">▲</span>':'';
-return `<button class="cell ${o.cls||''} ${pr?'has-pr':''}" ${o.attr||''} style="color:${RC[it.rar]};border-color:${RC[it.rar]}66;box-shadow:inset 0 0 12px ${RC[it.rar]}22">${itIcon(it)}${it.upg?`<small>+${it.upg}</small>`:''}${up}${pr}</button>`}
+return `<button class="cell ${o.cls||''} ${pr?'has-pr':''} ${it.rar===3?'uq':''} ${it.corr?'cr':''}" ${o.attr||''} style="color:${RC[it.rar]};border-color:${RC[it.rar]}66;box-shadow:inset 0 0 12px ${RC[it.rar]}22">${itIcon(it)}${it.upg?`<small>+${it.upg}</small>`:''}${up}${pr}</button>`}
 function detHTML(it,acts=''){return `<div class="tdet">${ttHTML(it)}${cmpHTML(it)}${acts?`<div class="acts">${acts}</div>`:''}</div>`}
 function renderShop(){$('shGold').innerHTML=goldPill();document.querySelectorAll('#shTabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===T.tab));
 for(const id of [...T.tray])if(!P.bag.some(it=>itId(it)===id))T.tray.delete(id);
