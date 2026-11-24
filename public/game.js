@@ -1127,7 +1127,7 @@ const STASH_KEY='tlen3_stash',ST_N=48;let STASH=null,stTab=0;
 function stashLoad(){if(STASH)return STASH;try{STASH=JSON.parse(localStorage.getItem(STASH_KEY))}catch(e){}if(!STASH||!Array.isArray(STASH.tabs))STASH={tabs:[[],[],[],[]],names:['Общая','Оружие','Броня','Ценное']};for(const t of STASH.tabs)for(const it of t)if(it&&it.id!=null&&it.id>=uid)uid=it.id+1;return STASH}
 function stashSave(){try{localStorage.setItem(STASH_KEY,JSON.stringify(STASH))}catch(e){}}
 function renderStash(){const S0=stashLoad(),tab=S0.tabs[stTab];$('stGold').innerHTML=goldPill();
-let h='<div class="tabs">'+S0.names.map((n,i)=>`<button data-stt="${i}" class="${i===stTab?'on':''}">${n} <small style="opacity:.6">${S0.tabs[i].length}</small></button>`).join('')+'</div>';
+let h='<div class="tabs">'+S0.names.map((n,i)=>`<button data-stt="${i}" class="${i===stTab?'on':''}">${n}<small style="display:block;opacity:.6;font-size:10.5px;margin-top:1px">${S0.tabs[i].length}</small></button>`).join('')+'</div>';
 h+=`<div class="sect"><span>Вкладка «${S0.names[stTab]}» · ${tab.length}/${ST_N}</span><span class="chips">${stTab===1?'<button class="chip" data-sq="w">Сложить оружие</button>':stTab===2?'<button class="chip" data-sq="a">Сложить броню</button>':stTab===3?'<button class="chip" data-sq="r">Сложить редкие и уник.</button>':'<button class="chip" data-sq="all">Сложить всё</button>'}</span></div><div class="bag stb">`;
 for(let i=0;i<ST_N;i++){const it=tab[i];h+=it?tcell(it,{up:isUpg(it),attr:`data-st="${i}"`}):'<button class="cell" disabled style="cursor:default"></button>'}
 h+=`</div><div class="sect"><span>Сумка ${P.bag.length}/36</span><small style="text-transform:none;letter-spacing:0">нажмите — переложить</small></div><div class="bag">`;
