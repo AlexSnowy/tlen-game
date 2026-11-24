@@ -898,7 +898,7 @@ for(const l of loot){const c=l.gold?'#d8b56a':l.orb?'#fff3b0':l.mapIt?'#9ad0ff':
 for(const a of allies){mc.fillStyle='#5ad06a';mc.beginPath();mc.arc(tx(a.g.position.x),tz(a.g.position.z),2,0,7);mc.fill()}
 for(const M of mons){if(M.dead)continue;mc.fillStyle=M.boss?'#d04fff':M.rare?'#ffd84a':'#e0483c';const r=M.boss?4.5:M.rare?3:2;mc.beginPath();mc.arc(tx(M.g.position.x),tz(M.g.position.z),r,0,7);mc.fill()}
 if(OBJ)for(const e of OBJ.ents){if(e.done)continue;const ex=e.M?e.M.g.position.x:e.x,ez=e.M?e.M.g.position.z:e.z;let X=tx(ex),Z=tz(ez);const dd=Math.hypot(X-W/2,Z-W/2);if(dd>W/2-7){X=W/2+(X-W/2)/dd*(W/2-7);Z=W/2+(Z-W/2)/dd*(W/2-7)}mc.save();mc.translate(X,Z);mc.rotate(Math.PI/4);mc.fillStyle=e.M?'#ff5a3a':'#ffd774';mc.strokeStyle='#000';mc.fillRect(-4,-4,8,8);mc.strokeRect(-4,-4,8,8);mc.restore()}
-if(exitP){mc.fillStyle='#9a5cff';mc.beginPath();mc.arc(tx(exitP.position.x),tz(exitP.position.z),4,0,7);mc.fill()}
+for(const pg of PINGS){mc.strokeStyle='#7cf0e0';mc.lineWidth=2;mc.beginPath();mc.arc(tx(pg.x),tz(pg.z),4+3*Math.sin(performance.now()/150),0,7);mc.stroke()}if(exitP){mc.fillStyle='#9a5cff';mc.beginPath();mc.arc(tx(exitP.position.x),tz(exitP.position.z),4,0,7);mc.fill()}
 if(S.boss&&!S.boss.dead){const bx=S.boss.g.position.x-hx,bz=S.boss.g.position.z-hz,bd=Math.hypot(bx,bz);if(bd*s>W/2-6){mc.fillStyle='#d04fff';const a=Math.atan2(bz,bx);mc.beginPath();mc.arc(W/2+Math.cos(a)*(W/2-7),W/2+Math.sin(a)*(W/2-7),4,0,7);mc.fill()}}
 mc.restore();mc.fillStyle='#fff';mc.beginPath();mc.arc(W/2,W/2,3,0,7);mc.fill()}
 
@@ -980,6 +980,7 @@ if(pr.c.lay.U.n!==pr.U)pr.c.playL('U',pr.U,{fade:.1});if(pr.c.lay.L.n!==pr.L)pr.
 if(pr.el&&proj(cp.set(g.x,3,g.z),sp)){pr.el.style.display='block';pr.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else if(pr.el)pr.el.style.display='none'}}
 const monById=id=>mons.find(m=>m.id===id);
 async function onNet(m){const t=m.t;
+if(t==='ping'){if(m.zk!==zkey())return;const pr=NET.peers[m.from];showPing(m.x,m.z,(pr&&pr.name||'Союзник')+': '+m.msg);return}
 if(t==='rift'){if(m.zk!==zkey()||!S.rift)return;const R=S.rift;if(m.st===1){if(R.st===0)toast('Разлом открыт!',2);R.st=1;R.r=m.r;R.t=m.tt;R.k=m.k}else if(m.st===2&&R.st===1){R.k=m.k;R.t=0;R.fin=1}return}
 if(t==='gift'){if(m.to&&m.to!==NET.id)return;const it=m.it;if(!it)return;it.id=uid++;if(P.bag.length<36){P.bag.push(it);toast((NET.peers[m.from]&&NET.peers[m.from].name||'Союзник')+' передал вам: '+it.name,3);chime([660,880,1100],.08);save()}else{stashLoad().tabs[0].push(it);stashSave();toast('Подарок отправлен в хранилище: '+it.name,3)}return}
 if(t==='hello'){NET.id=m.id;NET.on=true;setHost(m.host);toast('Ты в группе '+NET.room+(NET.host?' · ты лидер':''),2.5);sendInfo();renderParty();return}
@@ -1029,9 +1030,9 @@ if(!NET.on){box.innerHTML=`<label class="fl">Имя героя<input id="pName" 
 <div class="sect" style="margin-top:14px"><span>Открытые группы</span><button class="chip" data-pa2="lobby">Обновить</button></div><div id="lobbyList">${lobbyHTML()}</div><p class="muted">Играть вместе могут до 3 героев. Каждый получает свою добычу. Сложность монстров растёт с размером группы.</p>`;lobbyOpen();return}
 const mem=[`<li><b>${esc(NET.name||CLASSES[P.cls].n)}</b> · ${CLASSES[P.cls].n} ${P.lvl}${NET.host?' · <span class="lead">лидер</span>':''} (ты)</li>`].concat(Object.values(NET.peers).map(p=>`<li><b>${esc(p.name)}</b> · ${p.cls?CLASSES[p.cls].n:''} ${p.lvl||''}</li>`)).join('');
 box.innerHTML=`<p>Код группы: <b class="code">${NET.room}</b></p><div class="acts"><button class="ab" data-pa2="copy">Скопировать приглашение</button><button class="ab alt" data-pa2="leave">Покинуть группу</button></div><ul class="mem">${mem}</ul>
-${NET.leaderZone&&!NET.host?`<p class="muted">Лидер открыл: ${esc(NET.leaderZone.zone.n)}. Иди к порталу в лагере.</p>`:''}<p class="muted">Ссылка для друзей: <span class="lnk">${esc(link)}</span></p>${NET.host?`<label class="hcl" style="justify-content:flex-start"><input type="checkbox" id="openChk" ${NET.open?'checked':''}> Открытая группа — видна всем в списке «Открытые группы»</label>`:''}`}
+${NET.leaderZone&&!NET.host?`<p class="muted">Лидер открыл: ${esc(NET.leaderZone.zone.n)}. Иди к порталу в лагере.</p>`:''}<div class="chips" style="margin:8px 0"><button class="chip" data-pg="Сюда!">📍 Сюда!</button><button class="chip" data-pg="Помогите!">🆘 Помогите</button><button class="chip" data-pg="Тут добыча">💰 Добыча</button><button class="chip" data-pg="Иду к боссу">⚔ К боссу</button></div><p class="muted">Ссылка для друзей: <span class="lnk">${esc(link)}</span></p>${NET.host?`<label class="hcl" style="justify-content:flex-start"><input type="checkbox" id="openChk" ${NET.open?'checked':''}> Открытая группа — видна всем в списке «Открытые группы»</label>`:''}`}
 $('partyBox').addEventListener('change',e=>{if(e.target.id==='openChk'){NET.open=e.target.checked;advTick(true)}});
-$('partyBox').addEventListener('click',e=>{const jb=e.target.closest('[data-lj]');if(jb){lobbyClose();netConnect(jb.dataset.lj);setTimeout(renderParty,300);return}const b=e.target.closest('[data-pa2]');if(!b)return;if(b.dataset.pa2==='lobby'){lobbyClose();lobbyOpen();return}const a=b.dataset.pa2;const nm=$('pName');if(nm){NET.name=nm.value.trim().slice(0,16);try{localStorage.setItem('tlen_name',NET.name)}catch(_){}}
+$('partyBox').addEventListener('click',e=>{const pg=e.target.closest('[data-pg]');if(pg){const p=H.g.position;nsend({t:'ping',zk:zkey(),x:+p.x.toFixed(1),z:+p.z.toFixed(1),msg:pg.dataset.pg});showPing(p.x,p.z,'Вы: '+pg.dataset.pg);closePanels();return}const jb=e.target.closest('[data-lj]');if(jb){lobbyClose();netConnect(jb.dataset.lj);setTimeout(renderParty,300);return}const b=e.target.closest('[data-pa2]');if(!b)return;if(b.dataset.pa2==='lobby'){lobbyClose();lobbyOpen();return}const a=b.dataset.pa2;const nm=$('pName');if(nm){NET.name=nm.value.trim().slice(0,16);try{localStorage.setItem('tlen_name',NET.name)}catch(_){}}
 if(a==='create'){const c=Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');netConnect(c)}
 if(a==='join'){netConnect(($('pCode').value||'').trim())}if(a==='leave'){netLeave()}
 if(a==='copy'){const link=location.origin+location.pathname+'?room='+NET.room;const txt='Заходи ко мне в «Земли Тлена»: '+link;try{navigator.clipboard.writeText(txt).then(()=>toast('Приглашение скопировано',1.5),()=>toast(link,6))}catch(_){toast(link,6)}
@@ -1495,3 +1496,7 @@ for(let i=0;i<3;i++){const b=$('s'+i);let tm=null;b.addEventListener('pointerdow
 const m=new THREE.Mesh(new THREE.PlaneGeometry(9,9).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.38}));m.position.y=.04;m.renderOrder=1;H.g.add(m);H.glow=m}
 
 $('sortBtn').onclick=()=>{const so=['weapon','offhand','helmet','chest','gloves','boots','ring','amulet'];P.bag.sort((a,b)=>so.indexOf(a.slot)-so.indexOf(b.slot)||b.rar-a.rar||b.ilvl-a.ilvl);S.sel=null;save();renderInv();snd(700,.05,'triangle',.05)};
+
+let PINGS=[];
+function showPing(x,z,msg){toast(msg,2.5);snd(1500,.1,'sine',.08);setTimeout(()=>snd(1800,.1,'sine',.08),120);PINGS.push({x,z,t:6});if(S.mode==='zone')ringFx(x,z,3,'#7cf0e0',1.2,.2)}
+setInterval(()=>{PINGS=PINGS.filter(p=>(p.t-=.5)>0)},500);
