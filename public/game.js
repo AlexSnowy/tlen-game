@@ -687,7 +687,7 @@ function updSkillBar(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id
 
 /* ================= FLOW ================= */
 function rollShop(){S.shop=[];for(let i=0;i<8;i++)S.shop.push(genItem(Math.max(1,P.maxZone>8?8+P.maxMap:P.maxZone),Math.random()<.35?1:0,0,i<2?'weapon':undefined))}
-function enterTown(){S.mode='town';setTimeout(()=>{try{const n=Date.now();if(P&&n-(window.__lbT||0)>600000){window.__lbT=n;leaderboard(lbEntry(),()=>{},BRK())}}catch(e){}},4000);setTimeout(()=>cloudSave(true),1500);setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
+function enterTown(){S.mode='town';setTimeout(()=>{try{updObjHud()}catch(e){}},50);try{trophies()}catch(e){}setTimeout(()=>{try{const n=Date.now();if(P&&n-(window.__lbT||0)>600000){window.__lbT=n;leaderboard(lbEntry(),()=>{},BRK())}}catch(e){}},4000);setTimeout(()=>cloudSave(true),1500);setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
 setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');$('bossBar').classList.remove('on');rollShop();save();$('zoneName').textContent='Лагерь у костра';$('zoneSub').textContent=touch?'Торговка, кузнец и портал на севере':'Торговка, кузнец и портал. K — умения, P — пассивы, I — сумка'}
 function enterZone(zi,tier,net,mi){if(isGuest()&&!net){toast('Портал открывает лидер группы',2);return}S.mods=[];S.seed=net?net.seed:Math.floor(RNG0()*1e9);if(zi>=0){S.zi=zi;S.zone=ZONES[zi];S.L=zi+1;S.map=0;S.mapRar=0;S.pin=false;S.abyss=0}else{const base=mi?ZONES[mi.zi]:pick(ZONES);S.zi=-1;S.map=tier;S.L=8+tier;S.mapRar=mi?mi.rar:0;S.pin=!!(mi&&mi.pin);S.abyss=mi&&mi.abyss||0;S.mods=mi?mi.mods.map(k=>MAPMODS.find(m=>m.k===k)).filter(Boolean):[];
 if(net){S.zone=net.zone;S.mods=net.mods}else if(S.pin)S.zone={n:'Обитель Пожирателя',th:3,mons:[['fallen',2],['berserker',2],['necro',1],['brute',1.5]],boss:'Пожиратель Тлена',bt:'brute',obj:{t:'hunt',n:'Убей стражей Обители',c:2},kit:['slam','meteors','spiral','summon','teleport','nova','charge','enrage'],phases:1};else S.zone={n:'Карта: '+base.n,th:base.th,mons:base.mons.concat([['fallen',1],['necro',.6],['berserker',1]]),boss:base.boss+' Кошмара',bt:base.bt,obj:pick(OBJ_POOL),kit:shuffle(Object.keys(BOSS_SK).filter(k=>k!=='enrage')).slice(0,3).concat(tier>=3?['enrage']:[])}}
@@ -739,7 +739,7 @@ if(o.t==='totems'){for(let i=0;i<o.c;i++){const a=i/o.c*Math.PI*2+.4,x=BOSSP.x+M
 const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:new THREE.Color('#d070ff').multiplyScalar(3),toneMapped:false}));scene.add(line);add({x,z,g,orb,line,ch:2,verb:'Разрушить обелиск'})}
 const sh=new THREE.Mesh(new THREE.SphereGeometry(1.6,24,16),new THREE.MeshBasicMaterial({color:new THREE.Color('#b060ff').multiplyScalar(1.2),transparent:true,opacity:.25,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}));sh.position.y=1.6;sh.scale.setScalar(S.boss.sc);S.boss.g.add(sh);OBJ.shield=sh}
 updObjHud()}
-function updObjHud(){const el=$('objTxt');if(!OBJ){el.textContent='';return}if(OBJ.done){el.innerHTML='<b class="ok">✓</b> Путь к Стражу открыт: '+esc(S.zone.boss);return}
+function updObjHud(){const el=$('objTxt');el.style.display=OBJ?'':'none';if(!OBJ){el.textContent='';return}if(OBJ.done){el.innerHTML='<b class="ok">✓</b> Путь к Стражу открыт: '+esc(S.zone.boss);return}
 el.innerHTML='Задание: '+esc(OBJ.n)+' · <b>'+(OBJ.t==='defend'?Math.floor(OBJ.have)+' / '+OBJ.c+' с':OBJ.have+' / '+OBJ.c)+'</b>'}
 function ambush(e,kind){const n=kind==='cult'?3:4;for(let k=0;k<n;k++){const a=rand(0,6.28),d=rand(4,7);const t=kind==='cult'?(S.zone.mons.some(m=>m[0]==='cultist')?'cultist':zMon()):'minion';const m=spawnMon(t,e.x+Math.cos(a)*d,e.z+Math.sin(a)*d,{});wake(m)}toast(kind==='cult'?'Засада!':'Мёртвые поднимаются из могил!',1.8)}
 function objStep(pos){OBJ.have++;burst({x:pos.x,y:1.5,z:pos.z},'#ffd774',40,5,.4,.9,2.2);flash({x:pos.x,y:1,z:pos.z},'#ffd774',50,.5);snd(660,.2,'triangle',.12,1.5);setTimeout(()=>snd(990,.3,'triangle',.12),120);
@@ -1503,3 +1503,9 @@ setInterval(()=>{PINGS=PINGS.filter(p=>(p.t-=.5)>0)},500);
 
 $('bPing').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!NET.on)return;const p=H.g.position;nsend({t:'ping',zk:zkey(),x:+p.x.toFixed(1),z:+p.z.toFixed(1),msg:'Сюда!'});showPing(p.x,p.z,'Вы: Сюда!')});
 setInterval(()=>document.body.classList.toggle('grp',!!NET.on&&S.mode==='zone'),1000);
+
+/* трофеи в лагере за побеждённых стражей */
+let TROPHY=null;
+function trophies(){if(!P)return;if(TROPHY){town.remove(TROPHY)}TROPHY=new THREE.Group();town.add(TROPHY);const L=(P.lore||[]).slice().sort((a,b)=>a-b);
+L.forEach((zi,i)=>{const side=i%2?1:-1,row=Math.floor(i/2),x=side*3.2,z=-8-row*2.6;const b=prop('banner_patternA_red',1.1);b.position.set(x,0,z);b.rotation.y=side>0?-Math.PI/2:Math.PI/2;TROPHY.add(b)});
+if(P.pinK){const sk=prop('skull',2.2);sk.position.set(0,0,-16.4);TROPHY.add(sk)}}
