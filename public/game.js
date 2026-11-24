@@ -293,7 +293,7 @@ function updNums(dt){for(const n of nums){if(!n.on)continue;n.t+=dt;n.p.y+=dt*(2
 const s=n.t<.12?.6+n.t/.12*.7:1.3-Math.min(.3,(n.t-.12)*1.2);n.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-50%) scale(${s})`;n.el.style.opacity=1-Math.max(0,n.t-.6)*2.5}}
 let toastT=0;function toast(t,d=3){const e=$('toast');e.textContent=t;e.classList.add('on');toastT=d}
 let AC=null,master;
-function initAudio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.4;master.connect(AC.destination)}catch(e){AC=null}}
+function initAudio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=(typeof SET!=='undefined'?SET.vol:.4);master.connect(AC.destination)}catch(e){AC=null}}
 function snd(f,d,type='sine',v=.15,sl=0){if(!AC)return;try{const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*sl),t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(master);o.start(t);o.stop(t+d+.05)}catch(e){}}
 function noise(d,v=.15,f=800){if(!AC)return;try{const t=AC.currentTime,b=AC.createBuffer(1,Math.max(1,AC.sampleRate*d|0),AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*(1-i/a.length);const s=AC.createBufferSource();s.buffer=b;const fl=AC.createBiquadFilter();fl.type='lowpass';fl.frequency.value=f;const g=AC.createGain();g.gain.value=v;s.connect(fl).connect(g).connect(master);s.start(t)}catch(e){}}
 
@@ -928,7 +928,7 @@ if(OBJ)for(const e of OBJ.ents){if(e.done||!e.el||e.M)continue;const h=e.pick?2.
 for(const n of NPCS){if(S.mode==='town'&&proj(cp.set(n.lx,n.ly,n.lz),sp)){n.el.style.display='block';n.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else n.el.style.display='none'}
 if(S.mode==='title'||S.mode==='load'){orbit+=dt*.06;camera.position.set(Math.cos(orbit)*22,9,Math.sin(orbit)*22);camera.lookAt(0,1.5,-4);sun.position.set(14,30,10);sun.target.position.set(0,0,0)}
 else{const p=H.g.position,port=camera.aspect<1?1.3:1;cp.set(p.x,15*port,p.z+13.5*port);camera.position.lerp(cp,1-Math.pow(.003,dt));camT.lerp(p,1-Math.pow(.003,dt));camera.lookAt(camT.x,camT.y+.8,camT.z);
-if(S.shake>0){S.shake-=dt;const k=S.shake*.9;camera.position.x+=rand(-k,k);camera.position.y+=rand(-k,k)*.6}sun.position.set(p.x+12,26,p.z+9);sun.target.position.set(p.x,0,p.z)}
+if(S.shake>0){S.shake-=dt;const k=(typeof SET!=='undefined'&&!SET.shake)?0:S.shake*.9;camera.position.x+=rand(-k,k);camera.position.y+=rand(-k,k)*.6}sun.position.set(p.x+12,26,p.z+9);sun.target.position.set(p.x,0,p.z)}
 if(ST&&P&&S.mode!=='title'&&S.mode!=='load'){const mm=ST.mana*(1-ST.reserve);$hp.style.height=H.hp/ST.hp*100+'%';$hpT.textContent=Math.ceil(H.hp)+' / '+Math.round(ST.hp);$es.style.opacity=H.es>0?Math.min(1,H.es/(ST.hp*.3)):0;
 $mp.style.height=H.mana/Math.max(1,mm)*100*(1-ST.reserve)+'%';$mpT.textContent=Math.floor(H.mana)+' / '+Math.round(mm);
 $xp.style.width=P.xp/need(P.lvl)*100+'%';$lv.textContent=CLASSES[P.cls].n+' · уровень '+P.lvl+' · '+Math.floor(P.xp)+' / '+need(P.lvl)+' опыта';$gold.textContent=P.gold+' зол.';
@@ -1213,7 +1213,7 @@ const cs=k=>(P.cs&&P.cs[k])||0;
 function csAdd(k,v=1,max){P.cs=P.cs||{};P.cs[k]=max?Math.max(P.cs[k]||0,v):(P.cs[k]||0)+v;if(frameN%1===0)chBadge()}
 function chReady(){let d=0;try{const D=dailyGet();d=D.t.filter(t=>{const x=DPOOL.find(q=>q.k===t.k);return x&&!t.got&&cs(t.k)-t.b>=x.g}).length}catch(e){}return d+CH.filter(c=>{const[a,b]=c.p();return a>=b&&!(P.chc||[]).includes(c.id)}).length}
 function chBadge(){if(!P)return;const n=chReady(),b=$('chB');if(!b)return;b.textContent=n;b.classList.toggle('on',n>0)}
-function renderCh(){const got=P.chc||[];if(S.chTab==='r'){$('chBody').innerHTML=chTabs()+lbHTML();lbFetch();return}if(S.chTab==='g'){$('chBody').innerHTML=chTabs()+guideHTML();return}let h=chTabs()+dailyHTML()+`<div class="sect" style="margin-top:14px"><span>Испытания</span></div><div class="chsum"><span>Выполнено: <b style="color:#ffd774">${got.length}</b> из ${CH.length}</span></div><div class="chl">`;
+function renderCh(){const got=P.chc||[];if(S.chTab==='r'){$('chBody').innerHTML=chTabs()+lbHTML();lbFetch();return}if(S.chTab==='g'){$('chBody').innerHTML=chTabs()+setHTML()+guideHTML();return}let h=chTabs()+dailyHTML()+`<div class="sect" style="margin-top:14px"><span>Испытания</span></div><div class="chsum"><span>Выполнено: <b style="color:#ffd774">${got.length}</b> из ${CH.length}</span></div><div class="chl">`;
 for(const c of CH){const[a,b]=c.p(),done=a>=b,g=got.includes(c.id);const rw=Object.entries(c.rw).map(([k,v])=>uiI('orb:'+k,ORBS[k].c,'width:14px;height:14px;vertical-align:-2px;filter:none')+'×'+v).join(' ');
 h+=`<div class="chr ${done?'done':''} ${g?'got':''}">${gi(GI[c.ic]?c.ic:'trophy-cup','#ffd774')}<div><b>${c.n}</b><small>${c.d} · ${Math.min(a,b)}/${b}</small><div class="bar"><i style="width:${Math.min(100,a/b*100)}%"></i></div></div><div>${g?'<span class="rw">получено</span>':done?`<button class="ab" data-ch="${c.id}">Забрать</button>`:`<span class="rw">${rw}</span>`}</div></div>`}
 const us=P.uSeen||[];h+=`</div><div class="sect" style="margin-top:16px"><span>Коллекция уникальных · ${us.length}/${UNIQUES.length}</span></div><div class="ucol">`+UNIQUES.map(u=>us.includes(u.n)?`<span class="on" title="${esc(u.lore||'')}">${esc(u.n)}</span>`:'<span>???</span>').join('')+'</div>';const lo=(P.lore||[]).filter(i=>ZONES[i]&&ZONES[i].lore);h+=`<div class="sect" style="margin-top:16px"><span>Летопись · ${lo.length}/8</span></div>`+(lo.length?lo.sort((a,b)=>a-b).map(i=>`<div class="lore1"><b>${i+1}. ${esc(ZONES[i].n)} — ${esc(ZONES[i].boss)}</b><p>${esc(ZONES[i].lore)}</p></div>`).join(''):'<p class="muted">Победи стражей кампании, чтобы узнать историю Тлена.</p>');$('chBody').innerHTML=h+statsHTML()}
@@ -1353,7 +1353,7 @@ document.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'){tf.style
 if(!it){tf.style.display='none';tf._it=null;return}if(tf._it!==it){tf._it=it;tf.innerHTML=ttHTML(it)+(SLOTS.includes(it.slot)&&!el.dataset.eq?cmpHTML(it):'')}tf.style.display='block';const w=tf.offsetWidth,h=tf.offsetHeight;let x=e.clientX+18,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-18;if(y+h>innerHeight-8)y=innerHeight-h-8;tf.style.left=x+'px';tf.style.top=Math.max(8,y)+'px'})}
 
 /* вибрация на телефоне */
-let hapT=0;function haptic(k){const now=performance.now();if(now-hapT<120)return;hapT=now;try{const T=window.Telegram&&Telegram.WebApp&&Telegram.WebApp.HapticFeedback;if(T&&Telegram.WebApp.initData){k==='ok'?T.notificationOccurred('success'):T.impactOccurred(k==='heavy'?'heavy':k==='light'?'light':'medium');return}if(navigator.vibrate)navigator.vibrate(k==='heavy'?60:k==='ok'?[30,40,30]:k==='light'?12:25)}catch(e){}}
+let hapT=0;function haptic(k){if(typeof SET!=='undefined'&&!SET.vib)return;const now=performance.now();if(now-hapT<120)return;hapT=now;try{const T=window.Telegram&&Telegram.WebApp&&Telegram.WebApp.HapticFeedback;if(T&&Telegram.WebApp.initData){k==='ok'?T.notificationOccurred('success'):T.impactOccurred(k==='heavy'?'heavy':k==='light'?'light':'medium');return}if(navigator.vibrate)navigator.vibrate(k==='heavy'?60:k==='ok'?[30,40,30]:k==='light'?12:25)}catch(e){}}
 
 /* справочник */
 const GUIDE=[['Управление','Телефон: коснись экрана и веди пальцем — герой идёт и сам бьёт ближайших врагов. Q/E/R — умения, синяя кнопка — рывок в сторону движения, красная — флакон. ПК: WASD или мышь, Q/E/R, пробел, F.'],
@@ -1372,7 +1372,7 @@ const GUIDE=[['Управление','Телефон: коснись экран�
 ['Группа','До 3 игроков. Кнопка «Группа» → «Создать группу» и отправьте ссылку другу, или отметьте «Открытая группа» — тогда вас увидят все в списке «Открытые группы». У каждого своя добыча, вещи можно передавать союзнику из сумки.']];
 function guideHTML(){return '<div class="guide">'+GUIDE.map(([t,d],i)=>`<details ${i===0?'open':''}><summary>${t}</summary><p>${d}</p></details>`).join('')+'</div>'}
 
-function chTabs(){return `<div class="tabs"><button data-cht="c" class="${!S.chTab||S.chTab==='c'?'on':''}">Испытания</button><button data-cht="r" class="${S.chTab==='r'?'on':''}">Рекорды</button><button data-cht="g" class="${S.chTab==='g'?'on':''}">Справка</button></div>`}
+function chTabs(){return `<div class="tabs"><button data-cht="c" class="${!S.chTab||S.chTab==='c'?'on':''}">Испытания</button><button data-cht="r" class="${S.chTab==='r'?'on':''}">Рекорды</button><button data-cht="g" class="${S.chTab==='g'?'on':''}">Настройки</button></div>`}
 $('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-cht]');if(!b)return;S.chTab=b.dataset.cht;renderCh()});
 
 /* лобби открытых групп */
@@ -1509,3 +1509,17 @@ let TROPHY=null;
 function trophies(){if(!P)return;if(TROPHY){town.remove(TROPHY)}TROPHY=new THREE.Group();town.add(TROPHY);const L=(P.lore||[]).slice().sort((a,b)=>a-b);
 L.forEach((zi,i)=>{const side=i%2?1:-1,row=Math.floor(i/2),x=side*3.2,z=-8-row*2.6;const b=prop('banner_patternA_red',1.1);b.position.set(x,0,z);b.rotation.y=side>0?-Math.PI/2:Math.PI/2;TROPHY.add(b)});
 if(P.pinK){const sk=prop('skull',2.2);sk.position.set(0,0,-16.4);TROPHY.add(sk)}}
+
+/* настройки */
+const SET=(()=>{try{return Object.assign({vol:.4,vib:1,nums:1,shake:1},JSON.parse(localStorage.getItem('tlen_set')||'{}'))}catch(e){return{vol:.4,vib:1,nums:1,shake:1}}})();
+function setSave(){try{localStorage.setItem('tlen_set',JSON.stringify(SET))}catch(e){}if(master)master.gain.value=SET.vol;document.body.classList.toggle('nonums',!SET.nums)}
+function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Настройки</span></div><div class="setl">
+<label>Громкость <input type="range" min="0" max="1" step="0.05" value="${SET.vol}" data-set="vol"></label>
+<label><input type="checkbox" data-set="mus" ${musOn?'checked':''}> Музыка</label>
+<label><input type="checkbox" data-set="vib" ${SET.vib?'checked':''}> Вибрация</label>
+<label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
+<label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
+<label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
+$('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
+$('chBody').addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k||k==='vol')return;const v=e.target.checked;if(k==='mus'){if(v!==musOn)musToggle()}else if(k==='q'){Q=v?'low':'high';try{localStorage.setItem('tlen_q',Q)}catch(_){}setQBtns();applyQ()}else{SET[k]=v?1:0;setSave()}});
+setTimeout(setSave,500);
