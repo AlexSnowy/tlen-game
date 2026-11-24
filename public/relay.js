@@ -149,3 +149,28 @@ export function leaderboard(entry, onList, brokers = BROKERS) {
   const stop = () => { if (done) return; done = true; try { ws.send(new Uint8Array([0xE0, 0])); ws.close(); } catch {} };
   setTimeout(stop, 8000); return stop;
 }
+
+// Лента событий мира: подписка без присутствия, публикация коротких новостей
+export class Feed {
+  constructor(onMsg, brokers = BROKERS) { this.on = onMsg; this.brokers = brokers; this.q = []; this.open(); }
+  open() {
+    let ws; try { ws = new WebSocket(this.brokers[0], 'mqtt'); } catch { return; }
+    ws.binaryType = 'arraybuffer'; this.ws = ws; this.ok = false;
+    ws.onopen = () => ws.send(pkt(0x10, [...str('MQTT'), 4, 0x02, 0, 60, ...str('fd' + Math.random().toString(36).slice(2, 9))]));
+    ws.onmessage = e => {
+      const d = new Uint8Array(e.data); let i = 0;
+      while (i < d.length) {
+        const t = d[i] >> 4; let mul = 1, len = 0, j = i + 1, c;
+        do { c = d[j++]; len += (c & 127) * mul; mul *= 128; } while (c & 128);
+        const p = d.subarray(j, j + len); i = j + len;
+        if (t === 2) { this.ok = true; ws.send(pkt(0x82, [0, 3, ...str(PFX + 'feed'), 0])); for (const m of this.q.splice(0)) this.pub(m); }
+        else if (t === 3) { const tl = (p[0] << 8) | p[1]; try { const o = JSON.parse(td.decode(p.subarray(2 + tl))); if (o && o.txt && o.from !== this.me) this.on(o); } catch {} }
+      }
+    };
+    clearInterval(this.pi); this.pi = setInterval(() => { if (ws.readyState === 1) ws.send(new Uint8Array([0xC0, 0])); }, 30000);
+    ws.onclose = () => { this.ok = false; clearInterval(this.pi); if (!this.closed) setTimeout(() => this.open(), 15000); };
+    ws.onerror = () => {};
+  }
+  pub(o) { if (!this.ok) { this.q.push(o); return; } o.from = this.me; this.ws.send(pkt(0x30, [...str(PFX + 'feed'), ...te.encode(JSON.stringify(o))])); }
+  close() { this.closed = true; try { this.ws.close(); } catch {} }
+}

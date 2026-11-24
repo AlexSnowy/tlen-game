@@ -308,6 +308,8 @@ body.bn #toast{opacity:0!important}
 #bPing{position:fixed;right:max(12px,env(safe-area-inset-right));top:calc(max(12px,env(safe-area-inset-top)) + 200px);width:44px;height:44px;border-radius:50%;border:1px solid #7cf0e0;background:rgba(10,30,30,.7);font-size:20px;display:none;z-index:4;cursor:pointer}body.grp #bPing{display:block}
 .setl{display:grid;gap:8px;margin-bottom:14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.2)}.setl label{display:flex;align-items:center;gap:10px;font-size:14px}.setl input[type=range]{flex:1;accent-color:var(--gold)}.setl input[type=checkbox]{width:18px;height:18px;accent-color:var(--gold)}body.nonums .num:not(.lvl):not(.hurt){display:none!important}
 .zb.resume{width:100%;margin-bottom:10px;border-color:#7cf0e0;background:linear-gradient(90deg,rgba(40,120,120,.3),rgba(0,0,0,.2))}.zb.resume b{color:#9af0e0}
+#feed{position:fixed;left:max(10px,env(safe-area-inset-left));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 120px);z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:4px;max-width:min(60vw,360px)}.fd{font:500 12px Rubik;color:#e8d8b0;background:rgba(10,8,6,.7);border-left:2px solid #d8782e;padding:4px 8px;border-radius:0 8px 8px 0;animation:fdin .4s}@keyframes fdin{from{opacity:0;transform:translateX(-10px)}}
+@media (max-width:600px) and (orientation:portrait){#feed{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 200px)}}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -337,7 +339,7 @@ body.bn #toast{opacity:0!important}
   <button id="interact"></button>
   <div class="xp"><i id="xpFill"></i><span id="lvlTxt"></span></div>
 </div>
-<div id="banner"></div><button id="bPing" title="Позвать союзников">📍</button><div id="toast"></div>
+<div id="banner"></div><div id="feed"></div><button id="bPing" title="Позвать союзников">📍</button><div id="toast"></div>
 <div class="joy" id="joy"><i id="knob"></i></div>
 
 <div class="panel" id="pInv"><div class="pw">
