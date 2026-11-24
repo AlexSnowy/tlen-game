@@ -1500,3 +1500,6 @@ $('sortBtn').onclick=()=>{const so=['weapon','offhand','helmet','chest','gloves'
 let PINGS=[];
 function showPing(x,z,msg){toast(msg,2.5);snd(1500,.1,'sine',.08);setTimeout(()=>snd(1800,.1,'sine',.08),120);PINGS.push({x,z,t:6});if(S.mode==='zone')ringFx(x,z,3,'#7cf0e0',1.2,.2)}
 setInterval(()=>{PINGS=PINGS.filter(p=>(p.t-=.5)>0)},500);
+
+$('bPing').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!NET.on)return;const p=H.g.position;nsend({t:'ping',zk:zkey(),x:+p.x.toFixed(1),z:+p.z.toFixed(1),msg:'Сюда!'});showPing(p.x,p.z,'Вы: Сюда!')});
+setInterval(()=>document.body.classList.toggle('grp',!!NET.on&&S.mode==='zone'),1000);
