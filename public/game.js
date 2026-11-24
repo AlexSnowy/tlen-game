@@ -184,12 +184,12 @@ pillar_decorated:[1,1.1],column:[1.4,.5],rubble_large:[1,2.4],rubble_half:[1,1.7
 sword_shield_broken:[1,0],d_candle_triple:[1.2,0],banner_patternA_red:[1,.4],lantern_standing:[1.7,.35],torch_lit:[1.5,.3]};
 function place(name,x,z,parent,obs,opt={}){const d=PR[name]||[1,.6];const s=(opt.s||d[0])*(opt.sv?rand(1-opt.sv,1+opt.sv):1);const o=prop(name,s);o.position.set(x,opt.y||0,z);o.rotation.y=opt.ry??rand(0,6.28);parent.add(o);
 const r=opt.r!==undefined?opt.r:d[1]*(s/d[0]);if(r>0&&obs)obs.push({x,z,r});return o}
-function buildTown(){townObs=[];
-makeGround(90,noiseTex('#3b4a2c','#4c5e34','#2a341f'),16,town);
-const dm=new THREE.MeshStandardMaterial({map:noiseTex('#5a4a38','#6a5640','#3e3226'),roughness:1});dm.map.repeat.set(3,3);
+function buildTown(){townObs=[];const NYT=nyOn();
+const gt=NYT?noiseTex('#cfd8e3','#eef2f8','#b4bfcd'):noiseTex('#3b4a2c','#4c5e34','#2a341f');gt.userData.snow=NYT;makeGround(90,gt,16,town);
+const dm=new THREE.MeshStandardMaterial({map:NYT?noiseTex('#8d8a84','#a7a49d','#6e6a63'):noiseTex('#5a4a38','#6a5640','#3e3226'),roughness:1});dm.map.repeat.set(3,3);
 const dirt=new THREE.Mesh(new THREE.CircleGeometry(10,48).rotateX(-Math.PI/2),dm);dirt.position.y=.02;dirt.receiveShadow=true;town.add(dirt);
 const path=new THREE.Mesh(new THREE.PlaneGeometry(4.5,14).rotateX(-Math.PI/2),dm);path.position.set(0,.025,-14);path.receiveShadow=true;town.add(path);
-makeGrass(Q==='high'?7000:3500,40,'#6f8f3e',(x,z)=>Math.hypot(x,z)<10.5||(Math.abs(x)<2.6&&z<-6&&z>-22),town);
+if(!NYT||Q==='high')makeGrass((Q==='high'?7000:3500)*(NYT?.1:1),40,NYT?'#c9d6c4':'#6f8f3e',(x,z)=>Math.hypot(x,z)<10.5||(Math.abs(x)<2.6&&z<-6&&z>-22),town);
 for(let i=0;i<9;i++){const a=i/9*6.28;place('rock_single_B',Math.cos(a)*1.25,Math.sin(a)*1.25,town,null,{s:3.2})}
 for(let i=0;i<4;i++){const l=prop('resource_lumber',2.2);l.position.set(0,.12,0);l.rotation.y=i*.8;town.add(l)}
 townObs.push({x:0,z:0,r:1.5});fireLight=new THREE.PointLight(0xff8a3a,60,22,2);fireLight.position.set(0,1.8,0);town.add(fireLight);emitters.push({x:0,y:.4,z:0,kind:'fire',w:town});
@@ -1873,10 +1873,10 @@ function nySnowman(par,x,z,s,r){const N=nym();const g=new THREE.Group();[[.62,.5
  const nose=new THREE.Mesh(new THREE.ConeGeometry(.06,.32,8),N.carrot);nose.rotation.x=Math.PI/2;nose.position.set(0,2.02,.42);g.add(nose);for(const sx of [-.11,.11]){const e=new THREE.Mesh(N.pom,N.coal);e.scale.setScalar(.45);e.position.set(sx,2.12,.28);g.add(e)}
  for(const sx of [-1,1]){const a=new THREE.Mesh(new THREE.CylinderGeometry(.03,.04,.9,5),N.stick);a.position.set(sx*.62,1.5,0);a.rotation.z=sx*1.05;g.add(a)}const h=nyHatMesh();h.position.y=2.3;h.scale.setScalar(1.1);g.add(h);
  g.position.set(x,0,z);g.rotation.y=r()*6.28;g.scale.setScalar(s);par.add(g);return g}
-function nyDrift(par,x,z,s,r){const m=new THREE.Mesh(nym().sph,nym().driftM);s*=.75;m.scale.set(s*(1+r()*.8),s*.22,s*(.8+r()*.6));m.position.set(x,-s*.05,z);m.rotation.y=r()*3;m.receiveShadow=true;par.add(m);return m}
+function nyDrift(par,x,z,s,r,white){const m=new THREE.Mesh(nym().sph,white?nym().snowM:nym().driftM);s*=.75;m.scale.set(s*(1+r()*.8),s*.22,s*(.8+r()*.6));m.position.set(x,-s*.05,z);m.rotation.y=r()*3;m.receiveShadow=true;par.add(m);return m}
 function nyHatMesh(){const N=nym();const g=new THREE.Group();const c=new THREE.Mesh(N.hatCone,N.hatR);c.position.y=.32;c.rotation.z=-.35;c.position.x=.07;g.add(c);const b=new THREE.Mesh(N.hatBrim,N.hatW);b.rotation.x=Math.PI/2;b.position.y=.04;g.add(b);const p=new THREE.Mesh(N.pom,N.hatW);p.position.set(.2,.6,0);g.add(p);return g}
 // ---- земля в инее
-function nyGround(m){const c=m.material.color;c.setRGB(1.22,1.28,1.42);m.material.roughness=.7}
+function nyGround(m){if(m.material.map&&m.material.map.userData.snow){m.material.roughness=.85;return}const c=m.material.color;c.setRGB(1.22,1.28,1.42);m.material.roughness=.7}
 // ---- украшения в зоне
 let NYC=[];
 function nyZone(){const r=nyRng((S.seed||1)^0x5eed);NYC=[];const ok=(x,z,d)=>!zoneObs.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+d)&&Math.hypot(x,z-46)>6&&Math.hypot(x,z+44)>9;
@@ -1889,7 +1889,8 @@ function nyZone(){const r=nyRng((S.seed||1)^0x5eed);NYC=[];const ok=(x,z,d)=>!zo
 // ---- лагерь: гирлянды, снеговики, сугробы
 let NYB=[];
 function nyTown(town){const r=nyRng(777);NYB=[];
- for(let i=0;i<26;i++){const a=r()*6.28,d=14+r()*12,x=Math.cos(a)*d,z=Math.sin(a)*d;if(Math.abs(x)<5&&z<-6)continue;nyDrift(town,x,z,1+r()*2,r)}
+ for(const o of townObs)if(o.r>.6&&Math.hypot(o.x,o.z)>9)nyDrift(town,o.x+(r()-.5)*o.r*1.6,o.z+(r()-.5)*o.r*1.6,.8+o.r*.5,r,1);
+ for(let i=0;i<40;i++){const a=r()*6.28,d=12+r()*16,x=Math.cos(a)*d,z=Math.sin(a)*d;if(Math.abs(x)<5&&z<-6)continue;nyDrift(town,x,z,1+r()*2,r,1)}
  nySnowman(town,6.2,4.8,1,r);nySnowman(town,-11.5,6.5,.8,r);
  nyGift(town,-3.2,6.2,.5,r);nyGift(town,-2.5,6.7,.38,r);nyCane(town,3.4,6.3,1.1,r);nyCane(town,11.5,-6.6,1,r);nyBalls(town,2.6,6.9,r);
  // гирлянда по кругу лагеря (провисающие нити между столбами-фонарями)
