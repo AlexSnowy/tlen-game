@@ -1129,7 +1129,7 @@ for(let i=0;i<36;i++){const it=P.bag[i];h+=it?tcell(it,{up:isUpg(it),attr:`data-
 h+='</div>';const L=T.last;if(L)h+=detHTML(L);$('stBody').innerHTML=h}
 $('pStash').addEventListener('click',e=>{const b=e.target.closest('[data-stt],[data-st],[data-sbg],[data-sq]');if(!b)return;const d=b.dataset,tab=stashLoad().tabs[stTab];
 if(d.stt){stTab=+d.stt;T.last=null}
-else if(d.st!==undefined){const it=tab[+d.st];if(!it)return;if(P.bag.length>=36){toast('Сумка полна',1.5);return}tab.splice(+d.st,1);P.bag.push(it);T.last=it;snd(700,.05,'triangle',.05)}
+else if(d.st!==undefined){const it=tab[+d.st];if(!it)return;if(P.bag.length>=36){toast('Сумка полна',1.5);return}tab.splice(+d.st,1);it.id=uid++;P.bag.push(it);T.last=it;snd(700,.05,'triangle',.05)}
 else if(d.sbg!==undefined){const it=P.bag[+d.sbg];if(!it)return;if(tab.length>=ST_N){toast('Вкладка заполнена',1.5);return}P.bag.splice(+d.sbg,1);tab.push(it);T.last=it;snd(500,.05,'triangle',.05)}
 else if(d.sq){const f={w:it=>it.slot==='weapon'||it.slot==='offhand',a:it=>!['weapon','offhand'].includes(it.slot),r:it=>it.rar>=2,all:()=>true}[d.sq];P.bag=P.bag.filter(it=>{if(f(it)&&tab.length<ST_N){tab.push(it);return false}return true})}
 stashSave();save();renderStash()});
