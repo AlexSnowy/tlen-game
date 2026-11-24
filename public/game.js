@@ -511,12 +511,16 @@ const el=document.createElement('div');el.className='loot t'+it.rar;el.style.col
 const col=new THREE.Color(RCH[it.rar]);const gem=new THREE.Mesh(gemG,new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:it.rar>=2?2.5:1.2,roughness:.3,metalness:.3}));gem.position.y=.35;l.g.add(gem);l.gem=gem;
 if(it.rar>=2){const b=new THREE.Mesh(new THREE.CylinderGeometry(.18,.45,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b}
 if(it.rar===3){haptic('ok');chime([523,784,1047,1568],.11);l.beam&&(l.beam.scale.x=l.beam.scale.z=1.6)}else if(it.rar===2)chime([660,990],.08)}
-function layoutLoot(){const V=loot.filter(l=>l.vis);V.sort((a,b)=>(b.hi|0)-(a.hi|0)||a.sy-b.sy);const placed=[];const W=innerWidth,Hh=innerHeight;
-const free=(x0,x1,y,h)=>{if(y-h<4||y>Hh-4||x0<4||x1>W-4)return false;for(const q of placed)if(x0<q.x1+3&&x1>q.x0-3&&y-h<q.y+1&&y>q.y-q.h-1)return false;for(const q of HUDR)if(x0<q.r&&x1>q.l&&y-h<q.b&&y>q.t)return false;return true};
-for(const l of V){if(!l.w||l.wf){l.el.style.display='block';const ow=l.el.offsetWidth;l.w=ow||90;l.wf=!ow;l.h=l.el.offsetHeight||18}const w=l.w,h=l.h+2;let bx=l.sx,by=l.sy,ok=false;
- for(let ring=0;ring<14&&!ok;ring++){const cands=[];if(!ring)cands.push([0,0]);else for(let cy=-ring;cy<=ring;cy++)for(const cx of [0,-1,1,-2,2,-3,3])if(Math.max(Math.abs(cy),Math.abs(cx))===ring||(Math.abs(cy)===ring))cands.push([cx,cy]);cands.sort((a,b)=>Math.hypot(a[0]*1.6,a[1])-Math.hypot(b[0]*1.6,b[1]));
-  for(const [cx,cy] of cands){const x=l.sx+cx*(w*.55+4),y=l.sy+cy*h;if(free(x-w/2,x+w/2,y,l.h)){bx=x;by=y;ok=true;break}}}
- placed.push({x0:bx-w/2,x1:bx+w/2,y:by,h:l.h});l.el.style.display='block';l.el.style.transform=`translate(${bx}px,${by}px) translate(-50%,-100%)`}}
+function layoutLoot(){const V=loot.filter(l=>l.vis);V.sort((a,b)=>(b.hi|0)-(a.hi|0)||(a.id0||0)-(b.id0||0));const placed=[];
+const free=(x0,x1,y,h)=>{for(const q of placed)if(x0<q.x1+3&&x1>q.x0-3&&y-h<q.y+3&&y>q.y-q.h-3)return false;return true};
+const C=[[0,0]];for(let r=1;r<=9;r++)for(const y of [-r,r])for(const x of [0,-1,1])C.push([x*1.05,y]);for(const x of [-1,1])C.splice(3,0,[x*1.05,0]);
+for(const l of V){if(l.id0===undefined)l.id0=LOOT_SEQ++;if(!l.w||l.wf){l.el.style.display='block';const ow=l.el.offsetWidth;l.w=ow||90;l.wf=!ow;l.h=l.el.offsetHeight||18}const w=l.w,h=l.h+6;
+ const at=(c)=>[l.sx+c[0]*(w*.5+4),l.sy+c[1]*h];let pos=null;
+ if(l.lc){const [x,y]=at(l.lc);if(free(x-w/2,x+w/2,y,l.h))pos=[x,y,l.lc]}
+ if(!pos)for(const c of C){const [x,y]=at(c);if(free(x-w/2,x+w/2,y,l.h)){pos=[x,y,c];break}}
+ if(!pos){const [x,y]=at([0,0]);pos=[x,y,[0,0]]}
+ l.lc=pos[2];placed.push({x0:pos[0]-w/2,x1:pos[0]+w/2,y:pos[1],h:l.h});l.el.style.display='block';l.el.style.transform=`translate(${pos[0]}px,${pos[1]}px) translate(-50%,-100%)`}}
+var LOOT_SEQ=0;
 function chime(fs,v){fs.forEach((f,i)=>setTimeout(()=>snd(f,.45,'triangle',v,1.6),i*85))}
 function dropOrb(p,k0){const k=k0||wpick(ORB_K.map(k=>[k,ORBS[k].w]));const el=document.createElement('div');el.className='loot o';el.innerHTML=uiI('orb:'+k,ORBS[k].c)+esc(ORBS[k].n);const l=lootObj(p,el,{orb:k});
 const m=new THREE.Mesh(orbG,new THREE.MeshStandardMaterial({color:ORBS[k].c,emissive:ORBS[k].c,emissiveIntensity:1.6,roughness:.2,metalness:.5}));m.position.y=.3;l.g.add(m);l.gem=m;
@@ -1056,7 +1060,7 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
-window.__dbg={get zoom(){return CAMZT},dropSkillGem:(p,id)=>dropSkillGem(p,id),gainXp:x=>gainXp(x),sockN:it=>sockN(it),abyTick:dt=>abyTick(dt),makeAbyss:o=>makeAbyss(o||{}),makeRift:()=>makeRift(),updRift:dt=>updRift(dt),gearDbg:()=>{const ms=H.c.meshes;const r={skin:skinOf(ms)&&skinOf(ms).getHexString()};for(const n in ms)if(ms[n].userData.pal)r[n]=ms[n].userData.pal.map(c=>c.getHexString()).join(',');return JSON.stringify(r)},setZoom:z=>{setZoom(z);CAMZ=CAMZT},brTick:dt=>breachTick(dt),get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={get zoom(){return CAMZT},showUpd:m=>showUpd(m),dropSkillGem:(p,id)=>dropSkillGem(p,id),gainXp:x=>gainXp(x),sockN:it=>sockN(it),abyTick:dt=>abyTick(dt),makeAbyss:o=>makeAbyss(o||{}),makeRift:()=>makeRift(),updRift:dt=>updRift(dt),gearDbg:()=>{const ms=H.c.meshes;const r={skin:skinOf(ms)&&skinOf(ms).getHexString()};for(const n in ms)if(ms[n].userData.pal)r[n]=ms[n].userData.pal.map(c=>c.getHexString()).join(',');return JSON.stringify(r)},setZoom:z=>{setZoom(z);CAMZ=CAMZT},brTick:dt=>breachTick(dt),get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
 const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
@@ -1832,7 +1836,7 @@ function restoreLoot(list){if(!list||!list.length)return;const ch=chime;chime=()
 
 /* версия игры: сверка в группе и проверка обновлений */
 const GBUILD=+('__T__'.replace(/\D/g,''))||0;const GVER=(()=>{try{return new URL(import.meta.url).searchParams.get('v')||''}catch(e){return ''}})();
-function showUpd(msg){let b=$('updBar');if(!b){b=document.createElement('div');b.id='updBar';b.innerHTML='<span></span><button class="btn sm">Перезапустить</button>';document.body.appendChild(b);b.querySelector('button').onclick=()=>{try{save()}catch(e){}const u=new URL(location.href);u.searchParams.set('r',Date.now());location.replace(u.toString())}}b.querySelector('span').textContent=msg;b.classList.add('on')}
+function showUpd(msg){let b=$('updBar');if(!b){b=document.createElement('div');b.id='updBar';b.innerHTML='<span></span><button class="updb">Обновить</button>';document.body.appendChild(b);b.querySelector('button').onclick=()=>{try{save()}catch(e){}const u=new URL(location.href);u.searchParams.set('r',Date.now());location.replace(u.toString())}}b.querySelector('span').textContent=msg;b.classList.add('on')}
 async function updCheck(){if(!GBUILD||!/^[0-9a-f]{6,}$/.test(GVER))return;try{const r=await fetch('index.html?u='+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/game\.js\?v=([0-9a-f]{6,})/);if(m&&m[1]!==GVER){if(S.mode==='town'||S.mode==='title')showUpd('Вышло обновление игры');else updCheck.pend=1}}catch(e){}}
 setInterval(()=>{if(updCheck.pend&&S.mode==='town'){updCheck.pend=0;showUpd('Вышло обновление игры')}},3000);setTimeout(updCheck,20000);setInterval(updCheck,300000);
 
