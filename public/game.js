@@ -199,8 +199,10 @@ place('building_well_red',7,7,town,townObs,{s:4,ry:0,r:1.5});
 for(const[x,z]of[[4,11],[-5,11.5],[16,-12],[-12,13]])place('tent',x,z,town,townObs,{s:6,r:1.6});
 for(const[n,x,z,s,r]of[['crate_A_big',-7,-3.2,5,.6],['crate_open',-12.6,-3,5,.7],['barrel',-7.6,-1.8,5,.5],['sack',-12,-1.8,5,0],['weaponrack',13,-3,6,.7],['barrel',8,-3.2,5,.5],['resource_lumber',14,-1,4,1],['wheelbarrow',-4,6,5,.8],['bucket_water',6,5.5,5,0],['crate_long_A',3.6,-4.5,5,.8],['target',-3,-21,7,0],['bucket_arrows',-4,-20,6,0],['barrel',12,3,5,.5]])place(n,x,z,town,townObs,{s,r});
 for(const[x,z]of[[-3.2,-10],[3.2,-10],[-3.2,-17],[3.2,-17],[9,1.5],[-9,1.5]]){place('lantern_standing',x,z,town,townObs,{s:1.7});lights.push({x,y:1.6,z,hex:'#ffb050',w:'town'});emitters.push({x,y:1.25,z,kind:'lamp',w:town})}
-for(let i=0;i<22;i++){const a=i/22*6.28+rand(-.1,.1),r=rand(25,30);place(pick(['trees_A_large','trees_B_large']),Math.cos(a)*r,Math.sin(a)*r,town,null,{s:rand(5,7)})}
-for(let i=0;i<14;i++){const a=rand(0,6.28),r=rand(17,23);place(pick(['tree_single_A','tree_single_B']),Math.cos(a)*r,Math.sin(a)*r,town,townObs,{s:rand(4,5.5),r:.7})}
+const nearPortal=(x,z,d)=>Math.hypot(x,z+22)<d||(Math.abs(x)<5&&z<-6&&z>-24);
+for(let i=0;i<22;i++){const a=i/22*6.28+rand(-.1,.1),r=rand(25,30),x=Math.cos(a)*r,z=Math.sin(a)*r;if(nearPortal(x,z,10))continue;place(pick(['trees_A_large','trees_B_large']),x,z,town,null,{s:rand(5,7)})}
+for(let i=0;i<14;i++){const a=rand(0,6.28),r=rand(17,23),x=Math.cos(a)*r,z=Math.sin(a)*r;if(nearPortal(x,z,9)||Math.hypot(x-XT.x,z-XT.z)<5)continue;place(pick(['tree_single_A','tree_single_B']),x,z,town,townObs,{s:rand(4,5.5),r:.7})}
+xmasTree(town);
 for(let i=0;i<10;i++){const a=rand(0,6.28),r=rand(14,24);place(pick(['rock_single_A','rock_single_C','rock_single_D']),Math.cos(a)*r,Math.sin(a)*r,town,townObs,{s:rand(5,8),r:1})}
 place('flag_red',-3.4,-20.5,town,null,{s:7,ry:0});place('flag_red',3.4,-20.5,town,null,{s:7,ry:0});
 place('arch_gate',0,-22,town,null,{s:1.35,ry:0});townObs.push({x:-2.6,z:-22,r:.8},{x:2.6,z:-22,r:.8});
@@ -928,7 +930,7 @@ if(S.mode==='town'||S.mode==='zone'||S.mode==='dead'){if(!S.paused)update(dt);H.
 if(town.visible)for(const c of npcChars)c.mixer.update(dt);
 netTick(dt);updParticles(S.paused?0:dt);updFx(dt);updNums(dt);if(!S.paused||S.mode==='title')updEmitters(dt);
 lightT-=dt;if(lightT<=0){lightT=.4;assignLights()}for(const tl of torchLights)if(tl.userData.on)tl.intensity=18+Math.sin(time*13+tl.userData.ph)*2.5+Math.sin(time*7.3+tl.userData.ph*2)*2;
-if(fireLight)fireLight.intensity=55+Math.sin(time*11)*7+Math.sin(time*17.3)*5;if(portalDisc){portalDisc.rotation.z+=dt*.8;portalDisc.material.opacity=.6+Math.sin(time*2)*.12}if(exitP)exitP.children[exitP.children.length-1].rotation.z+=dt;
+if(fireLight)fireLight.intensity=55+Math.sin(time*11)*7+Math.sin(time*17.3)*5;if(S.mode==='town')xmasTick(time);if(portalDisc){portalDisc.rotation.z+=dt*.8;portalDisc.material.opacity=.6+Math.sin(time*2)*.12}if(exitP)exitP.children[exitP.children.length-1].rotation.z+=dt;
 for(const l of loot){const f=l.fly;if(f.t<1){f.t=Math.min(1,f.t+dt*1.8);l.pos.x=lerp(f.sx,f.tx,f.t);l.pos.z=lerp(f.sz,f.tz,f.t);l.pos.y=1+Math.sin(f.t*Math.PI)*1.8-f.t;if(f.t>=1)l.pos.y=0}
 if(l.gem){l.gem.rotation.y+=dt*2;l.gem.position.y=.35+Math.sin(time*3+l.pos.x)*.08}if(l.beam&&f.t>=1)l.beam.scale.y=Math.min(1,l.beam.scale.y+dt*3);
 if(f.t>=1&&proj(cp.copy(l.pos).setY(1),sp)){l.sx=sp.x;l.sy=sp.y;l.vis=1}else{l.vis=0;l.el.style.display='none'}}
@@ -1750,3 +1752,21 @@ document.addEventListener('click',e=>{const b=e.target.closest('#pLF [data-lfpre
  if(b.dataset.lfpre){c.pre=b.dataset.lfpre;c.r=LF_PRE[c.pre].r.slice();c.sl={};c.up=1}else if(b.dataset.lfr!==undefined){c.r[+b.dataset.lfr]=+b.dataset.v;c.pre='custom'}else{const k=b.dataset.lfsl;c.sl[k]=c.sl[k]===0?1:0;if(c.sl[k])delete c.sl[k];c.pre='custom'}
  save();renderLF();snd(700,.06,'sine',.05,1.2)});
 document.addEventListener('change',e=>{if(e.target.matches('#pLF [data-lfup]')&&P){const c=lfCfg();c.up=e.target.checked?1:0;c.pre='custom';save();renderLF()}});
+
+/* ===== новогодняя ёлка у портала ===== */
+const XT={x:-7.2,z:-16.5};let xmasLights=[];
+function xmasTree(town){xmasLights=[];const t=place('tree_single_A',XT.x,XT.z,town,townObs,{s:5.6,r:.9,ry:.3});if(!t)return;
+ const bb=new THREE.Box3().setFromObject(t);const H=bb.max.y-bb.min.y,R=Math.max(bb.max.x-bb.min.x,bb.max.z-bb.min.z)/2,y0=bb.min.y,cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
+ const COL=['#e8343a','#f2c14e','#3a7bff','#ffffff','#c05bff','#2fd27a'];const bg=new THREE.SphereGeometry(.17,12,10);
+ for(let k=0;k<34;k++){const h=.18+Math.random()*.68,rr=R*(1-h)*.92+.1,a=Math.random()*6.283;const c=new THREE.Color(pick(COL));
+  const m=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.35,metalness:.6,roughness:.25}));m.position.set(cx+Math.cos(a)*rr,y0+h*H,cz+Math.sin(a)*rr);m.scale.setScalar(.8+Math.random()*.6);town.add(m)}
+ const lg=new THREE.SphereGeometry(.07,8,6);const N=90;for(let k=0;k<N;k++){const f=k/N,h=.1+f*.78,rr=R*(1-h)*.98+.12,a=f*6.283*5.5;const c=new THREE.Color(['#ffcf6a','#ff5a5a','#7ad7ff','#9dff8a'][k%4]);
+  const m=new THREE.Mesh(lg,new THREE.MeshBasicMaterial({color:c.clone().multiplyScalar(2.4),toneMapped:false}));m.position.set(cx+Math.cos(a)*rr,y0+h*H,cz+Math.sin(a)*rr);m.userData={c,ph:k*.7};town.add(m);xmasLights.push(m)}
+ const star=new THREE.Mesh(new THREE.OctahedronGeometry(.42,0),new THREE.MeshBasicMaterial({color:new THREE.Color('#ffd76a').multiplyScalar(3),toneMapped:false}));star.position.set(cx,y0+H+.25,cz);star.scale.set(1,1.35,.45);town.add(star);xmasLights.star=star;
+ const sl=new THREE.PointLight(0xffc870,6,9,2);sl.position.set(cx,y0+H*.6,cz+1);town.add(sl);xmasLights.pl=sl;
+ const gifts=[['#c0262c','#f2d36a'],['#1f5fd0','#ffffff'],['#2a9a4a','#e8343a'],['#7a3ad0','#f2c14e']];gifts.forEach(([b,r],i)=>{const a=.4+i*.5,d=R*.55+.6,s=.45+(i%2)*.15;const g=new THREE.Group();
+  const box=new THREE.Mesh(new THREE.BoxGeometry(s,s*.8,s),new THREE.MeshStandardMaterial({color:b,roughness:.6}));box.position.y=s*.4;g.add(box);
+  const rb=new THREE.MeshStandardMaterial({color:r,roughness:.4,metalness:.3});const r1=new THREE.Mesh(new THREE.BoxGeometry(s*1.02,s*.82,s*.16),rb);r1.position.y=s*.4;g.add(r1);const r2=r1.clone();r2.rotation.y=Math.PI/2;g.add(r2);
+  g.position.set(cx+Math.cos(a)*d,0,cz+Math.sin(a)*d);g.rotation.y=Math.random()*3;town.add(g)})}
+function xmasTick(t){if(!xmasLights.length)return;for(const m of xmasLights){const v=.35+.65*Math.max(0,Math.sin(t*2.2+m.userData.ph));m.material.color.copy(m.userData.c).multiplyScalar(.4+v*2.4)}
+ if(xmasLights.star){xmasLights.star.rotation.y=t*.8;const p=1+.08*Math.sin(t*3);xmasLights.star.scale.set(p,1.35*p,.45*p)}if(xmasLights.pl)xmasLights.pl.intensity=5+1.5*Math.sin(t*2.6)}
