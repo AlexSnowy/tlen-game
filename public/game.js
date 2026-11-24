@@ -216,14 +216,14 @@ npcChars=[mer,smi,kn];
 NPCS=[{id:'stash',name:'Хранилище',x:-5.4,z:3.4,lx:-5.4,lz:3.4,ly:1.9},{id:'merchant',name:'Торговка Вера',x:-8.2,z:-1.4,lx:-8.6,lz:-2.6,ly:2.9},{id:'smith',name:'Кузнец Гром',x:8.8,z:-1.5,lx:9.2,lz:-2.8,ly:3.1},{id:'portal',name:'Портал',x:0,z:-19.6,lx:0,lz:-22,ly:5.6}];
 for(const n of NPCS){const el=document.createElement('div');el.className='npcn';el.textContent=n.name;$('npcl').appendChild(el);n.el=el}}
 let zGround=null,zGrass=null;
-function clearZone(){if(S.leg&&S.leg.el)S.leg.el.remove();S.leg=null;if(S.ess&&S.ess.el)S.ess.el.remove();S.ess=null;for(const m of mons)if(m.lab)m.lab.remove();if(S.rift&&S.rift.el)S.rift.el.remove();S.rift=null;if(S.shrines)for(const sh of S.shrines)sh.el.remove();S.shrines=[];zone.remove(dyn);for(const m of mons)m.c.mats.forEach(x=>x.dispose());mons=[];for(const a of allies)a.c&&a.c.mats.forEach(x=>x.dispose());allies=[];for(const l of loot)l.el.remove();loot=[];
+function clearZone(){S.br=null;if(S.leg&&S.leg.el)S.leg.el.remove();S.leg=null;if(S.ess&&S.ess.el)S.ess.el.remove();S.ess=null;for(const m of mons)if(m.lab)m.lab.remove();if(S.rift&&S.rift.el)S.rift.el.remove();S.rift=null;if(S.shrines)for(const sh of S.shrines)sh.el.remove();S.shrines=[];zone.remove(dyn);for(const m of mons)m.c.mats.forEach(x=>x.dispose());mons=[];for(const a of allies)a.c&&a.c.mats.forEach(x=>x.dispose());allies=[];for(const l of loot)l.el.remove();loot=[];
 for(const arr of[projs,grounds,pending,traps,bolts2])for(const o of arr)if(o.m)scene.remove(o.m);projs=[];grounds=[];pending=[];traps=[];bolts2=[];
 for(const r of rings){scene.remove(r.m);r.m.material.dispose()}rings=[];for(const d of decals){scene.remove(d.m);d.m.material.dispose()}decals=[];chests=[];exitP=null;zoneObs=[];if(OBJ)for(const e of OBJ.ents)e.el&&e.el.remove();OBJ=null;
 emitters=emitters.filter(e=>e.w!==zone);lights=lights.filter(l=>l.w==='town');if(zGround){zone.remove(zGround);zGround.geometry.dispose();zGround.material.map.dispose();zGround.material.dispose();zGround=null}
 if(zGrass){zone.remove(zGrass);zGrass.geometry.dispose();zGrass.material.dispose();zGrass=null}dyn=new THREE.Group();zone.add(dyn);H.whirl=H.leap=H.charge=H.barrage=null;H.queue=[]}
 const mod=k=>S.mods.some(m=>m.k===k);
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?(P.atlN&&P.atlN.includes('rift')?.75:.5):.3))makeRift();S.shrines=[];const mapZ=S.zi<0&&P.atlN;for(let i=0;i<(Math.random()<.6?1:0)+(Math.random()<.3?1:0)+(mapZ&&P.atlN.includes('shr')?1:0);i++)makeShrine();S.leg=null;if(!S.pin&&Math.random()<(S.zi<0?.3:.18))makeLegion();S.hz=[];if(mod('traps'))for(let i=0;i<14;i++){const f=freeSpot(-36,36,2);S.hz.push({x:f.x,z:f.z,t:rand(0,3)});const pl=new THREE.Mesh(new THREE.CylinderGeometry(1.8,1.8,.06,24),new THREE.MeshStandardMaterial({color:'#5a5a62',roughness:.6,metalness:.6}));pl.position.set(f.x,.03,f.z);dyn.add(pl);for(let k=0;k<9;k++){const sp2=new THREE.Mesh(new THREE.ConeGeometry(.09,.35,5),new THREE.MeshStandardMaterial({color:'#9a9aa6',metalness:.8,roughness:.3}));const a=k/9*6.28,r=k?1.1:0;sp2.position.set(f.x+Math.cos(a)*r,.2,f.z+Math.sin(a)*r);dyn.add(sp2)}}S.ess=null;if(!S.pin&&Math.random()<(mapZ&&P.atlN.includes('ess')?.56:.28))makeEss()}finally{Math.random=RNG0;S.building=false}}
+function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&!S.abyss&&Math.random()<(S.zi<0?(P.atlN&&P.atlN.includes('rift')?.75:.5):.3))makeRift();S.shrines=[];const mapZ=S.zi<0&&P.atlN;for(let i=0;i<(Math.random()<.6?1:0)+(Math.random()<.3?1:0)+(mapZ&&P.atlN.includes('shr')?1:0);i++)makeShrine();S.leg=null;if(!S.pin&&!S.abyss&&Math.random()<(S.zi<0?.3:.18))makeLegion();S.hz=[];if(mod('traps'))for(let i=0;i<14;i++){const f=freeSpot(-36,36,2);S.hz.push({x:f.x,z:f.z,t:rand(0,3)});const pl=new THREE.Mesh(new THREE.CylinderGeometry(1.8,1.8,.06,24),new THREE.MeshStandardMaterial({color:'#5a5a62',roughness:.6,metalness:.6}));pl.position.set(f.x,.03,f.z);dyn.add(pl);for(let k=0;k<9;k++){const sp2=new THREE.Mesh(new THREE.ConeGeometry(.09,.35,5),new THREE.MeshStandardMaterial({color:'#9a9aa6',metalness:.8,roughness:.3}));const a=k/9*6.28,r=k?1.1:0;sp2.position.set(f.x+Math.cos(a)*r,.2,f.z+Math.sin(a)*r);dyn.add(sp2)}}S.ess=null;if(!S.pin&&Math.random()<(mapZ&&P.atlN.includes('ess')?.56:.28))makeEss()}finally{Math.random=RNG0;S.building=false}}
 function buildZone0(){const Z=S.zone,th=THEMES[Z.th];S.th=th;
 zGround=makeGround(130,noiseTex(th.g[0],th.g[1],th.g[2],{tiles:th.tiles}),th.tiles?26:18,zone);
 const start={x:0,z:46},bossP={x:0,z:-44};const near=(x,z,r)=>Math.hypot(x-start.x,z-start.z)<r||Math.hypot(x-bossP.x,z-bossP.z)<r+3;
@@ -321,7 +321,7 @@ if(el==='chaos'||ctx.poison)s.poison.push({dps:d*.22,t:4*(1+ST.poisonDur/100)});
 if((el==='phys'&&Math.random()*100<ST.bleed)||ctx.bleed)s.bleed={dps:d*.3,t:4};
 if(ctx.stun||Math.random()*100<ST.stunCh+(ctx.stunCh||0))s.stun=M.boss?.3:1.1}
 function aoeHit(x,z,R,ctx,f){let n=0;for(const M of mons.slice())if(!M.dead&&Math.hypot(M.g.position.x-x,M.g.position.z-z)<R+M.r){dealDmg(M,ctx);n++;f&&f(M)}return n}
-function killMon(M){if(M.dead)return;M.dead=.01;if(!M.silent)tutEv('kill');if(M.lab){M.lab.remove();M.lab=null}if(NET.on&&NET.host&&!M.netKill)nsend({t:'kill',zk:zkey(),id:M.id});if(M.silent){M.dead=2.9;return}if(M.leader&&OBJ){const e=OBJ.ents.find(e=>e.M===M);if(e&&!e.done){e.done=true;objStep(M.g.position)}}const L=S.L,p=M.g.position.clone();p.y=1.2;M.c.play(M.c.clips['Death_C_Skeletons']?'Death_C_Skeletons':'Death_A',{once:true,restart:true,ts:1.2});
+function killMon(M){if(M.dead)return;M.dead=.01;if(!M.silent)tutEv('kill');if(M.lab){M.lab.remove();M.lab=null}if(NET.on&&NET.host&&!M.netKill)nsend({t:'kill',zk:zkey(),id:M.id});if(M.silent){M.dead=2.9;return}if(M.breach&&S.br)breachKill(M);if(M.leader&&OBJ){const e=OBJ.ents.find(e=>e.M===M);if(e&&!e.done){e.done=true;objStep(M.g.position)}}const L=S.L,p=M.g.position.clone();p.y=1.2;M.c.play(M.c.clips['Death_C_Skeletons']?'Death_C_Skeletons':'Death_A',{once:true,restart:true,ts:1.2});
 burst(p,M.boss?S.th.eyes:M.rare?'#ffd84a':'#d8cfb4',M.boss?70:22,M.boss?8:4.5,.4,.8,1.6);flash(p,M.boss?S.th.eyes:'#ffb060',M.boss?120:25,.35);noise(.25,.12,1600);snd(M.boss?90:170,.3,'sawtooth',.05,.4);
 if(M.rm.includes('fiery')&&!isGuest())tele(p.x,p.z,3,.6,M.dmg*1.5,'#ff5a1a');
 if(M.D.burst&&!isGuest())tele(p.x,p.z,2.4,.7,M.dmg*1.6,'#7aff3a');
@@ -504,9 +504,9 @@ snd(500,.25,'triangle',.12,2);return null}
 /* ================= LOOT ================= */
 const gemG=new THREE.OctahedronGeometry(.22,0),orbG=new THREE.SphereGeometry(.18,12,10);
 const RCH=['#d6d2c8','#8ea2ff','#ffe36b','#d8782e'],RN=['Обычный','Магический','Редкий','Уникальный'];
-function lootObj(p,el,o){const x=p.x+rand(-1.8,1.8),z=p.z+rand(-1.8,1.8),g=new THREE.Group();g.position.set(p.x,1,p.z);dyn.add(g);$('labels').appendChild(el);el.style.display='none';
-const l=Object.assign({g,el,pos:g.position,fly:{t:0,sx:p.x,sz:p.z,tx:x,tz:z}},o);el.onclick=()=>{H.target=new THREE.Vector3(l.fly.tx,0,l.fly.tz);H.pick=l};loot.push(l);return l}
-function dropItem(p,it){const up=P&&isUpg(it);const lv=P?lfVerdict(it):2;if(lv===0){const gg=Math.max(1,Math.round(price(it)*.6));lfStat.n++;lfStat.g+=gg;return dropGold(p,gg)}
+var LOOT_FIX=null;function lootObj(p,el,o){const F=LOOT_FIX;const x=F?F.x:p.x+rand(-1.8,1.8),z=F?F.z:p.z+rand(-1.8,1.8),g=new THREE.Group();g.position.set(F?x:p.x,F?0:1,F?z:p.z);dyn.add(g);$('labels').appendChild(el);el.style.display='none';
+const l=Object.assign({g,el,pos:g.position,fly:{t:F?1:0,sx:F?x:p.x,sz:F?z:p.z,tx:x,tz:z}},o);el.onclick=()=>{H.target=new THREE.Vector3(l.fly.tx,0,l.fly.tz);H.pick=l};loot.push(l);return l}
+function dropItem(p,it){const up=P&&isUpg(it);const lv=LOOT_FIX?(LOOT_FIX.auto?2:1):P?lfVerdict(it):2;if(lv===0){const gg=Math.max(1,Math.round(price(it)*.6));lfStat.n++;lfStat.g+=gg;return dropGold(p,gg)}
 const el=document.createElement('div');el.className='loot t'+it.rar;el.style.color=RCH[it.rar];el.innerHTML=(up?'<b class="lup">▲</b>':'')+itIcon(it)+esc(it.name)+(it.upg?' +'+it.upg:'');const l=lootObj(p,el,{it,hi:it.rar>=2||up,auto:lv===2});if(lv===1)el.classList.add('man');
 const col=new THREE.Color(RCH[it.rar]);const gem=new THREE.Mesh(gemG,new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:it.rar>=2?2.5:1.2,roughness:.3,metalness:.3}));gem.position.y=.35;l.g.add(gem);l.gem=gem;
 if(it.rar>=2){const b=new THREE.Mesh(new THREE.CylinderGeometry(.18,.45,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b}
@@ -518,7 +518,7 @@ for(const l of V){if(!l.w||l.wf){l.el.style.display='block';const ow=l.el.offset
   for(const [cx,cy] of cands){const x=l.sx+cx*(w*.55+4),y=l.sy+cy*h;if(free(x-w/2,x+w/2,y,l.h)){bx=x;by=y;ok=true;break}}}
  placed.push({x0:bx-w/2,x1:bx+w/2,y:by,h:l.h});l.el.style.display='block';l.el.style.transform=`translate(${bx}px,${by}px) translate(-50%,-100%)`}}
 function chime(fs,v){fs.forEach((f,i)=>setTimeout(()=>snd(f,.45,'triangle',v,1.6),i*85))}
-function dropOrb(p){const k=wpick(ORB_K.map(k=>[k,ORBS[k].w]));const el=document.createElement('div');el.className='loot o';el.innerHTML=uiI('orb:'+k,ORBS[k].c)+esc(ORBS[k].n);const l=lootObj(p,el,{orb:k});
+function dropOrb(p,k0){const k=k0||wpick(ORB_K.map(k=>[k,ORBS[k].w]));const el=document.createElement('div');el.className='loot o';el.innerHTML=uiI('orb:'+k,ORBS[k].c)+esc(ORBS[k].n);const l=lootObj(p,el,{orb:k});
 const m=new THREE.Mesh(orbG,new THREE.MeshStandardMaterial({color:ORBS[k].c,emissive:ORBS[k].c,emissiveIntensity:1.6,roughness:.2,metalness:.5}));m.position.y=.3;l.g.add(m);l.gem=m;
 const hi={exalt:3,divine:3,chaos:2,regal:2}[k]||0;if(hi){el.classList.add('h'+hi);l.hi=true;const col=new THREE.Color(hi===3?'#fff6d8':'#ffd36a');const b=new THREE.Mesh(new THREE.CylinderGeometry(.16,.4,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b;
 hi===3?chime([784,1175,1568,2093],.1):chime([880,1320],.07)}else snd(990,.2,'sine',.06,1.3)}
@@ -564,7 +564,7 @@ collide(p,.45);return l>.08}
 /* ================= UI ================= */
 const RC=RCH;
 function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass','ovStory','ovDlg'].some(x=>$(x).classList.contains('on'))}
-function closePanels(){lobbyClose();for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith','pStash','pCh'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
+function closePanels(){lobbyClose();document.querySelectorAll('.panel.on').forEach(e=>e.classList.remove('on'));S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(w==='sk'||w==='pas'||w==='inv')tutEv(w);if(w==='shop'||w==='smith')tutEv('town');if(w==='portal')tutEv('portal');if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
 ({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');$('pShop').querySelector('header p').textContent=npcQuote('merchant');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');$('pSmith').querySelector('header p').textContent=npcQuote('smith');T.res=null;renderSmith()},lf:()=>{$('pLF').classList.add('on');renderLF()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closePanels);
@@ -599,7 +599,7 @@ $('bagCount').textContent='Сумка '+P.bag.length+'/36 · '+P.gold+' зол.'
 let shop='';if(ctx==='merchant'){shop='<div class="shop"><b>Товары торговки</b><div class="bag">'+S.shop.map((it,i)=>cellHTML(it,S.sel&&S.sel.w==='shop'&&S.sel.k===i?'sel':'',`data-shop="${i}"`)).join('')+'</div><div class="acts">'+
 ['trans','alt','aug'].map(k=>`<button class="ab alt" data-buyorb="${k}">${uiI('orb:'+k,ORBS[k].c,'width:18px;height:18px;vertical-align:-4px;margin-right:6px')}${ORBS[k].n} · ${orbPrice(k)} зол.</button>`).join('')+'</div></div>'}$('shopBox').innerHTML=shop;
 let cells='';for(let i=0;i<36;i++){const it=P.bag[i];const sel=S.sel&&S.sel.w==='bag'&&S.sel.k===i;cells+=it?cellHTML(it,sel?'sel':'',`data-bag="${i}"`):'<button class="cell" disabled style="cursor:default"></button>'}$('bag').innerHTML=cells;
-const it=selItem();const d=$('detail');if(!it){d.innerHTML='<p class="muted" style="margin:0">Нажми на вещь в сумке или в снаряжении.</p>';return}
+const it=selItem();const d=$('detail');if(!it){d.innerHTML='<p class="muted" style="margin:0">Нажми на вещь — увидишь свойства. Нажми ещё раз — наденешь.</p>';return}
 let acts='';const w=S.sel.w;
 if(w==='shop'){const pr=price(it)*4;acts+=`<button class="ab" data-a="buy" ${P.gold<pr?'disabled':''}>Купить за ${pr} зол.</button>`}
 else{if(w==='bag')acts+=`<button class="ab" data-a="equip">Надеть</button>`;else acts+=`<button class="ab alt" data-a="unequip" ${P.bag.length>=36?'disabled':''}>Снять</button>`;
@@ -611,7 +611,7 @@ d.innerHTML=`${ttHTML(it)}${w!=='eq'?cmpHTML(it):''}<div class="acts">${acts}</d
 const orbPrice=k=>({trans:25,alt:40,aug:60}[k])*Math.max(1,S.L||1);
 $('lfBtn').onclick=()=>togglePanel('lf');
 $('pInv').addEventListener('click',e=>{const b=e.target.closest('[data-bag],[data-eq],[data-a],[data-shop],[data-orb],[data-buyorb]');if(!b)return;
-if(b.dataset.bag!==undefined){S.sel={w:'bag',k:+b.dataset.bag};renderInv();return}if(b.dataset.shop!==undefined){S.sel={w:'shop',k:+b.dataset.shop};renderInv();return}
+if(b.dataset.bag!==undefined){const k=+b.dataset.bag;if(S.sel&&S.sel.w==='bag'&&S.sel.k===k&&P.bag[k]&&SLOTS.includes(P.bag[k].slot)){const eb=document.querySelector('#pInv [data-a="equip"]');if(eb){eb.click();return}}S.sel={w:'bag',k};S.selT=performance.now();renderInv();return}if(b.dataset.shop!==undefined){S.sel={w:'shop',k:+b.dataset.shop};renderInv();return}
 if(b.dataset.buyorb){const k=b.dataset.buyorb,pr=orbPrice(k);if(P.gold>=pr){P.gold-=pr;P.orbs[k]=(P.orbs[k]||0)+1;snd(1200,.08,'square',.05)}renderInv();return}
 const row=e.target.closest('[data-eq]');if(row&&!b.dataset.a&&!b.dataset.orb){if(P.eq[row.dataset.eq])S.sel={w:'eq',k:row.dataset.eq};renderInv();return}
 const it=selItem();if(!it)return;
@@ -686,7 +686,7 @@ function renderPortal(){let h=(RESUME?`<button class="zb resume" data-resume="1"
 if(P.maxZone>8)h+=atlasHTML()+abyssHTML()+atlTreeHTML();
 $('zoneList').innerHTML=h}
 $('zoneList').addEventListener('click',e=>{const rs=e.target.closest('[data-resume]');if(rs){closePanels();resumeZone();return}const ab=e.target.closest('[data-aby]');if(ab){closePanels();enterAbyss(+ab.dataset.aby);return}const an=e.target.closest('[data-an2]');if(an){if(atlPts()>0){P.atlN=P.atlN||[];if(!P.atlN.includes(an.dataset.an2))P.atlN.push(an.dataset.an2);chime([587,880],.08);save()}renderPortal();return}const b=e.target.closest('[data-z],[data-mp],[data-mo],[data-go],[data-free],[data-pin]');if(!b)return;const d=b.dataset;
-if(d.z!==undefined){RESUME=null;closePanels();enterZone(+d.z,0);return}
+if(d.z!==undefined){if(RESUME&&RESUME.args&&RESUME.args.zi===+d.z){closePanels();resumeZone();return}RESUME=null;closePanels();enterZone(+d.z,0);return}
 if(d.mp!==undefined){AT.sel=+d.mp;renderPortal();return}
 if(d.mo){const m=P.maps[AT.sel];if(m&&mapOrb(m,d.mo))save();renderPortal();return}
 if(d.pin){if((P.frag||0)<4)return;P.frag-=4;save();closePanels();enterZone(-1,14,null,{zi:7,tier:14,rar:2,mods:['mdmg','mhp'],pin:1});return}
@@ -704,8 +704,8 @@ function enterZone(zi,tier,net,mi){tutEv('portal');if(!net)LASTZ={zi,tier,mi};if
 if(net){S.zone=net.zone;S.mods=net.mods}else if(S.pin)S.zone={n:'Обитель Пожирателя',th:3,mons:[['fallen',2],['berserker',2],['necro',1],['brute',1.5]],boss:'Пожиратель Тлена',bt:'brute',obj:{t:'hunt',n:'Убей стражей Обители',c:2},kit:['slam','meteors','spiral','summon','teleport','nova','charge','enrage'],phases:1};else S.zone={n:'Карта: '+base.n,th:base.th,mons:base.mons.concat([['fallen',1],['necro',.6],['berserker',1]]),boss:base.boss+' Кошмара',bt:base.bt,obj:pick(OBJ_POOL),kit:shuffle(Object.keys(BOSS_SK).filter(k=>k!=='enrage')).slice(0,3).concat(tier>=3?['enrage']:[])}}
 if(net&&zi>=0){S.zone=ZONES[zi]}S.mode='zone';town.visible=false;zone.visible=true;buildZone();if(NET.on&&NET.host&&!net)nsend({t:'zone',zi,tier,seed:S.seed,zone:S.zone,mods:S.mods,L:S.L});H.g.position.set(0,0,46);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.regenOff=mod('noregen');
 for(const id of P.slots)if(id&&SKILLS[id].kind==='summon'&&P.sk[id])summon(id,skLvl(id));
-music('zone');$('zoneName').textContent=S.zone.n;banner(S.zone.n,S.abyss?'Бездна · глубина '+S.abyss+' · '+S.mods.length+' мод.':S.pin?'Финальная битва Атласа':S.zi<0?'Карта · тир '+S.map+(S.mods.length?' · '+S.mods.length+' мод.':''):'Уровень монстров '+S.L,'zone',(()=>{if(S.zi<0)return'';P.narr=P.narr||[];if(P.narr.includes(S.zi))return'';P.narr.push(S.zi);return ZNARR[S.zi]})());$('zoneSub').textContent=(S.mods.length?'Ур. '+S.L+' · мод.: '+S.mods.length+' ⓘ':'Уровень монстров '+S.L+' · Страж ждёт на севере');setTimeout(()=>{if(S.mode==='zone')toast('Иди на север. В конце зоны тебя ждёт '+S.zone.boss+'.',3.5)},2600);snd(200,.8,'sine',.12,2)}
-function bossDown(){S.cleared=true;if(S.abyss){const d=S.abyss;if(d>(P.abyssBest||0)&&d%5===0)feedPub('достиг '+d+'-й глубины Бездны');P.abyssBest=Math.max(P.abyssBest||0,d);if(d%5===0){P.abyssCk=Math.max(P.abyssCk||1,d+1);setTimeout(()=>{const p=S.boss.g.position;for(let i=0;i<Math.floor(d/5);i++)dropOrb(p);toast('Глубина '+d+' пройдена! Контрольная точка: '+(d+1),3)},800)}csAdd('abyss',d,1);csAdd('abyc')}setTimeout(()=>music('zone'),2500);let lore=null,next='';if(S.zi>=0){if(S.zi+2>P.maxZone){P.maxZone=S.zi+2;next=S.zi<7?'Открыта зона «'+ZONES[S.zi+1].n+'».':'Открыты карты Кошмара!'}if(!P.lore.includes(S.zi)){P.lore.push(S.zi);lore=S.zone.lore;if([2,5,7].includes(S.zi))next+=' Получено очко Восхождения (Пассивы)!';if(S.zi===3)next+=' Открыта великая сила Пантеона (Пассивы)!';if(S.zi===5)next+=' Открыта малая сила Пантеона (Пассивы)!'}}else{if(S.map>P.maxMap&&!S.pin&&!S.abyss){P.maxMap=S.map}P.atlas=P.atlas||[];if(!S.pin&&!S.abyss&&!P.atlas.includes(S.map)){const hadA=P.atlas.some(t=>t>=5);P.atlas.push(S.map);if(!hadA&&S.map>=5)toast('Получено очко Восхождения!',3);next='Атлас: тир '+S.map+' покорён (+3% к количеству предметов на картах).'}}
+if(S.abyss)breachStart();music('zone');$('zoneName').textContent=S.zone.n;banner(S.zone.n,S.abyss?'Разлом Бездны · глубина '+S.abyss+' · '+S.mods.length+' мод.':S.pin?'Финальная битва Атласа':S.zi<0?'Карта · тир '+S.map+(S.mods.length?' · '+S.mods.length+' мод.':''):'Уровень монстров '+S.L,'zone',(()=>{if(S.zi<0)return'';P.narr=P.narr||[];if(P.narr.includes(S.zi))return'';P.narr.push(S.zi);return ZNARR[S.zi]})());$('zoneSub').textContent=(S.mods.length?'Ур. '+S.L+' · мод.: '+S.mods.length+' ⓘ':'Уровень монстров '+S.L+' · Страж ждёт на севере');setTimeout(()=>{if(S.mode==='zone'&&!S.abyss&&!S.br)toast('Иди на север. В конце зоны тебя ждёт '+S.zone.boss+'.',3.5)},2600);snd(200,.8,'sine',.12,2)}
+function bossDown(){S.cleared=true;if(S.abyss){const d=S.abyss;if(d>(P.abyssBest||0)&&d%5===0)feedPub('достиг '+d+'-й глубины Бездны');P.abyssBest=Math.max(P.abyssBest||0,d);P.abyssCk=Math.max(P.abyssCk||1,d+1);{const p=S.boss.g.position.clone();setTimeout(()=>{for(let i=0;i<2+Math.floor(d/2);i++)dropOrb(p);if(d%3===0)dropItem(p,genItem(S.L+1,2,ST.rarity));toast('Владыка повержен! Открыта глубина '+(d+1),3.5)},800)}if(S.br)breachSeal();csAdd('abyss',d,1);csAdd('abyc')}setTimeout(()=>music('zone'),2500);let lore=null,next='';if(S.zi>=0){if(S.zi+2>P.maxZone){P.maxZone=S.zi+2;next=S.zi<7?'Открыта зона «'+ZONES[S.zi+1].n+'».':'Открыты карты Кошмара!'}if(!P.lore.includes(S.zi)){P.lore.push(S.zi);lore=S.zone.lore;if([2,5,7].includes(S.zi))next+=' Получено очко Восхождения (Пассивы)!';if(S.zi===3)next+=' Открыта великая сила Пантеона (Пассивы)!';if(S.zi===5)next+=' Открыта малая сила Пантеона (Пассивы)!'}}else{if(S.map>P.maxMap&&!S.pin&&!S.abyss){P.maxMap=S.map}P.atlas=P.atlas||[];if(!S.pin&&!S.abyss&&!P.atlas.includes(S.map)){const hadA=P.atlas.some(t=>t>=5);P.atlas.push(S.map);if(!hadA&&S.map>=5)toast('Получено очко Восхождения!',3);next='Атлас: тир '+S.map+' покорён (+3% к количеству предметов на картах).'}}
 const p=S.boss.g.position;const g=prop('arch_gate',1);g.position.set(p.x,0,p.z-4);dyn.add(g);const d=new THREE.Mesh(new THREE.CircleGeometry(1.7,40),new THREE.MeshBasicMaterial({color:new THREE.Color('#9a5cff').multiplyScalar(2.2),transparent:true,opacity:.8,side:THREE.DoubleSide,toneMapped:false,map:softTex}));d.position.set(0,1.95,0);g.add(d);exitP=g;emitters.push({x:p.x,y:1.95,z:p.z-4,kind:'portal',w:zone});
 save();$('bossBar').classList.remove('on');setTimeout(()=>{if(lore){$('loreH').textContent=S.zone.boss+' повержен';$('loreP').textContent=lore;$('loreM').textContent=next+' Собери добычу и войди в портал, чтобы вернуться в лагерь.';$('ovLore').classList.add('on');setPaused()}else toast('Страж повержен! '+next,4)},1400)}
 $('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused();if(S.zi===7&&P&&!P.epi){P.epi=1;save();setTimeout(()=>storyPlay(EPILOGUE,()=>banner('Кампания пройдена','Открыты карты Кошмара — Атлас в портале')),300)}};
@@ -820,7 +820,7 @@ return false}
 
 /* ================= UPDATE ================= */
 let time=0;
-function update(dt){updEnchant(dt);updLegion(dt);updPet(dt);updHaz(dt);monFx(dt);updRift(dt);updShrines(dt);updEss(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
+function update(dt){updEnchant(dt);updLegion(dt);updPet(dt);updHaz(dt);monFx(dt);breachTick(dt);updRift(dt);updShrines(dt);updEss(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
 if(!H.leap&&!H.charge)H.face=angLerp(H.face,H.faceT,1-Math.pow(.0005,dt));H.c.root.rotation.y=H.face;
 for(let i=0;i<3;i++)H.cds[i]=Math.max(0,H.cds[i]-dt);H.dashCd=Math.max(0,H.dashCd-dt);H.inv=Math.max(0,H.inv-dt);S.bagWarn-=dt;H.castT-=dt;H.c.lock-=dt;H.immortal=Math.max(0,H.immortal-dt);H.lastCast=(H.lastCast||0)-dt;H.aimT=(H.aimT||0)-dt;
 for(let i=H.queue.length-1;i>=0;i--){const q=H.queue[i];q.t-=dt;if(q.t<=0){H.queue.splice(i,1);q.f()}}
@@ -898,7 +898,7 @@ collide(q,M.r);if(dist<40)c.mixer.update(dt)}
 // boss slam pending fill
 for(const a of pending)if(a.boss&&a.f){const k=1-a.t/a.T;a.f.scale.setScalar(Math.max(.01,k))}
 if(H.chillT>0)H.chillT-=dt;
-if(exitP&&Math.hypot(exitP.position.x-p.x,exitP.position.z-p.z)<2){if(S.abyss&&!isGuest()){const d=S.abyss+1;exitP=null;enterAbyss(d)}else{enterTown();toast('Ты вернулся в лагерь. Продай добычу и улучши снаряжение.',3)}}}
+if(exitP&&Math.hypot(exitP.position.x-p.x,exitP.position.z-p.z)<2){if(false){}else{saveResume();enterTown();toast('Ты вернулся в лагерь. Продай добычу и улучши снаряжение.',3)}}}
 
 /* ================= MINIMAP ================= */
 const mc=$('mini').getContext('2d');
@@ -963,7 +963,7 @@ function nearestPlayer(q){let best={x:H.g.position.x,z:H.g.position.z,peer:null,
 for(const pr of zonePeers()){const d=Math.hypot(pr.g.position.x-q.x,pr.g.position.z-q.z);if(d<best.d)best={x:pr.g.position.x,z:pr.g.position.z,peer:pr,d}}return best}
 function hurtTarget(t,d,src){if(t.peer)nsend({t:'hurt',to:t.peer.id,d});else hurtHero(d,src)}
 function myLook(){const w=P.eq.weapon,o=P.eq.offhand,C=CLASSES[P.cls];return{w:w?WBASE[w.wb].mesh:null,wr:w?w.rar:0,wu:w?w.upg:0,o:o&&!(w&&WBASE[w.wb].hands===2)?o.mesh:null,hat:!!P.eq.helmet,cape:P.eq.chest?P.eq.chest.rar:-1}}
-function sendInfo(){if(!P)return;nsend({t:'info',name:NET.name||CLASSES[P.cls].n,cls:P.cls,lvl:P.lvl,look:myLook()})}
+function sendInfo(){if(!P)return;nsend({t:'info',name:NET.name||CLASSES[P.cls].n,cls:P.cls,lvl:P.lvl,look:myLook(),bt:GBUILD})}
 const WSBASE=/workers\.dev$|^localhost|^127\./.test(location.hostname)?(location.protocol==='https:'?'wss://':'ws://')+location.host:'wss://tlen-game.zemlitlena.workers.dev';
 function netConnect(code){netLeave(true);code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length<4){toast('Код группы — 4–8 символов',2);return}
 const ws=/[?&]net=cf/.test(location.search)?new WebSocket(WSBASE+'/ws/'+code):new RelaySocket(code,(location.search.match(/[?&]broker=([^&]+)/)||[])[1]?[decodeURIComponent(location.search.match(/[?&]broker=([^&]+)/)[1])]:undefined);NET.ws=ws;NET.room=code;
@@ -974,7 +974,7 @@ function netLeave(silent){if(NET.ws){const w=NET.ws;NET.ws=null;try{w.close()}ca
 function dropPeer(id){const pr=NET.peers[id];if(!pr)return;if(pr.g)pr.g.parent&&pr.g.parent.remove(pr.g);if(pr.el)pr.el.remove();delete NET.peers[id];renderPartyHud()}
 function setHost(h){const was=NET.host;NET.host=h===NET.id;if(NET.host&&!was&&NET.on){toast('Ты теперь лидер группы',2);S.mid=Math.max(S.mid,...mons.map(m=>m.id+1),0)}}
 async function ensurePeer(m){let pr=NET.peers[m.from];if(!pr)pr=NET.peers[m.from]={id:m.from,name:'Игрок',cls:null,x:0,z:0,f:0,zk:'',U:'Idle',L:'Idle',hp:1,mx:1};
-if(m.t==='info'){const ch=pr.cls!==m.cls;Object.assign(pr,{name:m.name,cls:m.cls,lvl:m.lvl,look:m.look});if(ch||!pr.c){await loadAsset(CLASSES[m.cls].model);if(pr.g&&pr.g.parent)pr.g.parent.remove(pr.g);
+if(m.t==='info'){if(GBUILD&&m.bt&&m.bt>GBUILD)showUpd('У '+(m.name||'союзника')+' новее версия игры. Обнови, иначе монстры в группе не совпадут.');else if(GBUILD&&m.bt&&m.bt<GBUILD)toast('У '+(m.name||'союзника')+' старая версия игры — пусть перезапустит её',4);const ch=pr.cls!==m.cls;Object.assign(pr,{name:m.name,cls:m.cls,lvl:m.lvl,look:m.look});if(ch||!pr.c){await loadAsset(CLASSES[m.cls].model);if(pr.g&&pr.g.parent)pr.g.parent.remove(pr.g);
 pr.c=makeChar(CLASSES[m.cls].model,{show:[],keepHead:1,layered:1});pr.g=new THREE.Group();pr.g.add(pr.c.root);pr.g.position.set(pr.x,0,pr.z);scene.add(pr.g);
 if(!pr.el){pr.el=document.createElement('div');pr.el.className='peerl';$('npcl').appendChild(pr.el)}}peerLook(pr);renderPartyHud()}return pr}
 function peerLook(pr){if(!pr.c||!pr.look)return;const ms=pr.c.meshes,lk=pr.look,C=CLASSES[pr.cls];for(const n of ALLW)if(ms[n])ms[n].visible=false;if(lk.w&&ms[lk.w]){ms[lk.w].visible=true;setEnchant(ms[lk.w],lk.wu||0,lk.wr||0)}if(lk.o&&ms[lk.o])ms[lk.o].visible=true;
@@ -992,7 +992,7 @@ if(pr.el&&proj(cp.set(g.x,3,g.z),sp)){pr.el.style.display='block';pr.el.style.tr
 const monById=id=>mons.find(m=>m.id===id);
 async function onNet(m){const t=m.t;
 if(t==='ping'){if(m.zk!==zkey())return;const pr=NET.peers[m.from];showPing(m.x,m.z,(pr&&pr.name||'Союзник')+': '+m.msg);return}
-if(t==='rift'){if(m.zk!==zkey()||!S.rift)return;const R=S.rift;if(m.st===1){if(R.st===0)toast('Разлом открыт!',2);R.st=1;R.r=m.r;R.t=m.tt;R.k=m.k}else if(m.st===2&&R.st===1){R.k=m.k;R.t=0;R.fin=1}return}
+if(t==='br'){if(m.zk!==zkey())return;breachNet(m);return}if(t==='rift'){if(m.zk!==zkey()||!S.rift)return;const R=S.rift;if(m.st===1){if(R.st===0)toast('Разлом открыт!',2);R.st=1;R.r=m.r;R.t=m.tt;R.k=m.k}else if(m.st===2&&R.st===1){R.k=m.k;R.t=0;R.fin=1}return}
 if(t==='gift'){if(m.to&&m.to!==NET.id)return;const it=m.it;if(!it)return;it.id=uid++;if(P.bag.length<36){P.bag.push(it);toast((NET.peers[m.from]&&NET.peers[m.from].name||'Союзник')+' передал вам: '+it.name,3);chime([660,880,1100],.08);save()}else{stashLoad().tabs[0].push(it);stashSave();toast('Подарок отправлен в хранилище: '+it.name,3)}return}
 if(t==='hello'){NET.id=m.id;NET.on=true;setHost(m.host);toast('Ты в группе '+NET.room+(NET.host?' · ты лидер':''),2.5);sendInfo();renderParty();return}
 if(t==='full'){toast('Группа уже заполнена (3 игрока)',2.5);netLeave(true);return}
@@ -1035,19 +1035,20 @@ case'chain':lightning(g.clone().setY(1.5),new THREE.Vector3(m.tx,1.2,m.tz));brea
 case'slam':case'wave':case'leap':slamAt(m.tx,m.tz,sk.p.r||3,ctx,ec);break;case'orb':{const dir=new THREE.Vector3(Math.sin(f),0,Math.cos(f));spawnProj(new THREE.Vector3(g.x+dir.x,1.5,g.z+dir.z),dir,{el:'light',speed:sk.p.speed,life:sk.p.life,pierce:999,size:3,ctx})}break;
 case'warcry':case'buff':case'summon':ringFx(g.x,g.z,sk.p.r||2.5,'#ffd774',.5);break}}
 // ----- группа: UI
-function renderParty(){const box=$('partyBox');if(!box)return;const link=NET.room?location.origin+location.pathname+'?room='+NET.room:'';
+var PB_T=0;function renderParty(){const box=$('partyBox');if(!box)return;const wasOn=box.dataset.on;box.dataset.on=NET.on?'1':'';if(wasOn!==undefined&&wasOn!==box.dataset.on)PB_T=performance.now();const link=NET.room?location.origin+location.pathname+'?room='+NET.room:'';
 if(!NET.on){box.innerHTML=`<label class="fl">Имя героя<input id="pName" maxlength="16" value="${esc(NET.name)}" placeholder="${P?CLASSES[P.cls].n:'Имя'}"></label>
 <div class="acts"><button class="ab" data-pa2="create">Создать группу</button></div><label class="fl">Или войти по коду<input id="pCode" maxlength="8" placeholder="Например, K7QX"></label><div class="acts"><button class="ab alt" data-pa2="join">Войти</button></div>
 <div class="sect" style="margin-top:14px"><span>Открытые группы</span><button class="chip" data-pa2="lobby">Обновить</button></div><div id="lobbyList">${lobbyHTML()}</div><p class="muted">Играть вместе могут до 3 героев. Каждый получает свою добычу. Сложность монстров растёт с размером группы.</p>`;lobbyOpen();return}
 const mem=[`<li><b>${esc(NET.name||CLASSES[P.cls].n)}</b> · ${CLASSES[P.cls].n} ${P.lvl}${NET.host?' · <span class="lead">лидер</span>':''} (ты)</li>`].concat(Object.values(NET.peers).map(p=>`<li><b>${esc(p.name)}</b> · ${p.cls?CLASSES[p.cls].n:''} ${p.lvl||''}</li>`)).join('');
-box.innerHTML=`<p>Код группы: <b class="code">${NET.room}</b></p><div class="acts"><button class="ab" data-pa2="copy">Скопировать приглашение</button><button class="ab alt" data-pa2="leave">Покинуть группу</button></div><ul class="mem">${mem}</ul>
-${NET.leaderZone&&!NET.host?`<p class="muted">Лидер открыл: ${esc(NET.leaderZone.zone.n)}. Иди к порталу в лагере.</p>`:''}<div class="chips" style="margin:8px 0"><button class="chip" data-pg="Сюда!">📍 Сюда!</button><button class="chip" data-pg="Помогите!">🆘 Помогите</button><button class="chip" data-pg="Тут добыча">💰 Добыча</button><button class="chip" data-pg="Иду к боссу">⚔ К боссу</button></div><p class="muted">Ссылка для друзей: <span class="lnk">${esc(link)}</span></p>${NET.host?`<label class="hcl" style="justify-content:flex-start"><input type="checkbox" id="openChk" ${NET.open?'checked':''}> Открытая группа — видна всем в списке «Открытые группы»</label>`:''}`}
+box.innerHTML=`<p>Код группы: <b class="code">${NET.room}</b></p><div class="acts"><button class="ab" data-pa2="copy">Скопировать код и ссылку</button><button class="ab alt" data-pa2="leave">Покинуть группу</button></div><ul class="mem">${mem}</ul>
+${NET.leaderZone&&!NET.host?`<p class="muted">Лидер открыл: ${esc(NET.leaderZone.zone.n)}. Иди к порталу в лагере.</p>`:''}<div class="chips" style="margin:8px 0"><button class="chip" data-pg="Сюда!">📍 Сюда!</button><button class="chip" data-pg="Помогите!">🆘 Помогите</button><button class="chip" data-pg="Тут добыча">💰 Добыча</button><button class="chip" data-pg="Иду к боссу">⚔ К боссу</button></div><p class="muted">Ссылка для друзей: <span class="lnk">${esc(link)}</span></p><div class="acts" style="margin-top:6px"><button class="chip" data-pa2="tgshare">Позвать друга через Telegram</button></div><p class="muted" style="font-size:11px">Игра свернётся, пока ты выбираешь чат. Вернись в неё — группа сохранится.</p>${NET.host?`<label class="hcl" style="justify-content:flex-start"><input type="checkbox" id="openChk" ${NET.open?'checked':''}> Открытая группа — видна всем в списке «Открытые группы»</label>`:''}`}
 $('partyBox').addEventListener('change',e=>{if(e.target.id==='openChk'){NET.open=e.target.checked;advTick(true)}});
-$('partyBox').addEventListener('click',e=>{const pg=e.target.closest('[data-pg]');if(pg){const p=H.g.position;nsend({t:'ping',zk:zkey(),x:+p.x.toFixed(1),z:+p.z.toFixed(1),msg:pg.dataset.pg});showPing(p.x,p.z,'Вы: '+pg.dataset.pg);closePanels();return}const jb=e.target.closest('[data-lj]');if(jb){lobbyClose();netConnect(jb.dataset.lj);setTimeout(renderParty,300);return}const b=e.target.closest('[data-pa2]');if(!b)return;if(b.dataset.pa2==='lobby'){lobbyClose();lobbyOpen();return}const a=b.dataset.pa2;const nm=$('pName');if(nm){NET.name=nm.value.trim().slice(0,16);try{localStorage.setItem('tlen_name',NET.name)}catch(_){}}
+$('partyBox').addEventListener('click',e=>{if(performance.now()-(PB_T||0)<700)return;const pg=e.target.closest('[data-pg]');if(pg){const p=H.g.position;nsend({t:'ping',zk:zkey(),x:+p.x.toFixed(1),z:+p.z.toFixed(1),msg:pg.dataset.pg});showPing(p.x,p.z,'Вы: '+pg.dataset.pg);closePanels();return}const jb=e.target.closest('[data-lj]');if(jb){lobbyClose();netConnect(jb.dataset.lj);setTimeout(renderParty,300);return}const b=e.target.closest('[data-pa2]');if(!b)return;if(b.dataset.pa2==='lobby'){lobbyClose();lobbyOpen();return}const a=b.dataset.pa2;const nm=$('pName');if(nm){NET.name=nm.value.trim().slice(0,16);try{localStorage.setItem('tlen_name',NET.name)}catch(_){}}
 if(a==='create'){const c=Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');netConnect(c)}
 if(a==='join'){netConnect(($('pCode').value||'').trim())}if(a==='leave'){netLeave()}
 if(a==='copy'){const link=location.origin+location.pathname+'?room='+NET.room;const txt='Заходи ко мне в «Земли Тлена»: '+link;try{navigator.clipboard.writeText(txt).then(()=>toast('Приглашение скопировано',1.5),()=>toast(link,6))}catch(_){toast(link,6)}
-if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.openTelegramLink){try{Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent('Заходи в мою группу в «Земли Тлена»'))}catch(_){}}}
+}
+if(a==='tgshare'){const link=location.origin+location.pathname+'?room='+NET.room;if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.openTelegramLink&&Telegram.WebApp.initData){try{Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent('Заходи в мою группу в «Земли Тлена»'))}catch(_){}}else if(navigator.share){navigator.share({title:'Земли Тлена',text:'Заходи в мою группу',url:link}).catch(()=>{})}}
 setTimeout(renderParty,300)});
 function renderPartyHud(){const el=$('partyHud');if(!el)return;el.innerHTML=Object.values(NET.peers).filter(p=>p.cls).map(p=>`<div class="pm"><b>${esc(p.name)}</b> <small>${CLASSES[p.cls].n} ${p.lvl}${p.zk===zkey()?'':' · '+(p.zk==='town'?'в лагере':'в другой зоне')}</small><i style="--p:${Math.round((p.hp||1)/(p.mx||1)*100)}%"></i></div>`).join('')}
 setInterval(()=>{if(NET.on)renderPartyHud()},700);
@@ -1058,7 +1059,7 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
-window.__dbg={get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={brTick:dt=>breachTick(dt),get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
 const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
@@ -1249,7 +1250,7 @@ function supOf(id){const L=(P.links&&P.links[id]||[]).filter(k=>k&&SUPP[k]);if(!
 for(const k of L){const g=SUPP[k];if(g.st)for(const x in g.st)st[x]=(st[x]||0)+g.st[x];if(g.more)more*=g.more;if(g.mx)mx*=g.mx}
 st.crit=Math.min(80,st.crit);st.leech=Math.min(15,st.leech);return{st,more,mx}}
 function gemFree(k){let used=0;for(const id in (P.links||{}))for(const x of P.links[id])if(x===k)used++;return ((P.gems||{})[k]||0)-used}
-function dropGem(p){const k=pick(SUPK);const el=document.createElement('div');el.className='loot gm';el.innerHTML=gi('gem-pendant','#5ee07a')+'Камень: '+esc(SUPP[k].n);const l=lootObj(p,el,{gem2:k,hi:true});
+function dropGem(p,k0){const k=k0||pick(SUPK);const el=document.createElement('div');el.className='loot gm';el.innerHTML=gi('gem-pendant','#5ee07a')+'Камень: '+esc(SUPP[k].n);const l=lootObj(p,el,{gem2:k,hi:true});
 const g=new THREE.Mesh(new THREE.OctahedronGeometry(.22),new THREE.MeshStandardMaterial({color:'#5ee07a',emissive:'#2ac04a',emissiveIntensity:1.8,roughness:.2}));g.position.y=.35;l.g.add(g);l.gem=g;chime([784,1047],.07)}
 let sockOpen=null;
 function sockHTML(id){P.links=P.links||{};const L=P.links[id]||[null,null],sk=SKILLS[id];let h='<div class="socks">'+[0,1].map(j=>{const k=L[j];return `<button class="sock ${k?'on':''} ${sockOpen===id+':'+j?'op':''}" data-sock="${id}:${j}">${k?gi('gem-pendant','#5ee07a','width:14px;height:14px;filter:none')+SUPP[k].n:'◇ пустое гнездо'}</button>`}).join('')+'</div>';
@@ -1415,7 +1416,7 @@ const DIV=[
 {id:'storm',n:'Око бури',need:4,rw:'Уникальная вещь «Ураган» или «Посох вечной зимы»',f:()=>giveU(pick(['Ураган','Посох вечной зимы'])),flav:'В центре бури — тишина.'}];
 function giveU(n){const U=UNIQUES.find(u=>u.n===n);if(!U)return;const it=makeUnique(U,Math.max(S.L||1,P.lvl));if(P.bag.length<36)P.bag.push(it);else{stashLoad().tabs[0].push(it);stashSave()}}
 function giveO(k,n){P.orbs[k]=(P.orbs[k]||0)+n}
-function dropDiv(p){const W={gems:3,chaos:3,wolf:2,ash:2,storm:1.5,map:1.5,frag:1.5,crown:1,divine:1,exalt:.6};const cid=wpick(DIV.map(c=>[c.id,W[c.id]||1])),C=DIV.find(c=>c.id===cid);const el=document.createElement('div');el.className='loot dv';el.innerHTML=gi('card-random','#cfe8ff')+esc(C.n);const l=lootObj(p,el,{div:C.id,hi:true});
+function dropDiv(p,c0){const W={gems:3,chaos:3,wolf:2,ash:2,storm:1.5,map:1.5,frag:1.5,crown:1,divine:1,exalt:.6};const cid=c0||wpick(DIV.map(c=>[c.id,W[c.id]||1])),C=DIV.find(c=>c.id===cid);const el=document.createElement('div');el.className='loot dv';el.innerHTML=gi('card-random','#cfe8ff')+esc(C.n);const l=lootObj(p,el,{div:C.id,hi:true});
 const g=new THREE.Mesh(new THREE.BoxGeometry(.32,.46,.03),new THREE.MeshStandardMaterial({color:'#e8f2ff',emissive:'#8ab8ff',emissiveIntensity:1.6}));g.position.y=.4;l.g.add(g);l.gem=g;chime([988,1319],.07)}
 function divHTML(){P.cards=P.cards||{};const have=DIV.filter(c=>(P.cards[c.id]||0)>0);let h='<div class="sect"><span>Гадальные карты</span><small style="text-transform:none;letter-spacing:0">собери набор — получи награду</small></div>';
 if(!have.length)return h+'<p class="muted" style="font-size:12.5px">Гадальные карты изредка выпадают с монстров, чаще — с редких и стражей. Соберите полный набор, и Вера обменяет его на награду.</p>';
@@ -1479,7 +1480,7 @@ return `<div class="sect" style="margin-top:16px"><span>Статистика г�
 /* ================= БЕЗДНА: бесконечный спуск ================= */
 function enterAbyss(d){const n=Math.min(MAPMODS.length,1+Math.floor(d/3));const mods=shuffle(MAPMODS.map(m=>m.k)).slice(0,n);
 enterZone(-1,d,null,{zi:Math.floor(Math.random()*8),tier:d,rar:2,mods,abyss:d});S.zone.n='Бездна · глубина '+d;$('zoneName').textContent=S.zone.n}
-function abyssHTML(){const best=P.abyssBest||0,ck=P.abyssCk||1;return `<div class="pin aby"><div>${gi('magic-portal','#b06aff','width:34px;height:34px')}</div><div><b>Бездна</b><small>Бесконечный спуск: каждая глубина сильнее и с большим числом модификаторов. Портал стража ведёт глубже. Каждые 5 глубин — контрольная точка и сферы. Рекорд: <b style="color:#d0a0ff">${best}</b></small></div><div style="display:flex;flex-direction:column;gap:4px"><button class="ab" data-aby="${ck}">${ck>1?'С глубины '+ck:'Начать'}</button>${ck>1?'<button class="ab alt" data-aby="1">С 1</button>':''}</div></div>`}
+function abyssHTML(){const best=P.abyssBest||0,ck=P.abyssCk||1;return `<div class="pin aby"><div>${gi('magic-portal','#b06aff','width:34px;height:34px')}</div><div><b>Бездна</b><small>Разлом раскрывается кольцом: убивай монстров внутри — каждое убийство продлевает его. Когда время кончится, кольцо сожмётся и закроется. Набери нужное число убийств, чтобы призвать Владыку Бездны и открыть следующую глубину. Рекорд: <b style="color:#d0a0ff">${best}</b></small></div><div style="display:flex;flex-direction:column;gap:4px"><button class="ab" data-aby="${ck}">${ck>1?'С глубины '+ck:'Начать'}</button>${ck>1?'<button class="ab alt" data-aby="1">С 1</button>':''}</div></div>`}
 
 /* ================= ПАНТЕОН ================= */
 const PAN={maj:[{id:'sol',n:'Душа Солнца',st:{dmgTaken:-8,armorP:15},d:'−8% получаемого урона, +15% брони'},{id:'lun',n:'Душа Луны',st:{move:10,aspd:6},d:'+10% скорости бега, +6% скорости атак'},{id:'gai',n:'Душа Земли',st:{regen:5,hpP:8},d:'+5 здоровья в сек., +8% здоровья'}],
@@ -1543,12 +1544,12 @@ setTimeout(setSave,500);
 
 /* портал в город и обратно */
 let RESUME=null,LASTZ=null,RESUMED=null;
-function saveResume(){if(isGuest()||!LASTZ||S.cleared||(S.mode!=='zone'&&S.mode!=='dead')||(P&&P.dead)){RESUME=null;return}RESUME={args:LASTZ,seed:S.seed,dead:mons.filter(m=>m.dead&&!m.dyn).map(m=>m.id),obj:OBJ?{have:OBJ.have,done:OBJ.done,ents:OBJ.ents.map(e=>!!e.done)}:null,name:S.zone.n,rift:S.rift?S.rift.st:0,shr:(S.shrines||[]).map(x=>x.used),ess:S.ess?S.ess.st:0}}
+function saveResume(){if(isGuest()||!LASTZ||(S.cleared&&(S.abyss||!loot.some(l=>l.fly)))||(S.mode!=='zone'&&S.mode!=='dead')||(P&&P.dead)){RESUME=null;return}RESUME={args:LASTZ,seed:S.seed,dead:(()=>{const al=new Set(mons.filter(m=>!m.dead).map(m=>m.id));const d=[];for(let i=0;i<(S.mid||0);i++)if(!al.has(i))d.push(i);return d})(),obj:OBJ?{have:OBJ.have,done:OBJ.done,ents:OBJ.ents.map(e=>!!e.done)}:null,name:S.zone.n,rift:S.rift?S.rift.st:0,shr:(S.shrines||[]).map(x=>x.used),ess:S.ess?S.ess.st:0,cleared:!!S.cleared,bp:S.boss?{x:+S.boss.g.position.x.toFixed(1),z:+S.boss.g.position.z.toFixed(1)}:null,loot:loot.filter(l=>l.fly).map(l=>({x:+l.fly.tx.toFixed(2),z:+l.fly.tz.toFixed(2),it:l.it,gold:l.gold,orb:l.orb,ess:l.ess,div:l.div,gem2:l.gem2,frag:l.frag,mapIt:l.mapIt,auto:l.it?!!l.auto:1}))}}
 function resumeZone(){const R=RESUME;if(!R)return;RESUME=R;const a=R.args;const keep=R;enterZone(a.zi,a.tier,null,a.mi);RESUME=null;
 const dead=new Set(keep.dead);for(const m of mons)if(dead.has(m.id)&&!m.dead){m.silent=1;m.dead=1;m.g.visible=false;if(m.lab){m.lab.remove();m.lab=null}}mons=mons.filter(m=>!dead.has(m.id));
 if(OBJ&&keep.obj){OBJ.have=keep.obj.have;keep.obj.ents.forEach((d,i)=>{const e=OBJ.ents[i];if(d&&e&&!e.done){try{completeEnt(e,true,true)}catch(_){e.done=true;if(e.el)e.el.remove()}}});if(keep.obj.done&&!OBJ.done){try{objDone()}catch(_){}}updObjHud()}
 if(S.rift&&keep.rift){S.rift.st=2;S.rift.el.remove();S.rift.g.visible=false}(S.shrines||[]).forEach((x,i)=>{if(keep.shr[i]){x.used=true;x.el.remove();x.gl.visible=false}});if(S.ess&&keep.ess){S.ess.st=1;S.ess.el.remove();S.ess.cr.visible=false}
-toast('Портал вернул тебя в «'+keep.name+'»',2.5)}
+if(keep.cleared){S.cleared=true;$('bossBar').classList.remove('on');if(!exitP&&keep.bp){const gg=prop('arch_gate',1);gg.position.set(keep.bp.x,0,keep.bp.z-4);dyn.add(gg);const d=new THREE.Mesh(new THREE.CircleGeometry(1.7,40),new THREE.MeshBasicMaterial({color:new THREE.Color('#9a5cff').multiplyScalar(2.2),transparent:true,opacity:.8,side:THREE.DoubleSide,toneMapped:false,map:softTex}));d.position.set(0,1.95,0);gg.add(d);exitP=gg;emitters.push({x:keep.bp.x,y:1.95,z:keep.bp.z-4,kind:'portal',w:zone})}if(OBJ&&!OBJ.done){try{objDone()}catch(_){}}}restoreLoot(keep.loot);toast('Портал вернул тебя в «'+keep.name+'»'+(keep.loot&&keep.loot.length?' — добыча на месте':''),2.5)}
 
 /* опасности карт: ловушки и буря */
 function updHaz(dt){if(S.mode!=='zone'||isGuest())return;if(S.hz)for(const h of S.hz){h.t-=dt;if(h.t<=0){h.t=3.2;const d=Math.hypot(h.x-H.g.position.x,h.z-H.g.position.z);if(d<24)tele(h.x,h.z,1.8,.9,(S.L*6+10),'#c0c0c0')}}
@@ -1597,9 +1598,9 @@ const rerollCost=()=>Math.round(20*Math.max(1,P.maxZone>8?8+(P.maxMap||1):P.maxZ
 let HUDR=[],hudT=0;
 function hudRects(){HUDR=[];for(const el of document.querySelectorAll('#hud .trow .hb,#hud .gold,#hud .tl,#hud .tl *,#coach.on,#tutArr,#banner b,#banner small,#zoneName,#zoneSub,#objTxt,#mini,#skills .sk,.globe,#bossBar,#toast,#partyHud,#buffs,#bPing,#banner.on b,#feed .fd,#interact,#lvlTxt')){const cs=getComputedStyle(el);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)continue;if(el.closest('[style*="display: none"],[style*="display:none"]'))continue;const r=el.getBoundingClientRect();if(r.width<2||r.height<2)continue;HUDR.push({l:r.left-3,t:r.top-3,r:r.right+3,b:r.bottom+3})}}
 function fitLabels(){const now=performance.now();if(now-hudT>(document.body.classList.contains('bn')||$('toast').style.visibility?120:500)){hudT=now;hudLayout();hudRects()}const vw=innerWidth;
-const LB=$('labels'),kids=LB?[...LB.children]:[];const groups=[[...$('npcl').children],kids.filter(e=>e.classList.contains('loot')),kids.filter(e=>!e.classList.contains('loot')),[...$('nums').children]];
+const LB=$('labels'),kids=LB?[...LB.children]:[];const groups=[[...$('npcl').children,...kids.filter(e=>e.classList.contains('objl'))],kids.filter(e=>e.classList.contains('loot')),kids.filter(e=>!e.classList.contains('loot')&&!e.classList.contains('objl')),[...$('nums').children]];
 const items=[];for(let gi=0;gi<4;gi++)for(const el of groups[gi]){if(el.style.display==='none')continue;const r=el.getBoundingClientRect();if(r.width<1)continue;const pd=el._dx||0;items.push({el,gi,l:r.left-pd,r:r.right-pd,t:r.top,b:r.bottom})}
-const placed=[],H0=innerHeight;for(const it of items){const isLoot=it.gi===1,isNum=it.gi===3;let dx=0;if(!isLoot){if(it.l<6)dx=6-it.l;else if(it.r>vw-6)dx=vw-6-it.r}
+const placed=[],H0=innerHeight;for(const it of items){const isLoot=it.gi===1||(it.gi===0&&it.el.classList.contains('objl')),isNum=it.gi===3;let dx=0;if(!isLoot){if(it.l<6)dx=6-it.l;else if(it.r>vw-6)dx=vw-6-it.r}
 const L=it.l+dx,R=it.r+dx;let hit=!isNum&&(it.b>H0-2||it.t<2);if(!hit)for(const h of HUDR)if(L<h.r&&R>h.l&&it.t<h.b&&it.b>h.t){hit=true;break}
 if(!hit&&!isLoot&&!isNum)for(const q of placed)if(L<q.r&&R>q.l&&it.t<q.b&&it.b>q.t){hit=true;break}
 if(!hit&&!isNum)placed.push({l:L-2,r:R+2,t:it.t-2,b:it.b+2});it.dx=dx;it.hit=hit}
@@ -1728,7 +1729,7 @@ function interactLayout(){const ib=$('interact');if(!ib||!ib.classList.contains(
 function coachLayout(){interactLayout();const c=$('coach');if(!c||!c.classList.contains('on'))return;c.style.bottom='';const obs=[];
 for(const e of document.querySelectorAll('#interact.on,#skills .sk,.globe,#lvlTxt,#partyHud,#buffs')){const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden')continue;const r=e.getBoundingClientRect();if(r.width>2&&r.height>2)obs.push(r)}
 for(let k=0;k<6;k++){const C=c.getBoundingClientRect();let top=null;for(const r of obs)if(C.left<r.right+6&&C.right>r.left-6&&C.top<r.bottom+8&&C.bottom>r.top-8)top=top===null?r.top:Math.min(top,r.top);if(top===null)break;
-c.style.bottom=Math.max(8,innerHeight-top+10)+'px'}}
+c.style.bottom=Math.max(8,innerHeight-top+10)+'px';hudT=0}}
 addEventListener('resize',()=>setTimeout(coachLayout,60));
 
 /* ===== фильтр добычи (как в PoE) ===== */
@@ -1770,3 +1771,67 @@ function xmasTree(town){xmasLights=[];const t=place('tree_single_A',XT.x,XT.z,to
   g.position.set(cx+Math.cos(a)*d,0,cz+Math.sin(a)*d);g.rotation.y=Math.random()*3;town.add(g)})}
 function xmasTick(t){if(!xmasLights.length)return;for(const m of xmasLights){const v=.35+.65*Math.max(0,Math.sin(t*2.2+m.userData.ph));m.material.color.copy(m.userData.c).multiplyScalar(.4+v*2.4)}
  if(xmasLights.star){xmasLights.star.rotation.y=t*.8;const p=1+.08*Math.sin(t*3);xmasLights.star.scale.set(p,1.35*p,.45*p)}if(xmasLights.pl)xmasLights.pl.intensity=5+1.5*Math.sin(t*2.6)}
+
+/* ===== Разлом Бездны: расширяющееся и сужающееся кольцо (как Breach в PoE) ===== */
+function breachStart(){if(isGuest())return;const d=S.abyss;
+ for(const M of mons.slice()){M.silent=true;killMon(M)}S.boss=null;$('bossBar').classList.remove('on');
+ if(OBJ){if(OBJ.barrier)dyn.remove(OBJ.barrier);for(const e of OBJ.ents){e.el&&e.el.remove();for(const o of [e.g,e.gem,e.c&&e.c.root,e.mesh])if(o&&o.parent)o.parent.remove(o)}OBJ=null}
+ S.cleared=false;const C={x:0,z:30};
+ const ring=new THREE.Mesh(new THREE.RingGeometry(.75,1,128).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color('#b56aff').multiplyScalar(2.6),transparent:true,opacity:.9,toneMapped:false,side:THREE.DoubleSide,depthWrite:false}));ring.position.set(C.x,.06,C.z);dyn.add(ring);
+ const disc=new THREE.Mesh(new THREE.CircleGeometry(1,96).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:'#5a1a9a',transparent:true,opacity:.22,blending:THREE.AdditiveBlending,depthWrite:false}));disc.position.set(C.x,.04,C.z);dyn.add(disc);
+ const core=new THREE.Group();core.position.set(C.x,0,C.z);const tor=new THREE.Mesh(new THREE.TorusGeometry(1.3,.14,12,48),new THREE.MeshBasicMaterial({color:new THREE.Color('#d08aff').multiplyScalar(2.4),toneMapped:false}));tor.position.y=1.9;core.add(tor);
+ const eye=new THREE.Mesh(new THREE.CircleGeometry(1.2,40),new THREE.MeshBasicMaterial({color:'#2a0050',transparent:true,opacity:.9,side:THREE.DoubleSide}));eye.position.y=1.9;core.add(eye);dyn.add(core);
+ const pl=new THREE.PointLight(0xb070ff,40,30,2);pl.position.set(C.x,3,C.z);dyn.add(pl);
+ const need=40+d*4;S.br={C,r:1.5,T:9,k:0,need,st:'grow',ring,disc,core,tor,eye,pl,sp:0,hud:0,net:0,lord:null,wid:1.1};
+ H.g.position.set(C.x,0,C.z+5);toast('Разлом раскрывается! Убивай внутри кольца — каждое убийство продлевает его.',4);breachHud()}
+function breachKill(M){const B=S.br;if(!B||B.st==='closed')return;B.k++;if(B.fast){breachHud();return}B.T=Math.min(22,B.T+(M.rare?2.6:M.magic?1:.55));if(B.st==='shrink'&&B.T>0)B.st='grow';
+ if(!B.lord&&B.k>=B.need&&B.st!=='lord'){B.st='lord';B.T=Math.max(B.T,3);const t=wpick(S.zone.mons);const prevBoss=S.zone.boss;S.zone=Object.assign({},S.zone,{boss:'Владыка Бездны'});
+  const L=spawnMon(S.zone.bt||t,B.C.x,B.C.z,{boss:1,tint:'#7a2aff'});if(L){L.kit=['slam','summon','ring','cross'].filter(k=>BOSS_SK[k]);L.abT=2;L.sumN=0;L.name='Владыка Бездны';S.boss=L;B.lord=L;wake&&wake(L);banner('Владыка Бездны','Разлом держится, пока он жив','boss');music('boss')}}
+ breachHud()}
+function breachSeal(){const B=S.br;if(!B)return;B.st='shrink';B.T=0;B.fast=1}
+function breachEnd(){const B=S.br;B.st='closed';for(const M of mons.slice())if(M.breach&&!M.dead){M.silent=true;killMon(M)}
+ for(const o of [B.ring,B.disc,B.core,B.pl])dyn.remove(o);const won=!!(B.lord&&B.lord.dead);
+ const p=new THREE.Vector3(B.C.x,1,B.C.z);if(!won){const n=Math.floor(B.k/15);for(let i=0;i<n;i++)dropOrb(p);if(B.k>=10)dropItem(p,genItem(S.L,Math.min(2,1+Math.floor(B.k/30)),ST.rarity));
+  toast(`Разлом закрылся. Убито ${B.k} из ${B.need} — Владыка не явился.`,4);csAdd&&csAdd('abyc')}
+ P.abyssKills=Math.max(P.abyssKills||0,B.k);
+ if(!exitP){const g=prop('arch_gate',1);g.position.set(B.C.x,0,B.C.z-3);dyn.add(g);const d=new THREE.Mesh(new THREE.CircleGeometry(1.7,40),new THREE.MeshBasicMaterial({color:new THREE.Color('#9a5cff').multiplyScalar(2.2),transparent:true,opacity:.8,side:THREE.DoubleSide,toneMapped:false,map:softTex}));d.position.set(0,1.95,0);g.add(d);exitP=g;emitters.push({x:B.C.x,y:1.95,z:B.C.z-3,kind:'portal',w:zone})}
+ S.cleared=true;save();breachHud();setTimeout(()=>music('zone'),1500)}
+function breachHud(){const el=$('objTxt');const B=S.br;if(!el||!B)return;el.style.display='';
+ if(B.st==='closed'){el.innerHTML=(B.lord&&B.lord.dead?'<b class="ok">✓</b> Разлом запечатан · ':'Разлом закрыт · ')+'убито <b>'+B.k+'</b> · портал в лагерь открыт';return}
+ const ph=B.st==='lord'?'<b style="color:#e0a8ff">Владыка Бездны!</b>':B.st==='grow'?'кольцо растёт':'<b style="color:#ff9a8a">кольцо сжимается</b>';
+ el.innerHTML=`Разлом · ${ph} · убито <b>${Math.min(B.k,B.need)} / ${B.need}</b>${B.st!=='lord'?` · <b>${Math.max(0,B.T).toFixed(1)} с</b>`:''}`}
+function breachTick(dt){const B=S.br;if(!B||S.mode!=='zone'||B.st==='closed')return;const t=time;
+ B.tor.rotation.z+=dt*1.6;B.tor.rotation.y=Math.sin(t*.7)*.5;B.eye.lookAt(camera.position);
+ if(!isGuest()){
+  if(B.st==='grow'){B.T-=dt;B.r=Math.min(30,B.r+dt*(1.2+B.T*.05));if(B.T<=0){B.st='shrink'}}
+  else if(B.st==='lord'){B.r=Math.min(30,B.r+dt*.4);if(B.lord&&B.lord.dead)breachSeal()}
+  else if(B.st==='shrink'){B.r-=dt*(B.fast?9:2.4);if(B.r<=.4){B.r=.4;breachEnd();return}}
+  // спавн внутри кольца
+  if(B.st!=='shrink'||B.r>6){B.sp-=dt;const alive=mons.filter(m=>m.breach&&!m.dead).length;if(B.sp<=0&&alive<Math.min(42,10+B.r*1.4)){B.sp=Math.max(.15,.7-B.r*.02);const n=1+(Math.random()<.45?1:0)+(Math.random()<.15?2:0);
+   for(let k=0;k<n;k++){const a=rand(0,6.283),dd=rand(.25,.95)*B.r;const x=B.C.x+Math.cos(a)*dd,z=B.C.z+Math.sin(a)*dd;if(Math.hypot(x-H.g.position.x,z-H.g.position.z)<4.5||Math.abs(x)>44||Math.abs(z)>48)continue;
+    const rare=Math.random()<.035,magic=!rare&&Math.random()<.14;const M=spawnMon(wpick(S.zone.mons),x,z,{rare,magic,tint:'#9b5cff'});if(M){M.breach=1;M.xpMul=.6;wake&&wake(M);emit(x,1,z,0,2,0,.7,.4,1.5,.7,.3,1,1)}}}}
+  // монстры за кольцом при сжатии исчезают
+  if(B.st==='shrink')for(const M of mons.slice())if(M.breach&&!M.dead&&Math.hypot(M.g.position.x-B.C.x,M.g.position.z-B.C.z)>B.r+1){M.silent=true;killMon(M)}
+  B.net-=dt;if(B.net<=0&&NET.on&&NET.host){B.net=.25;nsend({t:'br',zk:zkey(),r:B.r,T:B.T,k:B.k,need:B.need,st:B.st})}}
+ // визуал
+ const r=Math.max(.4,B.r);B.ring.scale.set(r,1,r);B.disc.scale.set(r,1,r);
+ const k=(r-.7)/r;if(Math.abs(k-(B.wk||0))>.01){B.wk=k;B.ring.geometry.dispose();B.ring.geometry=new THREE.RingGeometry(Math.max(.01,1-.5/r),1,128).rotateX(-Math.PI/2)}
+ B.ring.material.color.set(B.st==='shrink'?'#ff6a8a':B.st==='lord'?'#e08aff':'#b56aff').multiplyScalar(2.4+Math.sin(t*6)*.4);B.disc.material.opacity=B.st==='shrink'?.14:.22;B.pl.intensity=30+B.r*1.5;
+ if(Math.random()<.6){const a=rand(0,6.283);emit(B.C.x+Math.cos(a)*r,.3,B.C.z+Math.sin(a)*r,0,rand(1,2.5),0,.7,.35,1,.7,.4,1,1)}
+ B.hud-=dt;if(B.hud<=0){B.hud=.2;breachHud()}}
+function breachNet(m){if(!isGuest()||S.mode!=='zone')return;if(!S.br){S.abyss=S.abyss||1;const C={x:0,z:30};
+  const ring=new THREE.Mesh(new THREE.RingGeometry(.97,1,128).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color('#b56aff').multiplyScalar(2.6),transparent:true,opacity:.9,toneMapped:false,side:THREE.DoubleSide,depthWrite:false}));ring.position.set(C.x,.06,C.z);dyn.add(ring);
+  const disc=new THREE.Mesh(new THREE.CircleGeometry(1,96).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:'#5a1a9a',transparent:true,opacity:.22,blending:THREE.AdditiveBlending,depthWrite:false}));disc.position.set(C.x,.04,C.z);dyn.add(disc);
+  const core=new THREE.Group();core.position.set(C.x,0,C.z);const tor=new THREE.Mesh(new THREE.TorusGeometry(1.3,.14,12,48),new THREE.MeshBasicMaterial({color:new THREE.Color('#d08aff').multiplyScalar(2.4),toneMapped:false}));tor.position.y=1.9;core.add(tor);const eye=new THREE.Mesh(new THREE.CircleGeometry(1.2,40),new THREE.MeshBasicMaterial({color:'#2a0050'}));eye.position.y=1.9;core.add(eye);dyn.add(core);const pl=new THREE.PointLight(0xb070ff,40,30,2);pl.position.set(C.x,3,C.z);dyn.add(pl);
+  S.br={C,r:1,T:0,k:0,need:1,st:'grow',ring,disc,core,tor,eye,pl,sp:0,hud:0,net:0}}
+ Object.assign(S.br,{r:m.r,T:m.T,k:m.k,need:m.need,st:m.st});if(m.st==='closed'){for(const o of [S.br.ring,S.br.disc,S.br.core,S.br.pl])dyn.remove(o)}breachHud()}
+
+/* возврат добычи на землю после портала */
+function restoreLoot(list){if(!list||!list.length)return;const ch=chime;chime=()=>{};try{for(const r of list){LOOT_FIX={x:r.x,z:r.z,auto:r.auto};const p=new THREE.Vector3(r.x,1,r.z);
+ try{if(r.it)dropItem(p,r.it);else if(r.gold)dropGold(p,r.gold);else if(r.orb)dropOrb(p,r.orb);else if(r.ess)dropEss(p,r.ess);else if(r.div)dropDiv(p,r.div);else if(r.gem2)dropGem(p,r.gem2);else if(r.frag)dropFrag(p);else if(r.mapIt)dropMap(p,r.mapIt)}catch(e){}}}finally{LOOT_FIX=null;chime=ch}}
+
+/* версия игры: сверка в группе и проверка обновлений */
+const GBUILD=+('__T__'.replace(/\D/g,''))||0;const GVER=(()=>{try{return new URL(import.meta.url).searchParams.get('v')||''}catch(e){return ''}})();
+function showUpd(msg){let b=$('updBar');if(!b){b=document.createElement('div');b.id='updBar';b.innerHTML='<span></span><button class="btn sm">Перезапустить</button>';document.body.appendChild(b);b.querySelector('button').onclick=()=>{try{save()}catch(e){}const u=new URL(location.href);u.searchParams.set('r',Date.now());location.replace(u.toString())}}b.querySelector('span').textContent=msg;b.classList.add('on')}
+async function updCheck(){if(!GBUILD||!/^[0-9a-f]{6,}$/.test(GVER))return;try{const r=await fetch('index.html?u='+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/game\.js\?v=([0-9a-f]{6,})/);if(m&&m[1]!==GVER){if(S.mode==='town'||S.mode==='title')showUpd('Вышло обновление игры');else updCheck.pend=1}}catch(e){}}
+setInterval(()=>{if(updCheck.pend&&S.mode==='town'){updCheck.pend=0;showUpd('Вышло обновление игры')}},3000);setTimeout(updCheck,20000);setInterval(updCheck,300000);

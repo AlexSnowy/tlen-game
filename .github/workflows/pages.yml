@@ -22,6 +22,8 @@ jobs:
           touch public/.nojekyll
           V=${GITHUB_SHA::8}
           sed -i "s/__V__/$V/g" public/index.html public/game.js
+          T=$(date +%s)
+          sed -i "s/__T__/$T/g" public/game.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
