@@ -322,6 +322,19 @@ body.bn #toast{opacity:0!important}
 @media (max-height:500px){.credit{position:static!important;margin-top:10px!important}}
 @media (max-height:500px){#banner{top:28%}body.bn #hud .tl,body.bn #hud .trow{opacity:.15;transition:opacity .4s}#banner b{font-size:28px}#banner small{font-size:12px}body.bn #bossBar{opacity:0}}
 #bossBar{transition:opacity .4s}
+#coach{position:fixed;left:50%;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 200px);transform:translate(-50%,8px);width:min(400px,88vw);background:linear-gradient(180deg,rgba(38,30,20,.96),rgba(22,18,13,.96));border:1px solid #8a6a36;border-radius:12px;padding:10px 14px 9px;z-index:6;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;box-shadow:0 6px 24px rgba(0,0,0,.6)}
+#coach.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#coach b{display:inline-block;max-width:calc(100% - 96px);font:600 14px/1.25 Rubik;color:#ffd98a;margin-bottom:3px}#coach.hid{opacity:0!important;pointer-events:none!important}
+#coach span{display:block;font:400 13px/1.4 Rubik;color:#e6dccb}
+#coachX{position:absolute;top:8px;right:8px;background:none;border:1px solid #5a4a32;border-radius:7px;color:#a8977a;font:500 11px Rubik;padding:3px 7px;cursor:pointer}
+.tutT{animation:tutP 1.3s ease-in-out infinite;position:relative;z-index:3}
+@keyframes tutP{0%,100%{box-shadow:0 0 0 0 rgba(255,210,110,.0),0 0 0 2px rgba(255,210,110,.9)}50%{box-shadow:0 0 0 7px rgba(255,210,110,.25),0 0 0 2px rgba(255,230,150,1)}}
+.npcn.tutN{color:#ffe08a!important;font-size:15px!important;animation:tutB 1s ease-in-out infinite}
+.npcn.tutN::before{content:'▼ ';color:#ffcf5a}
+@keyframes tutB{50%{margin-top:-6px}}
+#tutArr{position:fixed;display:none;z-index:6;font-size:30px;color:#ffd57a;text-shadow:0 0 10px rgba(255,190,80,.9),0 2px 2px #000;pointer-events:none}
+@media (max-height:500px){#coach{bottom:calc(max(8px,env(safe-area-inset-bottom)) + 30px);width:min(360px,44vw);padding:8px 10px 7px}#coach b{font-size:13px}#coach span{font-size:12px}}
+@media (min-width:901px) and (pointer:fine){#coach{bottom:150px}}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
