@@ -313,6 +313,12 @@ body.bn #toast{opacity:0!important}
 .cell.uq{animation:uq 2.2s ease-in-out infinite}@keyframes uq{50%{box-shadow:inset 0 0 18px rgba(216,120,46,.45),0 0 10px rgba(216,120,46,.5)}}.cell.cr::before{content:"";position:absolute;left:3px;top:3px;width:7px;height:7px;border-radius:50%;background:#d20000;box-shadow:0 0 4px #f00}
 #zoneName,#zoneSub{pointer-events:auto;cursor:pointer}
 @media (max-width:600px) and (orientation:portrait){.tl{max-width:calc(100vw - 180px)}}
+.tcard{text-align:center;max-width:min(460px,94vw)!important}.tcard h1{margin-bottom:4px}.tcard .tag{font-size:14px;color:#c9b8a0;margin:0 0 14px;line-height:1.4}
+.tbtns{display:flex;flex-direction:column;gap:8px;align-items:stretch;max-width:320px;margin:6px auto 14px}.tbtns .btn{width:100%}
+.tmore{display:flex;flex-direction:column;gap:6px;max-width:420px;margin:0 auto}.tmore .news{margin:0;max-width:none}
+.tset{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 10px 12px}.btn.sm{padding:7px 12px!important;font-size:13px!important}
+.credit{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));font-size:9.5px!important;color:#6f665a!important;margin:0!important;line-height:1.3;text-align:center;padding:0 12px;pointer-events:none}
+#ovTitle{background:radial-gradient(ellipse at 50% 45%,rgba(8,7,10,.72),rgba(8,7,10,.35) 70%)}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -388,14 +394,21 @@ body.bn #toast{opacity:0!important}
 </div></div>
 
 <div class="ov on" id="ovLoad"><div class="card"><h1>Земли Тлена</h1><div class="lbar"><i id="lFill"></i></div><p class="muted" id="lTxt">Загрузка мира…</p></div></div>
-<div class="ov" id="ovTitle"><div class="card">
+<div class="ov" id="ovTitle"><div class="card tcard">
   <h1>Земли Тлена</h1>
-  <p>Тысячу лет Тлен спал под Вальмором. Теперь мёртвые встают из могил, и уцелел только лагерь у старого костра.</p>
-  <p>Выбери героя, пройди восемь земель Тлена, сразись с его Стражами и узнай, кто разбудил древнее зло. А потом — бесконечные карты Кошмара.</p>
-  <p class="muted" id="ctlHint">Ходить: WASD, клик мышью или палец. Атака по ближайшему врагу — сама. Умения: Q, E, R. Рывок: пробел. Флакон: F. Умения — K, пассивное дерево — P, сумка — I.</p>
-  <details class="news"><summary>Что нового</summary><ul><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details><div id="charList"></div><button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn alt" id="bNew">Новый герой</button>
-  <p class="muted" style="font-size:12px!important;margin-top:14px">3D-модели: Kay Lousberg, KayKit (CC0) · Иконки: game-icons.net (CC BY 3.0)</p>
-  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><div class="seg" id="qSeg"><button data-q="high">Графика: высокая</button><button data-q="low">Экономная</button></div><button class="btn alt" id="bMus" style="padding:8px 14px;font-size:14px">Музыка: вкл</button></div><div style="display:flex;gap:8px;justify-content:center;margin-top:8px"><button class="btn alt" id="bExp" style="padding:7px 12px;font-size:13px">Экспорт сохранения</button><button class="btn alt" id="bImp" style="padding:7px 12px;font-size:13px">Импорт</button></div>
+  <p class="tag">Мёртвые встают из могил Вальмора. Уцелел лишь лагерь у старого костра.</p>
+  <div id="charList"></div>
+  <div class="tbtns"><button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn" id="bNew">Новый герой</button></div>
+  <p class="muted" id="ctlHint" style="display:none"></p>
+  <div class="tmore">
+    <details class="news"><summary>Что нового</summary><ul><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details>
+    <details class="news"><summary>Настройки и сохранения</summary><div class="tset">
+      <div class="seg" id="qSeg"><button data-q="high">Графика: высокая</button><button data-q="low">Экономная</button></div>
+      <button class="btn alt sm" id="bMus">Музыка: вкл</button>
+      <button class="btn alt sm" id="bExp">Экспорт сохранения</button><button class="btn alt sm" id="bImp">Импорт</button>
+    </div></details>
+  </div>
+  <p class="credit">3D-модели: Kay Lousberg, KayKit (CC0) · Иконки: game-icons.net (CC BY 3.0)</p>
 </div></div>
 <div class="ov" id="ovClass"><div class="card"><h2>Выбери класс</h2><p>У каждого класса три ветки по 7 умений и свой вход в общее пассивное дерево.</p><div class="cls" id="classList"></div><label class="hcl"><input type="checkbox" id="hcChk"><span><b>Хардкор</b> — смерть необратима, зато +25% к редкости добычи</span></label><button class="btn alt" id="bBack">Назад</button></div></div>
 <div class="ov" id="ovDead"><div class="card"><h2 id="deadH">Ты пал</h2><p id="deadP">Тлен забрал тело, но костёр лагеря вернул тебя назад. Добыча при тебе.</p><p class="muted" id="deadKill" style="color:#ff8a7a"></p><button class="btn" id="bRevive">Очнуться у костра</button></div></div>
