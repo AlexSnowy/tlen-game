@@ -509,10 +509,12 @@ const el=document.createElement('div');el.className='loot t'+it.rar;el.style.col
 const col=new THREE.Color(RCH[it.rar]);const gem=new THREE.Mesh(gemG,new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:it.rar>=2?2.5:1.2,roughness:.3,metalness:.3}));gem.position.y=.35;l.g.add(gem);l.gem=gem;
 if(it.rar>=2){const b=new THREE.Mesh(new THREE.CylinderGeometry(.18,.45,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b}
 if(it.rar===3){haptic('ok');chime([523,784,1047,1568],.11);l.beam&&(l.beam.scale.x=l.beam.scale.z=1.6)}else if(it.rar===2)chime([660,990],.08)}
-function layoutLoot(){const V=loot.filter(l=>l.vis);V.sort((a,b)=>(b.hi|0)-(a.hi|0)||a.sy-b.sy);const placed=[];
-for(const l of V){if(!l.w){l.el.style.display='block';l.w=l.el.offsetWidth||90;l.h=l.el.offsetHeight||18}let y=l.sy,tries=0;const x0=l.sx-l.w/2,x1=l.sx+l.w/2;
-for(;tries<14;tries++){const hit=placed.find(q=>x0<q.x1&&x1>q.x0&&y-l.h<q.y&&y>q.y-q.h);if(!hit)break;y=hit.y-hit.h-2}
-placed.push({x0,x1,y,h:l.h});l.el.style.display='block';l.el.style.transform=`translate(${l.sx}px,${y}px) translate(-50%,-100%)`}}
+function layoutLoot(){const V=loot.filter(l=>l.vis);V.sort((a,b)=>(b.hi|0)-(a.hi|0)||a.sy-b.sy);const placed=[];const W=innerWidth,Hh=innerHeight;
+const free=(x0,x1,y,h)=>{if(y-h<4||y>Hh-4||x0<4||x1>W-4)return false;for(const q of placed)if(x0<q.x1+3&&x1>q.x0-3&&y-h<q.y+1&&y>q.y-q.h-1)return false;for(const q of HUDR)if(x0<q.r&&x1>q.l&&y-h<q.b&&y>q.t)return false;return true};
+for(const l of V){if(!l.w||l.wf){l.el.style.display='block';const ow=l.el.offsetWidth;l.w=ow||90;l.wf=!ow;l.h=l.el.offsetHeight||18}const w=l.w,h=l.h+2;let bx=l.sx,by=l.sy,ok=false;
+ for(let ring=0;ring<14&&!ok;ring++){const cands=[];if(!ring)cands.push([0,0]);else for(let cy=-ring;cy<=ring;cy++)for(const cx of [0,-1,1,-2,2,-3,3])if(Math.max(Math.abs(cy),Math.abs(cx))===ring||(Math.abs(cy)===ring))cands.push([cx,cy]);cands.sort((a,b)=>Math.hypot(a[0]*1.6,a[1])-Math.hypot(b[0]*1.6,b[1]));
+  for(const [cx,cy] of cands){const x=l.sx+cx*(w*.55+4),y=l.sy+cy*h;if(free(x-w/2,x+w/2,y,l.h)){bx=x;by=y;ok=true;break}}}
+ placed.push({x0:bx-w/2,x1:bx+w/2,y:by,h:l.h});l.el.style.display='block';l.el.style.transform=`translate(${bx}px,${by}px) translate(-50%,-100%)`}}
 function chime(fs,v){fs.forEach((f,i)=>setTimeout(()=>snd(f,.45,'triangle',v,1.6),i*85))}
 function dropOrb(p){const k=wpick(ORB_K.map(k=>[k,ORBS[k].w]));const el=document.createElement('div');el.className='loot o';el.innerHTML=uiI('orb:'+k,ORBS[k].c)+esc(ORBS[k].n);const l=lootObj(p,el,{orb:k});
 const m=new THREE.Mesh(orbG,new THREE.MeshStandardMaterial({color:ORBS[k].c,emissive:ORBS[k].c,emissiveIntensity:1.6,roughness:.2,metalness:.5}));m.position.y=.3;l.g.add(m);l.gem=m;
@@ -1593,10 +1595,10 @@ const rerollCost=()=>Math.round(20*Math.max(1,P.maxZone>8?8+(P.maxMap||1):P.maxZ
 let HUDR=[],hudT=0;
 function hudRects(){HUDR=[];for(const el of document.querySelectorAll('#hud .trow .hb,#hud .gold,#hud .tl,#hud .tl *,#coach.on,#tutArr,#banner b,#banner small,#zoneName,#zoneSub,#objTxt,#mini,#skills .sk,.globe,#bossBar,#toast,#partyHud,#buffs,#bPing,#banner.on b,#feed .fd,#interact,#lvlTxt')){const cs=getComputedStyle(el);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)continue;if(el.closest('[style*="display: none"],[style*="display:none"]'))continue;const r=el.getBoundingClientRect();if(r.width<2||r.height<2)continue;HUDR.push({l:r.left-3,t:r.top-3,r:r.right+3,b:r.bottom+3})}}
 function fitLabels(){const now=performance.now();if(now-hudT>(document.body.classList.contains('bn')||$('toast').style.visibility?120:500)){hudT=now;hudLayout();hudRects()}const vw=innerWidth;
-const placed=[];for(const host of [$('npcl'),$('labels'),$('nums')]){if(!host)continue;for(const el of host.children){if(el.style.display==='none')continue;el.style.marginLeft='0px';const r=el.getBoundingClientRect();if(r.width<1)continue;
-let dx=0;if(r.left<6)dx=6-r.left;else if(r.right>vw-6)dx=vw-6-r.right;if(dx)el.style.marginLeft=dx+'px';
+const placed=[];const LB=$('labels'),kids=LB?[...LB.children]:[];const groups=[[...$('npcl').children],kids.filter(e=>e.classList.contains('loot')),kids.filter(e=>!e.classList.contains('loot')),[...$('nums').children]];for(let gi=0;gi<4;gi++){const host=gi===3?$('nums'):null;const isLoot=gi===1;for(const el of groups[gi]){if(el.style.display==='none')continue;el.style.marginLeft='0px';const r=el.getBoundingClientRect();if(r.width<1)continue;
+let dx=0;if(!isLoot)if(r.left<6)dx=6-r.left;else if(r.right>vw-6)dx=vw-6-r.right;if(dx)el.style.marginLeft=dx+'px';
 const L=r.left+dx,R=r.right+dx;let hit=host!==$('nums')&&(r.bottom>innerHeight-2||r.top<2);for(const h of HUDR)if(L<h.r&&R>h.l&&r.top<h.b&&r.bottom>h.t){hit=true;break}
-if(!hit&&host!==$('nums'))for(const q of placed)if(L<q.r&&R>q.l&&r.top<q.b&&r.bottom>q.t){hit=true;break}
+if(!hit&&!isLoot&&host!==$('nums'))for(const q of placed)if(L<q.r&&R>q.l&&r.top<q.b&&r.bottom>q.t){hit=true;break}
 if(!hit&&host!==$('nums'))placed.push({l:L-2,r:R+2,t:r.top-2,b:r.bottom+2});el.style.visibility=hit?'hidden':''}}}
 addEventListener('resize',()=>hudT=0);
 
