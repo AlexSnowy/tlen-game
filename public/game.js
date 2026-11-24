@@ -920,7 +920,7 @@ if(Math.random()<(S.th.embers&&zone.visible?.9:.35)){const x=hp.x+rand(-14,14),z
 function assignLights(){const hp=H.g.position;const L=(town.visible?lights.filter(l=>l.w==='town'):lights.filter(l=>l.w==='zone')).map(l=>({l,d:Math.hypot(l.x-hp.x,l.z-hp.z)})).sort((a,b)=>a.d-b.d);
 const n=Q==='high'?4:2;torchLights.forEach((tl,i)=>{const x=L[i];if(i<n&&x&&x.d<26){tl.position.set(x.l.x,x.l.y,x.l.z);tl.color.set(x.l.hex);tl.userData.on=true}else{tl.userData.on=false;tl.intensity=0}})}
 const $hp=$('hpFill'),$hpT=$('hpTxt'),$mp=$('mpFill'),$mpT=$('mpTxt'),$xp=$('xpFill'),$lv=$('lvlTxt'),$gold=$('gold'),$es=$('esFill');
-function frame(now){requestAnimationFrame(frame);grade.uniforms.uTime.value=(now%1000)/1000;let dt=Math.min(.05,(now-last)/1000);if(S.slow>0){S.slow-=dt;dt*=S.slow>0?.3:1}last=now;time+=dt;frameN++;gU.uTime.value=time;
+function frame(now){requestAnimationFrame(frame);autoQ(now);grade.uniforms.uTime.value=(now%1000)/1000;let dt=Math.min(.05,(now-last)/1000);if(S.slow>0){S.slow-=dt;dt*=S.slow>0?.3:1}last=now;time+=dt;frameN++;gU.uTime.value=time;
 if(S.mode==='town'||S.mode==='zone'||S.mode==='dead'){if(!S.paused)update(dt);H.c.mixer.update(S.paused?0:dt)}
 if(town.visible)for(const c of npcChars)c.mixer.update(dt);
 netTick(dt);updParticles(S.paused?0:dt);updFx(dt);updNums(dt);if(!S.paused||S.mode==='title')updEmitters(dt);
@@ -1573,3 +1573,7 @@ for(let i=0;i<14;i++){const a=i/14*6.283+rand(-.1,.1),r=rand(5,8.4);const M=spaw
 toast('Легион застыл во времени! Бей статуи, пока они не ожили — каждая даёт добычу.',3.5);banner('Легион','10 секунд до пробуждения','zone')}return}
 if(L.state===1){L.t-=dt;L.ring.material.opacity=.35+.25*Math.sin(performance.now()/120);if(Math.random()<.6){const a=rand(0,6.28);emit(L.x+Math.cos(a)*8.8,.3,L.z+Math.sin(a)*8.8,0,rand(.5,1.5),0,.8,.2,.6,.75,1.2,0,1)}
 if(L.t<=0||L.M.every(m=>m.dead)){L.state=2;L.ring.visible=false;for(const m of L.M){if(m.ice){m.g.remove(m.ice);m.ice=null}if(!m.dead){m.st.stun=0;burst(m.g.position.clone().setY(1),'#9ac8ff',12,3,.3,.5,2)}}toast('Легион пробудился!',2);noise(.6,.25,300)}}}
+
+/* авто-понижение графики, если телефон не тянет */
+let aqT=0,aqN=0,aqLast=0,aqDone=false;
+function autoQ(now){if(aqDone||Q==='low'||S.mode!=='zone'||document.hidden){aqLast=now;return}const d=now-aqLast;aqLast=now;if(d>200)return;aqT+=d;aqN++;if(aqT>6000){const fps=aqN/(aqT/1000);aqT=0;aqN=0;if(fps<24){aqDone=true;Q='low';try{localStorage.setItem('tlen_q',Q)}catch(_){}setQBtns();applyQ();toast('Графика переключена на экономную для плавности. Вернуть можно в настройках.',3.5)}}}
