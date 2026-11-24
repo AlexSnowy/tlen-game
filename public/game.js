@@ -1594,7 +1594,7 @@ function hudRects(){HUDR=[];for(const el of document.querySelectorAll('#hud .tro
 function fitLabels(){const now=performance.now();if(now-hudT>(document.body.classList.contains('bn')||$('toast').style.visibility?120:500)){hudT=now;hudLayout();hudRects()}const vw=innerWidth;
 const placed=[];for(const host of [$('npcl'),$('labels'),$('nums')]){if(!host)continue;for(const el of host.children){if(el.style.display==='none')continue;el.style.marginLeft='0px';const r=el.getBoundingClientRect();if(r.width<1)continue;
 let dx=0;if(r.left<6)dx=6-r.left;else if(r.right>vw-6)dx=vw-6-r.right;if(dx)el.style.marginLeft=dx+'px';
-const L=r.left+dx,R=r.right+dx;let hit=false;for(const h of HUDR)if(L<h.r&&R>h.l&&r.top<h.b&&r.bottom>h.t){hit=true;break}
+const L=r.left+dx,R=r.right+dx;let hit=host!==$('nums')&&(r.bottom>innerHeight-2||r.top<2);for(const h of HUDR)if(L<h.r&&R>h.l&&r.top<h.b&&r.bottom>h.t){hit=true;break}
 if(!hit&&host!==$('nums'))for(const q of placed)if(L<q.r&&R>q.l&&r.top<q.b&&r.bottom>q.t){hit=true;break}
 if(!hit&&host!==$('nums'))placed.push({l:L-2,r:R+2,t:r.top-2,b:r.bottom+2});el.style.visibility=hit?'hidden':''}}}
 addEventListener('resize',()=>hudT=0);
