@@ -225,6 +225,7 @@ let n=0;for(let t=0;t<900&&n<120;t++){const x=rand(-55,55),z=rand(-55,55);if(nea
 if(nm==='skull_candle'||nm==='d_candle_triple')emitters.push({x,y:.9,z,kind:'candle',w:zone});n++}
 for(let i=0;i<16;i++){let x=rand(-46,46),z=lerp(40,-38,i/15)+rand(-4,4);if(i%2)x=rand(-12,12);place(th.light,x,z,dyn,zoneObs);const tor=th.light==='torch_lit';
 lights.push({x,y:tor?1.4:1.6,z,hex:tor?'#ff8a30':'#ffb050',w:'zone'});emitters.push({x,y:1.25,z,kind:tor?'torch':'lamp',w:zone})}
+for(let i=0;i<8;i++){const a=i/8*6.283+.39,x=BOSSP.x+Math.cos(a)*13.2,z=BOSSP.z+Math.sin(a)*13.2;place('pillar_decorated',x,z,dyn,zoneObs,{ry:a,s:1.05});if(i%2===0){lights.push({x,y:2.2,z,hex:'#ff7a3a',w:'zone'});emitters.push({x,y:2.4,z,kind:'torch',w:zone})}}
 if(th.gn)zGrass=makeGrass(Q==='high'?th.gn:th.gn*.45|0,56,th.grass,(x,z)=>zoneObs.some(o=>o.r>1&&Math.hypot(o.x-x,o.z-z)<o.r*.8),zone);
 for(let i=0;i<4;i++){for(let t=0;t<50;t++){const x=rand(-48,48),z=rand(-36,38);if(near(x,z,10)||zoneObs.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+2))continue;const gold=i===0;const c=place(gold?'chest_gold':'chest',x,z,dyn,zoneObs,{s:.9,r:.8});chests.push({o:c,x,z,gold,open:false});break}}
 const packN=Math.round(13*(mod('pack')?1.4:1));let packs=0;for(let t=0;t<600&&packs<packN;t++){const x=rand(-46,46),z=rand(-32,34);if(Math.hypot(x,z-46)<15)continue;if(zoneObs.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+1.5))continue;
