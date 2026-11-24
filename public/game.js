@@ -1606,8 +1606,8 @@ const R=tr.getBoundingClientRect(),T=tl.getBoundingClientRect();
 if(T.top<R.bottom&&T.bottom>R.top&&T.right>R.left-8)tl.style.maxWidth=Math.max(120,R.left-T.left-10)+'px';
 if(bb.style.display!=='none'&&bb.offsetParent){const B=bb.getBoundingClientRect(),T2=tl.getBoundingClientRect();let push=0;
 for(const X of [R,T2])if(B.left<X.right&&B.right>X.left&&B.top<X.bottom&&B.bottom>X.top)push=Math.max(push,X.bottom+6-B.top);if(push>0)bb.style.marginTop=push+'px'}
-if(to.classList.contains('on')){const O=to.getBoundingClientRect();let push=0;const obs=[tl.getBoundingClientRect(),R,...[...document.querySelectorAll('#hud .trow')].map(e=>e.getBoundingClientRect()),$('zoneSub').getBoundingClientRect()];if($('coach')&&$('coach').classList.contains('on'))obs.push($('coach').getBoundingClientRect());if(bb.offsetParent)obs.push(bb.getBoundingClientRect());const ob=$('objTxt');if(ob&&ob.offsetParent)obs.push(ob.getBoundingClientRect());
-for(const X of obs)if(X.width&&O.left<X.right&&O.right>X.left&&O.top<X.bottom&&O.bottom>X.top)push=Math.max(push,X.bottom+8-O.top);if(push>0)to.style.marginTop=push+'px'}}
+if(to.classList.contains('on')){const O=to.getBoundingClientRect();let push=0;const obs=[tl.getBoundingClientRect(),R,...[...document.querySelectorAll('#hud .trow')].map(e=>e.getBoundingClientRect()),$('zoneSub').getBoundingClientRect()];if(bb.offsetParent)obs.push(bb.getBoundingClientRect());const ob=$('objTxt');if(ob&&ob.offsetParent)obs.push(ob.getBoundingClientRect());
+for(const X of obs)if(X.width&&O.left<X.right&&O.right>X.left&&O.top<X.bottom&&O.bottom>X.top)push=Math.max(push,X.bottom+8-O.top);if(push>0)to.style.marginTop=push+'px';const co=$('coach');if(co&&co.classList.contains('on')&&!co.classList.contains('hid')){const C=co.getBoundingClientRect(),O2=to.getBoundingClientRect();if(O2.bottom>C.top-4&&O2.top<C.bottom)to.style.visibility='hidden'}}}
 addEventListener('resize',()=>setTimeout(hudLayout,50));setInterval(hudLayout,700);
 
 function kfmt(n){n=Math.floor(n);if(n<10000)return String(n);if(n<1e6)return (n/1000).toFixed(n<1e5?1:0).replace('.0','')+'к';return (n/1e6).toFixed(1).replace('.0','')+'м'}
