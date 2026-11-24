@@ -1582,5 +1582,5 @@ for(const id of ['zoneName','zoneSub'])$(id).addEventListener('pointerdown',()=>
 
 function shareHero(){const C=CLASSES[P.cls];const url=location.origin+location.pathname;const a=ascSub();const txt=`Мой герой в «Землях Тлена»: ${C.n}${a?' ('+a.n+')':''}, уровень ${P.lvl}${P.abyssBest?', Бездна '+P.abyssBest:''}${(P.atlas||[]).length?', Атлас '+P.atlas.length+'/12':''}${P.pinK?', победил Пожирателя':''}. Сможешь лучше?`;
 try{if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData&&Telegram.WebApp.openTelegramLink){Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(txt));return}}catch(e){}
-if(navigator.share){navigator.share({title:'Земли Тлена',text:txt,url}).catch(()=>{});return}try{navigator.clipboard.writeText(txt+' '+url).then(()=>toast('Текст скопирован — отправь друзьям',2.5))}catch(e){toast(txt+' '+url,6)}}
+if(navigator.share){navigator.share({title:'Земли Тлена',text:txt,url}).catch(()=>{});return}try{navigator.clipboard.writeText(txt+' '+url).then(()=>toast('Текст скопирован — отправь друзьям',2.5),()=>toast(txt+' '+url,6))}catch(e){toast(txt+' '+url,6)}}
 $('chBody').addEventListener('click',e=>{if(e.target.closest('[data-share]'))shareHero()});
