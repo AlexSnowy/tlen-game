@@ -134,7 +134,13 @@ const n=add({id:`${cls}_${ri}_${k}`,x:Math.cos(ang)*rr,y:Math.sin(ang)*rr,t:isEn
 // мосты между соседними классами
 for(let i=0;i<4;i++){const a=order[i],b=order[(i+1)%4];const aa=(base[a]+(base[b]-base[a]+360)%360/2)*Math.PI/180;
 for(const[rr,k]of[[190,1],[290,3]]){const n=add({id:`br_${a}_${k}`,x:Math.cos(aa)*rr,y:Math.sin(aa)*rr,t:'small',cls:null,n:k===1?'Стойкость':'Мастерство',st:k===1?{hp:15,dmgP:4}:{dmgP:8,aspd:3}});
-link(n,TREE.nodes[`${a}_2_${k}`]);link(n,TREE.nodes[`${b}_0_${k}`])}}})();
+link(n,TREE.nodes[`${a}_2_${k}`]);link(n,TREE.nodes[`${b}_0_${k}`])}}
+// внешнее кольцо мастерства
+const RS=[{n:'Кольцо силы',st:{dmgP:6}},{n:'Кольцо жизни',st:{hpP:4}},{n:'Кольцо скорости',st:{aspd:3}},{n:'Кольцо стихий',st:{fireP:6,coldP:6,lightP:6}},{n:'Кольцо брони',st:{armorP:8}},{n:'Кольцо удачи',st:{rarity:5,crit:1}}];const ring=[];
+for(let i=0;i<24;i++){const a=(-90+i*15)*Math.PI/180;const big=i%6===3;const d=RS[i%6];ring.push(add({id:'ring_'+i,x:Math.cos(a)*362,y:Math.sin(a)*362,t:big?'notable':'small',cls:null,n:big?'Великое кольцо':d.n,st:big?{dmgP:12,hpP:6}:d.st}))}
+for(let i=0;i<24;i++)link(ring[i],ring[(i+1)%24]);
+for(const n of TREE.list.filter(n=>/_4$/.test(n.id))){let best=null,bd=1e9;for(const r of ring){const d=Math.hypot(r.x-n.x,r.y-n.y);if(d<bd){bd=d;best=r}}link(n,best)}
+})();
 function canAlloc(id){const n=TREE.nodes[id];if(!n||P.pas.includes(id))return false;return n.links.some(l=>P.pas.includes(l))}
 function canRefund(id){if(!P.pas.includes(id)||TREE.nodes[id].t==='start')return false;const rest=P.pas.filter(x=>x!==id);const start=P.cls+'_s';const seen=new Set([start]),q=[start];
 while(q.length){const c=q.pop();for(const l of TREE.nodes[c].links)if(rest.includes(l)&&!seen.has(l)){seen.add(l);q.push(l)}}return rest.every(x=>seen.has(x))}
@@ -665,7 +671,7 @@ const cls=P.cls;let lines='',nodes='';const done=new Set();
 for(const n of TREE.list)for(const l of n.links){const k=[n.id,l].sort().join('|');if(done.has(k))continue;done.add(k);const m=TREE.nodes[l];const on=P.pas.includes(n.id)&&P.pas.includes(l);lines+=`<line x1="${n.x}" y1="${n.y}" x2="${m.x}" y2="${m.y}" class="${on?'on':''}"/>`}
 for(const n of TREE.list){const on=P.pas.includes(n.id),av=canAlloc(n.id);const r=n.t==='start'?16:n.t==='key'?15:n.t==='notable'?12:7;const col=n.cls?CLASSES[n.cls].col:'#bbb';
 nodes+=`<g class="pn ${on?'on':''} ${av?'av':''} ${S.pasSel===n.id?'sel':''}" data-n="${n.id}"><circle cx="${n.x}" cy="${n.y}" r="${r+8}" fill="transparent"/>${n.t==='key'?`<circle cx="${n.x}" cy="${n.y}" r="${r+4}" class="kr" style="stroke:${col}"/>`:''}<circle cx="${n.x}" cy="${n.y}" r="${r}" class="nc" style="--c:${col}"/>${n.t==='start'?`<text x="${n.x}" y="${n.y+4}" text-anchor="middle">${n.n[0]}</text>`:''}</g>`}
-const tz=S.treeZ||1,sc0=$('tree').scrollLeft,st0=$('tree').scrollTop;$('tree').innerHTML=`<div class="tzb"><button data-tz="-1">−</button><span>${Math.round(tz*100)}%</span><button data-tz="1">+</button></div><svg viewBox="-360 -360 720 720" style="width:${tz*100}%;max-height:none">${lines}${nodes}</svg>`;$('tree').scrollLeft=sc0;$('tree').scrollTop=st0;
+const tz=S.treeZ||1,sc0=$('tree').scrollLeft,st0=$('tree').scrollTop;$('tree').innerHTML=`<div class="tzb"><button data-tz="-1">−</button><span>${Math.round(tz*100)}%</span><button data-tz="1">+</button></div><svg viewBox="-385 -385 770 770" style="width:${tz*100}%;max-height:none">${lines}${nodes}</svg>`;$('tree').scrollLeft=sc0;$('tree').scrollTop=st0;
 const n=S.pasSel&&TREE.nodes[S.pasSel];const box=$('pasInfo');if(!n){box.innerHTML='<p class="muted" style="margin:0">Нажми на узел дерева.</p>';return}
 const on=P.pas.includes(n.id);const st=Object.entries(n.st).filter(([k])=>k!=='bloodMagic').map(([k,v])=>`<li>${stLine(k,v)}</li>`).join('');const rc=20*P.lvl;
 box.innerHTML=`<h4>${n.n}</h4><div class="sub">${n.t==='key'?'Ключевой узел':n.t==='notable'?'Значимый узел':n.t==='start'?'Старт класса '+(n.cls?CLASSES[n.cls].n:''):'Узел'}${n.cls&&n.cls!==cls&&n.t!=='start'?' · ветка класса '+CLASSES[n.cls].n:''}</div>${n.d?`<p>${n.d}</p>`:''}<ul>${st}</ul><div class="acts">${!on&&canAlloc(n.id)?`<button class="ab" data-pa="add" ${P.ppts?'':'disabled'}>Изучить</button>`:''}${on&&canRefund(n.id)?`<button class="ab alt" data-pa="ref" ${P.gold>=rc?'':'disabled'}>Сбросить · ${rc} зол.</button>`:''}</div>`}
