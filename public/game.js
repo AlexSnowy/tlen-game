@@ -944,7 +944,7 @@ $xp.style.width=P.xp/need(P.lvl)*100+'%';$lv.textContent=CLASSES[P.cls].n+' · �
 const sb=$('skB'),pb=$('pasB');sb.textContent=P.spts;sb.classList.toggle('on',P.spts>0);pb.textContent=P.ppts;pb.classList.toggle('on',P.ppts>0);const z=S.mode==='zone';$('bTown').style.display=z?'block':'none';$('mini').style.display=z?'block':'none';
 for(let i=0;i<3;i++)$('s'+i).style.setProperty('--cd',H.cds[i]/((H.cdMax&&H.cdMax[i])||1));if(frameN%6===0)for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id];let lack=false;if(sk&&sk.mana&&sk.kind!=='aura'){const sp=supOf(id),c=Math.round(sk.mana*(1+.08*(skLvl(id)-1))*(sp?sp.mx:1));lack=ST.bloodMagic?H.hp<=c+1:H.mana<c}$('s'+i).classList.toggle('nomana',lack)}$('sDash').style.setProperty('--cd',H.dashCd/(H.dashMax||2.5));$('sFlask').style.setProperty('--cd',1-Math.min(1,H.flask));$('flaskN').textContent=Math.floor(H.flask);
 $('buffs').innerHTML=H.buffs.map(b=>`<span>${b.n} ${Math.ceil(b.t)}с</span>`).join('')+activeAuras().map(id=>`<span class="au">${SKILLS[id].n}</span>`).join('');
-const n=nearNpc(),ib=$('interact');ib.classList.toggle('on',!!n&&!S.paused);if(n)ib.textContent=(n.id==='portal'?'Открыть портал':n.id==='stash'?'Открыть хранилище':'Говорить: '+n.name)+(touch?'':' (Enter)');
+const n=nearNpc(),ib=$('interact');{const was=ib.classList.contains('on');ib.classList.toggle('on',!!n&&!S.paused);if(was!==ib.classList.contains('on'))coachLayout()}if(n)ib.textContent=(n.id==='portal'?'Открыть портал':n.id==='stash'?'Открыть хранилище':'Говорить: '+n.name)+(touch?'':' (Enter)');
 S.hurtV=Math.max(0,S.hurtV-dt*2.5);const low=H.hp/ST.hp<.3?.35+Math.sin(time*6)*.15:0;$('vig').style.opacity=Math.max(S.hurtV*.8,low);if(frameN%3===0)drawMini()}
 if(toastT>0){toastT-=dt;if(toastT<=0)$('toast').classList.remove('on')}
 composer.render();fitLabels();tutTick(dt)}
@@ -1056,7 +1056,7 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
-window.__dbg={updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
 const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
@@ -1605,7 +1605,7 @@ for(const it of items){const el=it.el;if((el._dx||0)!==it.dx){el._dx=it.dx;el.st
 addEventListener('resize',()=>hudT=0);
 
 /* раскладка HUD: заголовок зоны, полоса босса и подсказка не наезжают на кнопки */
-function hudLayout(){const tr=document.querySelector('#hud .trow'),tl=document.querySelector('#hud .tl'),bb=$('bossBar'),to=$('toast');if(!tr||!tl)return;
+function hudLayout(){coachLayout();const tr=document.querySelector('#hud .trow'),tl=document.querySelector('#hud .tl'),bb=$('bossBar'),to=$('toast');if(!tr||!tl)return;
 tl.style.maxWidth='';bb.style.marginTop='';to.style.marginTop='';to.style.visibility=(document.body.classList.contains('bn')||+getComputedStyle($('banner')).opacity>.05)?'hidden':'';
 const R=tr.getBoundingClientRect(),T=tl.getBoundingClientRect();
 if(T.top<R.bottom&&T.bottom>R.top&&T.right>R.left-8)tl.style.maxWidth=Math.max(120,R.left-T.left-10)+'px';
@@ -1648,11 +1648,11 @@ function tutPick(){const mode=S.mode;let best=null;for(const s of TUT){if(P.tut.
  const i=TUT.indexOf(s);if(!s.pri&&!s.when&&TUT.slice(0,i).some(q=>!q.pri&&!q.when&&!P.tut.includes(q.id)))continue;
  if(!best||(s.pri||0)>(best.pri||0))best=s}return best}
 function tutShow(s){document.querySelectorAll('.tutT').forEach(e=>e.classList.remove('tutT'));if(NPCS)for(const n of NPCS)n.el&&n.el.classList.remove('tutN');
- tutCur=s;const c=$('coach');if(!c)return;c.classList.toggle('on',!!s);if(!s){$('tutArr').style.display='none';return}if(s.info)tutInfoT=performance.now()+s.info*1000;tutDraw()}
+ tutCur=s;const c=$('coach');if(!c)return;c.classList.toggle('on',!!s);if(s)requestAnimationFrame(coachLayout);if(!s){$('tutArr').style.display='none';return}if(s.info)tutInfoT=performance.now()+s.info*1000;tutDraw()}
 function tutDraw(){const s=tutCur,c=$('coach');if(!s||!c)return;c.querySelector('b').textContent=s.t+(s.need?` · ${tutCnt} / ${s.need}`:'');c.querySelector('span').textContent=s.d();
  if(s.sel){const e=document.querySelector(s.sel);e&&e.classList.add('tutT')}if(s.npc){const n=NPCS.find(n=>n.id===s.npc);n&&n.el&&n.el.classList.add('tutN')}hudT=0}
 let tutAcc=0,tutMv=0,tutLP=null;
-function tutTick(dt){if(!P||!P.tut)return;if(!tutActive()){if(tutCur)tutShow(null);return}const blk=S.paused||!!document.querySelector('.panel.on,.ov.on');const cc=$('coach');if(cc)cc.classList.toggle('hid',blk);if(blk){$('tutArr').style.display='none';return}
+function tutTick(dt){if(!P||!P.tut)return;if(!$('coach'))tutInit();if(!tutActive()){if(tutCur)tutShow(null);return}const blk=S.paused||!!document.querySelector('.panel.on,.ov.on');const cc=$('coach');if(cc)cc.classList.toggle('hid',blk);if(blk){$('tutArr').style.display='none';return}
  tutAcc+=dt;if(tutCur&&tutCur.id==='move'&&H&&H.g){const p=H.g.position;if(tutLP){tutMv+=Math.hypot(p.x-tutLP.x,p.z-tutLP.z)}tutLP={x:p.x,z:p.z};if(tutMv>4)tutDone('move')}
  if(tutCur&&tutCur.info&&performance.now()>tutInfoT)tutDone(tutCur.id)
  if(tutAcc>.4){tutAcc=0;const n=tutPick();if(n!==tutCur&&!(tutCur&&tutCur.info&&performance.now()<tutInfoT&&!(n&&n.pri>(tutCur.pri||0))))tutShow(n);else if(tutCur&&tutCur.sel){const e=document.querySelector(tutCur.sel);e&&!e.classList.contains('tutT')&&e.classList.add('tutT')}}
@@ -1720,3 +1720,11 @@ function shortSk(n){return SKSHORT[n]||n}
 
 function fitSn(){document.querySelectorAll('#skills .sn').forEach(e=>{e.style.fontSize='';let f=parseFloat(getComputedStyle(e).fontSize);while(e.scrollWidth>e.clientWidth+1&&f>7){f-=.5;e.style.fontSize=f+'px'}})}
 addEventListener('resize',()=>setTimeout(fitSn,100));
+
+/* подсказка обучения не наезжает на кнопки, «Говорить…», шары и умения */
+function interactLayout(){const ib=$('interact');if(!ib||!ib.classList.contains('on'))return;ib.style.bottom='';const I=ib.getBoundingClientRect();let top=null;for(const e of document.querySelectorAll('#skills .sk,.globe')){const r=e.getBoundingClientRect();if(r.width<2)continue;if(I.left<r.right&&I.right>r.left&&I.top<r.bottom+6&&I.bottom>r.top-6)top=top===null?r.top:Math.min(top,r.top)}if(top!==null)ib.style.bottom=(innerHeight-top+8)+'px'}
+function coachLayout(){interactLayout();const c=$('coach');if(!c||!c.classList.contains('on'))return;c.style.bottom='';const obs=[];
+for(const e of document.querySelectorAll('#interact.on,#skills .sk,.globe,#lvlTxt,#partyHud,#buffs')){const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden')continue;const r=e.getBoundingClientRect();if(r.width>2&&r.height>2)obs.push(r)}
+for(let k=0;k<6;k++){const C=c.getBoundingClientRect();let top=null;for(const r of obs)if(C.left<r.right+6&&C.right>r.left-6&&C.top<r.bottom+8&&C.bottom>r.top-8)top=top===null?r.top:Math.min(top,r.top);if(top===null)break;
+c.style.bottom=Math.max(8,innerHeight-top+10)+'px'}}
+addEventListener('resize',()=>setTimeout(coachLayout,60));
