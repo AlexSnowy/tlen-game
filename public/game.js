@@ -537,13 +537,14 @@ if(S.mode==='town'){const d=Math.hypot(p.x,p.z);if(d>23){p.x*=23/d;p.z*=23/d}}el
 const K={},joy={id:null,ox:0,oy:0,dx:0,dy:0},mouse={down:false,id:null};
 const ray=new THREE.Raycaster(),gp=new THREE.Plane(new THREE.Vector3(0,1,0),0),ndc=new THREE.Vector2(),hitP=new THREE.Vector3();
 function groundAt(e){ndc.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(ndc,camera);return ray.ray.intersectPlane(gp,hitP)?hitP.clone():null}
-canvas.addEventListener('pointerdown',e=>{if(S.mode!=='town'&&S.mode!=='zone'||S.paused)return;initAudio();
+canvas.addEventListener('pointerdown',e=>{if(S.mode!=='town'&&S.mode!=='zone'||S.paused)return;initAudio();if(e.pointerType!=='mouse')TPT[e.pointerId]={x:e.clientX,y:e.clientY};
 if(e.pointerType==='mouse'){mouse.down=true;mouse.id=e.pointerId;const g=groundAt(e);if(g){H.target=g;H.pick=null;ringFx(g.x,g.z,.7,'#d8b56a',.3,.25)}}
-else if(joy.id===null){joy.id=e.pointerId;joy.ox=e.clientX;joy.oy=e.clientY;joy.dx=joy.dy=0;const j=$('joy');j.style.left=e.clientX+'px';j.style.top=e.clientY+'px';j.style.display='block';$('knob').style.transform=''}
+else if(joy.id!==null&&!PINCH&&TPT[joy.id]&&Math.hypot(joy.dx,joy.dy)<.3){const a=TPT[joy.id];PINCH={a:joy.id,b:e.pointerId,d0:Math.max(30,Math.hypot(e.clientX-a.x,e.clientY-a.y)),z0:CAMZT};joy.id=null;joy.dx=joy.dy=0;$('joy').style.display='none'}
+else if(joy.id===null&&!PINCH){joy.id=e.pointerId;joy.ox=e.clientX;joy.oy=e.clientY;joy.dx=joy.dy=0;const j=$('joy');j.style.left=e.clientX+'px';j.style.top=e.clientY+'px';j.style.display='block';$('knob').style.transform=''}
 try{canvas.setPointerCapture(e.pointerId)}catch(_){}});
-canvas.addEventListener('pointermove',e=>{if(mouse.down&&e.pointerId===mouse.id){const g=groundAt(e);if(g)H.target=g}
+canvas.addEventListener('pointermove',e=>{if(TPT[e.pointerId]){TPT[e.pointerId].x=e.clientX;TPT[e.pointerId].y=e.clientY}if(PINCH&&(e.pointerId===PINCH.a||e.pointerId===PINCH.b)){const A=TPT[PINCH.a],B=TPT[PINCH.b];if(A&&B){setZoom(PINCH.z0*PINCH.d0/Math.max(20,Math.hypot(A.x-B.x,A.y-B.y)))}return}if(mouse.down&&e.pointerId===mouse.id){const g=groundAt(e);if(g)H.target=g}
 if(e.pointerId===joy.id){let dx=e.clientX-joy.ox,dy=e.clientY-joy.oy;const l=Math.hypot(dx,dy);if(l>52){dx*=52/l;dy*=52/l}joy.dx=dx/52;joy.dy=dy/52;$('knob').style.transform=`translate(${dx}px,${dy}px)`}});
-const up=e=>{if(e.pointerId===mouse.id)mouse.down=false;if(e.pointerId===joy.id){joy.id=null;joy.dx=joy.dy=0;$('joy').style.display='none'}};
+const up=e=>{delete TPT[e.pointerId];if(PINCH&&(e.pointerId===PINCH.a||e.pointerId===PINCH.b)){PINCH=null;zoomSave()}if(e.pointerId===mouse.id)mouse.down=false;if(e.pointerId===joy.id){joy.id=null;joy.dx=joy.dy=0;$('joy').style.display='none'}};
 canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
 addEventListener('keydown',e=>{if(S.mode!=='town'&&S.mode!=='zone')return;if(e.target&&e.target.tagName==='INPUT'){if(e.code==='Escape')closePanels();return}K[e.code]=true;
 if(e.code==='Escape'){closePanels();return}if(e.code==='KeyI')togglePanel('inv');if(e.code==='KeyK')togglePanel('sk');if(e.code==='KeyP')togglePanel('pas');if(e.code==='KeyG')togglePanel('party');if(S.paused)return;
@@ -938,7 +939,7 @@ layoutLoot();
 if(OBJ)for(const e of OBJ.ents){if(e.done||!e.el||e.M)continue;const h=e.pick?2.4:e.defend?3.2:e.line?4.4:2.8;if(proj(cp.set(e.x,h,e.z),sp)&&Math.hypot(e.x-H.g.position.x,e.z-H.g.position.z)<32){e.el.style.display='block';e.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else e.el.style.display='none'}
 for(const n of NPCS){if(S.mode==='town'&&proj(cp.set(n.lx,n.ly,n.lz),sp)){n.el.style.display='block';n.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else n.el.style.display='none'}
 if(S.mode==='title'||S.mode==='load'){orbit+=dt*.06;camera.position.set(Math.cos(orbit)*22,9,Math.sin(orbit)*22);camera.lookAt(0,1.5,-4);sun.position.set(14,30,10);sun.target.position.set(0,0,0)}
-else{const p=H.g.position,port=camera.aspect<1?1.3:1;cp.set(p.x,15*port,p.z+13.5*port);camera.position.lerp(cp,1-Math.pow(.003,dt));camT.lerp(p,1-Math.pow(.003,dt));camera.lookAt(camT.x,camT.y+.8,camT.z);
+else{const p=H.g.position,port=camera.aspect<1?1.3:1;CAMZ+=(CAMZT-CAMZ)*(1-Math.pow(.0005,dt));const zz=CAMZ,hz=zz*(.5+.5*zz);cp.set(p.x,15*port*hz,p.z+13.5*port*zz);camera.position.lerp(cp,1-Math.pow(.003,dt));camT.lerp(p,1-Math.pow(.003,dt));camera.lookAt(camT.x,camT.y+.8+(1-zz)*.6,camT.z);
 if(S.shake>0){S.shake-=dt;const k=(typeof SET!=='undefined'&&!SET.shake)?0:S.shake*.9;camera.position.x+=rand(-k,k);camera.position.y+=rand(-k,k)*.6}sun.position.set(p.x+12,26,p.z+9);sun.target.position.set(p.x,0,p.z)}
 if(ST&&P&&S.mode!=='title'&&S.mode!=='load'){const mm=ST.mana*(1-ST.reserve);$hp.style.height=H.hp/ST.hp*100+'%';$hpT.textContent=Math.ceil(H.hp)+' / '+Math.round(ST.hp);$es.style.opacity=H.es>0?Math.min(1,H.es/(ST.hp*.3)):0;
 $mp.style.height=H.mana/Math.max(1,mm)*100*(1-ST.reserve)+'%';$mpT.textContent=Math.floor(H.mana)+' / '+Math.round(mm);
@@ -1059,7 +1060,7 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
-window.__dbg={brTick:dt=>breachTick(dt),get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={get zoom(){return CAMZT},gearDbg:()=>{const ms=H.c.meshes;const r={skin:skinOf(ms)&&skinOf(ms).getHexString()};for(const n in ms)if(ms[n].userData.pal)r[n]=ms[n].userData.pal.map(c=>c.getHexString()).join(',');return JSON.stringify(r)},setZoom:z=>{setZoom(z);CAMZ=CAMZT},brTick:dt=>breachTick(dt),get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
 const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
@@ -1534,7 +1535,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="vib" ${SET.vib?'checked':''}> Вибрация</label>
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
-<label><input type="checkbox" data-set="ny" ${nyOn()?'checked':''}> Новогоднее настроение — снег, украшения, шапки на монстрах</label> <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
+<label class="zrow">Приближение камеры <input type="range" min="0.42" max="1.3" step="0.02" value="${CAMZT}" data-zoom><small>колесо мыши или два пальца</small></label> <label><input type="checkbox" data-set="ny" ${nyOn()?'checked':''}> Новогоднее настроение — снег, украшения, шапки на монстрах</label> <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
 <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
 <label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
@@ -1922,5 +1923,43 @@ const GEAR_PART=[[/_(Hat|Helmet|Hood)$/,'helmet',.7],[/_Cape$/,'chest',.62],[/_B
 function gearTint(ms,gear){if(!ms||!gear)return;for(const n in ms){const m=ms[n];let part=null;for(const [re,slot,k] of GEAR_PART)if(re.test(n)){part=[slot,k];break}if(!part)continue;
  const it=gear[part[0]],rar=it?it[0]:-1,upg=it?it[1]:0,key=rar+':'+(upg>=10?2:upg>=6?1:0);if(m.userData.gk===key)continue;m.userData.gk=key;
  if(!m.userData.baseMat)m.userData.baseMat=m.material;if(rar<1){m.material=m.userData.baseMat;continue}
- const mat=m.userData.baseMat.clone();const c=new THREE.Color(GEAR_C[rar]);mat.color.lerp(c,part[1]);if(rar>=2){mat.metalness=Math.max(mat.metalness||0,rar===3?.65:.5);mat.roughness=Math.min(mat.roughness??1,.38)}
- const em=(upg>=10?.32:upg>=6?.16:0)+(rar===3?.12:0);if(em){mat.emissive=c.clone();mat.emissiveIntensity=em}m.material=mat}}
+ const dom=meshDomColor(m);if(!dom){m.material=m.userData.baseMat;continue}const D=[0,1,2].map(i=>dom[i]||dom[0]);
+ const mat=m.userData.baseMat.clone();const c=new THREE.Color(GEAR_C[rar]);const em=(upg>=10?.35:upg>=6?.18:0)+(rar===3?.12:0);
+ const U={uD0:{value:D[0]},uD1:{value:D[1]},uD2:{value:D[2]},uTint:{value:c},uK:{value:Math.min(.95,part[1]+.25)},uMet:{value:rar>=2?(rar===3?.7:.55):0},uRough:{value:rar>=2?.32:1},uEm:{value:em}};
+ mat.onBeforeCompile=sh=>{Object.assign(sh.uniforms,U);sh.fragmentShader='uniform vec3 uD0;uniform vec3 uD1;uniform vec3 uD2;uniform vec3 uTint;uniform float uK;uniform float uMet;uniform float uRough;uniform float uEm;float gMask=0.;\n'+sh.fragmentShader
+  .replace('#include <map_fragment>',`#include <map_fragment>
+  #ifdef USE_MAP
+   { vec3 tc=sampledDiffuseColor.rgb; float d0=distance(tc,uD0),d1=distance(tc,uD1),d2=distance(tc,uD2);vec3 dn=d0<d1?(d0<d2?uD0:uD2):(d1<d2?uD1:uD2);gMask=1.-smoothstep(.03,.09,min(d0,min(d1,d2)));
+     float lt=dot(tc,vec3(.299,.587,.114)),ld=max(dot(dn,vec3(.299,.587,.114)),.02);float mx=max(dot(uD0,vec3(.299,.587,.114)),max(dot(uD1,vec3(.299,.587,.114)),dot(uD2,vec3(.299,.587,.114))));ld=mix(ld,mx,.5);
+     vec3 tinted=uTint*clamp(lt/ld,.35,1.8)*.9; diffuseColor.rgb=mix(diffuseColor.rgb,tinted,uK*gMask); }
+  #endif`)
+  .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=mix(roughnessFactor,min(roughnessFactor,uRough),gMask);')
+  .replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\n metalnessFactor=mix(metalnessFactor,max(metalnessFactor,uMet),gMask);')
+  .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n totalEmissiveRadiance+=uTint*uEm*gMask;')};
+ mat.customProgramCacheKey=()=>'gearTint';m.material=mat}}
+/* основной цвет части модели — по пикселям текстуры под её развёрткой */
+const TEXPX=new Map();
+function texPixels(tex){if(!tex||!tex.image)return null;if(TEXPX.has(tex))return TEXPX.get(tex);let d=null;try{const im=tex.image,w=im.width,h=im.height;const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);d={w,h,px:x.getImageData(0,0,w,h).data,flip:tex.flipY}}catch(e){d=null}TEXPX.set(tex,d);return d}
+function meshDomColor(m){if(m.userData.dom!==undefined)return m.userData.dom;const mat=m.userData.baseMat||m.material;const T=texPixels(mat.map);const uv=m.geometry&&m.geometry.attributes.uv;if(!T||!uv){m.userData.dom=null;return null}
+ const B=new Map(),pos=m.geometry.attributes.position,idx=m.geometry.index,nt=idx?idx.count/3:pos.count/3,va=new THREE.Vector3(),vb=new THREE.Vector3(),vc=new THREE.Vector3();
+ for(let t=0;t<nt;t++){const i0=idx?idx.getX(t*3):t*3,i1=idx?idx.getX(t*3+1):t*3+1,i2=idx?idx.getX(t*3+2):t*3+2;va.fromBufferAttribute(pos,i0);vb.fromBufferAttribute(pos,i1);vc.fromBufferAttribute(pos,i2);const area=vb.sub(va).cross(vc.sub(va)).length()*.5;if(!(area>0))continue;
+  let u=((uv.getX(i0)+uv.getX(i1)+uv.getX(i2))/3)%1,v=((uv.getY(i0)+uv.getY(i1)+uv.getY(i2))/3)%1;if(u<0)u+=1;if(v<0)v+=1;const px=Math.min(T.w-1,Math.floor(u*T.w)),py=Math.min(T.h-1,Math.floor((T.flip?1-v:v)*T.h));const o=(py*T.w+px)*4;const r=T.px[o],gg=T.px[o+1],b=T.px[o+2];const k=(r>>4)<<8|(gg>>4)<<4|(b>>4);const e=B.get(k)||[0,0,0,0];e[0]+=r*area;e[1]+=gg*area;e[2]+=b*area;e[3]+=area;B.set(k,e)}
+ let tot=0;for(const e of B.values())tot+=e[3];const arr=[...B.values()].sort((a,b)=>b[3]-a[3]);const res=[];
+ for(const e of arr){if((res.length&&e[3]<tot*.16)||res.length>=3)break;const c=new THREE.Color().setRGB(e[0]/e[3]/255,e[1]/e[3]/255,e[2]/e[3]/255,THREE.SRGBColorSpace);if(isSkinC(c))continue;if(res.some(q=>Math.hypot(c.r-q.r,c.g-q.g,c.b-q.b)<.03))continue;res.push(c)}
+ m.userData.dom=res.length?res:null;return m.userData.dom}
+function palOf(m){if(m.userData.pal!==undefined)return m.userData.pal;const sk=m.userData.skin,dm=m.userData.dom;m.userData.skin=null;m.userData.dom=undefined;
+ const T=texPixels((m.userData.baseMat||m.material).map),uv=m.geometry&&m.geometry.attributes.uv;let res=[];if(T&&uv){const B=new Map();for(let i=0;i<uv.count;i++){let u=uv.getX(i)%1,v=uv.getY(i)%1;if(u<0)u+=1;if(v<0)v+=1;const o=(Math.min(T.h-1,Math.floor((T.flip?1-v:v)*T.h))*T.w+Math.min(T.w-1,Math.floor(u*T.w)))*4;const k=(T.px[o]>>4)<<8|(T.px[o+1]>>4)<<4|(T.px[o+2]>>4);const e=B.get(k)||[0,0,0,0];e[0]+=T.px[o];e[1]+=T.px[o+1];e[2]+=T.px[o+2];e[3]++;B.set(k,e)}
+  let tot=0;for(const e of B.values())tot+=e[3];for(const e of B.values())if(e[3]>=tot*.04)res.push(new THREE.Color().setRGB(e[0]/e[3]/255,e[1]/e[3]/255,e[2]/e[3]/255,THREE.SRGBColorSpace))}
+ m.userData.skin=sk;m.userData.dom=dm;m.userData.pal=res;return res}
+function skinOf(ms){if(ms.__skin!==undefined)return ms.__skin;let head=null,arm=null;for(const n in ms){if(/_Head$/.test(n))head=ms[n];if(/_ArmLeft$/.test(n))arm=ms[n]}let s=null;
+ if(head&&arm){const ph=palOf(head),pa=palOf(arm);for(const c of ph)if(pa.some(q=>Math.hypot(c.r-q.r,c.g-q.g,c.b-q.b)<.05)){s=c;break}}Object.defineProperty(ms,'__skin',{value:s,enumerable:false});return s}
+
+/* приближение камеры: колесо мыши, щипок двумя пальцами, ползунок в настройках */
+let CAMZ=1,CAMZT=1,PINCH=null;const TPT={};
+{const z=+((typeof SET!=='undefined'&&SET.zoom)||1);CAMZ=CAMZT=Math.min(1.3,Math.max(.42,z||1))}
+function setZoom(z){CAMZT=Math.min(1.3,Math.max(.42,z));const sl=document.querySelector('[data-zoom]');if(sl)sl.value=CAMZT}
+let zsT=0;function zoomSave(){clearTimeout(zsT);zsT=setTimeout(()=>{SET.zoom=+CAMZT.toFixed(2);setSave()},400)}
+canvas.addEventListener('wheel',e=>{if(S.mode!=='town'&&S.mode!=='zone')return;e.preventDefault();setZoom(CAMZT*(e.deltaY>0?1.1:1/1.1));zoomSave()},{passive:false});
+document.addEventListener('input',e=>{if(e.target.matches('[data-zoom]')){setZoom(+e.target.value);zoomSave()}});
+
+function isSkinC(c){const s=c.clone().convertLinearToSRGB();return s.r>.82&&s.g>.55&&s.g<.86&&s.b>.4&&s.b<.76&&s.r-s.b>.14&&s.r>=s.g&&s.g>=s.b}
