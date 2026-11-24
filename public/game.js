@@ -1627,6 +1627,8 @@ const TUT=[
  {id:'pas',pri:2,when:()=>P.ppts>0&&P.lvl>=2&&tutHas('sk'),t:'Пассивное дерево',d:()=>'Открой «Пассивы» и возьми узел рядом с началом — это постоянные бонусы.',sel:'#bPas'},
  {id:'obj',m:'zone',info:7,when:()=>tutHas('kill'),t:'Цель зоны',d:()=>'Слева сверху — задание. Выполни его, и откроется путь к Стражу в конце зоны.',sel:'#objTxt'},
  {id:'inv',info:7,when:()=>P.bag.length>=2,t:'Сумка',d:()=>'В «Сумке» надевай вещи: зелёная стрелка ▲ значит, что вещь лучше надетой.',sel:'#bInv'},
+ {id:'orb',late:1,m:'town',info:9,when:()=>tutHas('town')&&Object.values(P.orbs||{}).some(v=>v>0)&&P.bag.length>0,t:'Сферы',d:()=>'Сферы меняют свойства вещей. Открой «Сумку», выбери вещь и нажми на сферу внизу.',sel:'#bInv'},
+ {id:'atlas',late:1,m:'town',info:9,when:()=>P.maxZone>8,t:'Атлас Кошмара',d:()=>'Кампания пройдена. В портале открыт Атлас: карты с тирами и модами. Чем выше тир — тем богаче добыча.',npc:'portal'},
  {id:'town',m:'town',when:()=>tutHas('kill'),t:'Лагерь',d:()=>'Торговка Вера купит лишнее, Кузнец Гром заточит оружие. Подойди к любому из них.',npc:'merchant'}
 ];
 let tutCur=null,tutInfoT=0,tutCnt=0;
@@ -1636,7 +1638,7 @@ function tutInit(){if(!P.tut){P.tut=(P.lvl>3||P.maxZone>1)?['_off']:[]}if(!$('co
  const a=document.createElement('div');a.id='tutArr';a.textContent='➜';document.body.appendChild(a);
  $('coachX').onclick=e=>{e.stopPropagation();if($('coachX').dataset.arm){P.tut.push('_off');tutShow(null);save();toast('Обучение скрыто. Его можно вернуть в «Испытания» → Настройки.',3)}else{$('coachX').dataset.arm=1;$('coachX').textContent='Точно? Нажми ещё раз';setTimeout(()=>{const b=$('coachX');if(b){delete b.dataset.arm;b.textContent='Пропустить'}},2500)}}}}
 function tutEv(ev){if(!tutActive())return;const s=tutCur;if(!s||s.id!==ev&&!(s.id==='kill'&&ev==='kill'))return;if(s.need){tutCnt++;tutDraw();if(tutCnt<s.need)return}tutDone(s.id)}
-function tutDone(id){if(!P.tut.includes(id))P.tut.push(id);tutCnt=0;tutShow(null);haptic&&haptic('light');snd(880,.12,'sine',.06,1.5);if(!TUT.some(s=>!P.tut.includes(s.id))){setTimeout(()=>banner('Обучение пройдено','Дальше — сам. Удачи в Землях Тлена.'),400)}save()}
+function tutDone(id){if(!P.tut.includes(id))P.tut.push(id);tutCnt=0;tutShow(null);haptic&&haptic('light');snd(880,.12,'sine',.06,1.5);if(!TUT.find(x=>x.id===id).late&&!TUT.some(s=>!s.late&&!P.tut.includes(s.id))){setTimeout(()=>banner('Обучение пройдено','Дальше — сам. Удачи в Землях Тлена.'),400)}save()}
 function tutPick(){const mode=S.mode;let best=null;for(const s of TUT){if(P.tut.includes(s.id))continue;if(s.m&&s.m!==mode)continue;if(s.when&&!s.when())continue;
  // линейный порядок для основных шагов
  const i=TUT.indexOf(s);if(!s.pri&&!s.when&&TUT.slice(0,i).some(q=>!q.pri&&!q.when&&!P.tut.includes(q.id)))continue;
