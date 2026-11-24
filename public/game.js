@@ -1075,12 +1075,12 @@ h+=`<div class="deal"><div class="sum">Вещей: ${tr.length} · вы полу
 h+=`<div class="sect"><span>Сумка ${P.bag.length}/36</span><small style="text-transform:none;letter-spacing:0">▲ — лучше надетого</small></div><div class="bag">`;
 for(let i=0;i<36;i++){const it=P.bag[i];h+=it?tcell(it,{pr:price(it),up:isUpg(it),cls:T.tray.has(itId(it))?'intray':'',attr:`data-sb="${i}"`}):'<button class="cell" disabled style="cursor:default"></button>'}
 h+='</div>';const L=T.last!=null&&P.bag.find(it=>itId(it)===T.last);if(L)h+=detHTML(L)}
-else{h+=`<div class="sect"><span>Снаряжение</span><span style="text-transform:none;letter-spacing:0">цена × уровень зоны</span></div><div class="bag">`+
+else{const rc=rerollCost();h+=`<div class="sect"><span>Снаряжение</span><button class="chip" data-rr="1" ${P.gold<rc?'disabled':''}>Новые товары · ${rc} зол.</button></div><div class="bag">`+
 (S.shop.length?S.shop.map((it,i)=>{const pr=price(it)*4;return tcell(it,{pr,no:P.gold<pr,up:isUpg(it),cls:T.buySel===i?'sel':'',attr:`data-buy="${i}"`})}).join(''):'<div class="muted">Товар раскуплен — загляни после следующего похода.</div>')+'</div>';
 const B=T.buySel!=null&&S.shop[T.buySel];if(B){const pr=price(B)*4;h+=detHTML(B,`<button class="ab" data-a="buygo" ${P.gold<pr||P.bag.length>=36?'disabled':''}>Купить за ${pr} зол.</button>${P.bag.length>=36?'<span class="muted">Сумка полна</span>':''}`)}
 h+=divHTML();h+='<div class="sect"><span>Сферы</span></div>'+['trans','alt','aug'].map(k=>{const pr=orbPrice(k);return `<div class="orbrow">${uiI('orb:'+k,ORBS[k].c)}<div><b style="color:${ORBS[k].c}">${ORBS[k].n} <small style="display:inline;color:#a99f8f">· у вас ${P.orbs[k]||0}</small></b><small>${ORBS[k].d}</small></div><button class="ab" data-bo="${k}" ${P.gold<pr?'disabled':''}>${pr} зол.</button></div>`}).join('')}
 $('shBody').innerHTML=h}
-$('pShop').addEventListener('click',e=>{const dv=e.target.closest('[data-dv]');if(dv){const C=DIV.find(c=>c.id===dv.dataset.dv);if(C&&(P.cards[C.id]||0)>=C.need){P.cards[C.id]-=C.need;C.f();toast('Обмен: '+C.rw,3);chime([523,659,784,1047,1319],.1);haptic('ok');save();renderShop()}return}const b=e.target.closest('[data-tab],[data-sb],[data-tr],[data-q],[data-a],[data-buy],[data-bo]');if(!b)return;const d=b.dataset;
+$('pShop').addEventListener('click',e=>{if(e.target.closest('[data-rr]')){const c=rerollCost();if(P.gold>=c){P.gold-=c;rollShop();T.buySel=null;snd(900,.08,'triangle',.06);save();renderShop()}return}const dv=e.target.closest('[data-dv]');if(dv){const C=DIV.find(c=>c.id===dv.dataset.dv);if(C&&(P.cards[C.id]||0)>=C.need){P.cards[C.id]-=C.need;C.f();toast('Обмен: '+C.rw,3);chime([523,659,784,1047,1319],.1);haptic('ok');save();renderShop()}return}const b=e.target.closest('[data-tab],[data-sb],[data-tr],[data-q],[data-a],[data-buy],[data-bo]');if(!b)return;const d=b.dataset;
 if(d.tab){T.tab=d.tab;T.buySel=null}
 else if(d.sb!==undefined){const it=P.bag[+d.sb];if(!it)return;const id=itId(it);T.tray.has(id)?T.tray.delete(id):T.tray.add(id);T.last=id;snd(900,.04,'square',.03)}
 else if(d.tr!==undefined){T.tray.delete(+d.tr);T.last=+d.tr}
@@ -1584,3 +1584,5 @@ function shareHero(){const C=CLASSES[P.cls];const url=location.origin+location.p
 try{if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData&&Telegram.WebApp.openTelegramLink){Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(txt));return}}catch(e){}
 if(navigator.share){navigator.share({title:'Земли Тлена',text:txt,url}).catch(()=>{});return}try{navigator.clipboard.writeText(txt+' '+url).then(()=>toast('Текст скопирован — отправь друзьям',2.5),()=>toast(txt+' '+url,6))}catch(e){toast(txt+' '+url,6)}}
 $('chBody').addEventListener('click',e=>{if(e.target.closest('[data-share]'))shareHero()});
+
+const rerollCost=()=>Math.round(20*Math.max(1,P.maxZone>8?8+(P.maxMap||1):P.maxZone));
