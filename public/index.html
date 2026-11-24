@@ -28,7 +28,7 @@ kbd{font:500 10px Rubik,sans-serif;opacity:.6;margin-left:4px}
 .trow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .hb{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 11px;min-height:38px;cursor:pointer;position:relative;font-size:14px}
 .hb:hover{border-color:var(--gold)}
-.gold{font-weight:700;color:var(--gold);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-variant-numeric:tabular-nums}
+.gold{white-space:nowrap;font-weight:700;color:var(--gold);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-variant-numeric:tabular-nums}
 .badge{position:absolute;top:-6px;right:-6px;background:#c2352b;color:#fff;border-radius:999px;font:700 11px Rubik;min-width:18px;height:18px;display:none;place-items:center;padding:0 4px}
 .badge.on{display:grid}
 #mini{width:140px;height:140px;border-radius:50%;border:2px solid var(--line);background:rgba(10,10,12,.55)}
@@ -102,7 +102,7 @@ kbd{font:500 10px Rubik,sans-serif;opacity:.6;margin-left:4px}
 .detail{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:90px;background:rgba(0,0,0,.3)}
 .detail h4{margin:0;font:700 18px Philosopher,serif}.detail .sub{font-size:12.5px;opacity:.65;margin-bottom:6px}
 .detail ul{margin:6px 0;padding:0;list-style:none;font-size:14px}.detail li{padding:1px 0}.detail li.aff{color:#a9b8ff}
-.cmp{font-size:13px;margin-top:6px}.up{color:#7dff9a}.down{color:#ff7a6a}
+.cmp{font-size:13px;margin-top:6px}.up{color:#7dff9a}.cmp span{display:inline-block;white-space:nowrap}.down{color:#ff7a6a}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ab{background:var(--gold);color:#1a1206;border:0;border-radius:9px;padding:10px 14px;font:600 14px Rubik;cursor:pointer;min-height:42px}
 .ab.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
@@ -319,6 +319,9 @@ body.bn #toast{opacity:0!important}
 .tset{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 10px 12px}.btn.sm{padding:7px 12px!important;font-size:13px!important}
 .credit{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));font-size:9.5px!important;color:#6f665a!important;margin:0!important;line-height:1.3;text-align:center;padding:0 12px;pointer-events:none}
 #ovTitle{background:radial-gradient(ellipse at 50% 45%,rgba(8,7,10,.72),rgba(8,7,10,.35) 70%)}
+@media (max-height:500px){.credit{position:static!important;margin-top:10px!important}}
+@media (max-height:500px){#banner{top:28%}body.bn #hud .tl,body.bn #hud .trow{opacity:.15;transition:opacity .4s}#banner b{font-size:28px}#banner small{font-size:12px}body.bn #bossBar{opacity:0}}
+#bossBar{transition:opacity .4s}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>

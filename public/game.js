@@ -297,7 +297,7 @@ const pv=new THREE.Vector3();function proj(p,out){pv.copy(p).project(camera);out
 const sp={x:0,y:0};
 function updNums(dt){for(const n of nums){if(!n.on)continue;n.t+=dt;n.p.y+=dt*(2.2-n.t*2);n.p.x+=n.vx*dt;if(n.t>1||!proj(n.p,sp)){n.on=false;n.el.style.display='none';continue}
 const s=n.t<.12?.6+n.t/.12*.7:1.3-Math.min(.3,(n.t-.12)*1.2);n.el.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-50%) scale(${s})`;n.el.style.opacity=1-Math.max(0,n.t-.6)*2.5}}
-let toastT=0;function toast(t,d=3){const e=$('toast');e.textContent=t;e.classList.add('on');toastT=d}
+let toastT=0;function toast(t,d=3){const e=$('toast');e.textContent=t;e.classList.add('on');toastT=d;hudT=0;hudLayout()}
 let AC=null,master;
 function initAudio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=(typeof SET!=='undefined'?SET.vol:.4);master.connect(AC.destination)}catch(e){AC=null}}
 function snd(f,d,type='sine',v=.15,sl=0){if(!AC)return;try{const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*sl),t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(master);o.start(t);o.stop(t+d+.05)}catch(e){}}
@@ -937,14 +937,14 @@ else{const p=H.g.position,port=camera.aspect<1?1.3:1;cp.set(p.x,15*port,p.z+13.5
 if(S.shake>0){S.shake-=dt;const k=(typeof SET!=='undefined'&&!SET.shake)?0:S.shake*.9;camera.position.x+=rand(-k,k);camera.position.y+=rand(-k,k)*.6}sun.position.set(p.x+12,26,p.z+9);sun.target.position.set(p.x,0,p.z)}
 if(ST&&P&&S.mode!=='title'&&S.mode!=='load'){const mm=ST.mana*(1-ST.reserve);$hp.style.height=H.hp/ST.hp*100+'%';$hpT.textContent=Math.ceil(H.hp)+' / '+Math.round(ST.hp);$es.style.opacity=H.es>0?Math.min(1,H.es/(ST.hp*.3)):0;
 $mp.style.height=H.mana/Math.max(1,mm)*100*(1-ST.reserve)+'%';$mpT.textContent=Math.floor(H.mana)+' / '+Math.round(mm);
-$xp.style.width=P.xp/need(P.lvl)*100+'%';$lv.textContent=CLASSES[P.cls].n+' · уровень '+P.lvl+' · '+Math.floor(P.xp)+' / '+need(P.lvl)+' опыта';$gold.textContent=P.gold+' зол.';
+$xp.style.width=P.xp/need(P.lvl)*100+'%';$lv.textContent=CLASSES[P.cls].n+' · уровень '+P.lvl+' · '+Math.floor(P.xp)+' / '+need(P.lvl)+' опыта';$gold.textContent=kfmt(P.gold);
 const sb=$('skB'),pb=$('pasB');sb.textContent=P.spts;sb.classList.toggle('on',P.spts>0);pb.textContent=P.ppts;pb.classList.toggle('on',P.ppts>0);const z=S.mode==='zone';$('bTown').style.display=z?'block':'none';$('mini').style.display=z?'block':'none';
 for(let i=0;i<3;i++)$('s'+i).style.setProperty('--cd',H.cds[i]/((H.cdMax&&H.cdMax[i])||1));if(frameN%6===0)for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id];let lack=false;if(sk&&sk.mana&&sk.kind!=='aura'){const sp=supOf(id),c=Math.round(sk.mana*(1+.08*(skLvl(id)-1))*(sp?sp.mx:1));lack=ST.bloodMagic?H.hp<=c+1:H.mana<c}$('s'+i).classList.toggle('nomana',lack)}$('sDash').style.setProperty('--cd',H.dashCd/(H.dashMax||2.5));$('sFlask').style.setProperty('--cd',1-Math.min(1,H.flask));$('flaskN').textContent=Math.floor(H.flask);
 $('buffs').innerHTML=H.buffs.map(b=>`<span>${b.n} ${Math.ceil(b.t)}с</span>`).join('')+activeAuras().map(id=>`<span class="au">${SKILLS[id].n}</span>`).join('');
 const n=nearNpc(),ib=$('interact');ib.classList.toggle('on',!!n&&!S.paused);if(n)ib.textContent=(n.id==='portal'?'Открыть портал':n.id==='stash'?'Открыть хранилище':'Говорить: '+n.name)+(touch?'':' (Enter)');
 S.hurtV=Math.max(0,S.hurtV-dt*2.5);const low=H.hp/ST.hp<.3?.35+Math.sin(time*6)*.15:0;$('vig').style.opacity=Math.max(S.hurtV*.8,low);if(frameN%3===0)drawMini()}
 if(toastT>0){toastT-=dt;if(toastT<=0)$('toast').classList.remove('on')}
-composer.render()}
+composer.render();fitLabels()}
 
 /* ================= NETWORK (кооператив) ================= */
 const NET={ws:null,id:null,room:null,host:true,on:false,peers:{},sendT:0,snapT:0,name:'',pendingJoin:null,leaderZone:null,syncWait:false};
@@ -1274,7 +1274,7 @@ const n=3+Math.floor(R.k/12);for(let i=0;i<n;i++)dropItem(p,genItem(L+1,i<2?2:1,
 for(let i=0;i<70;i++){const a=rand(0,6.28),v=rand(2,8);emit(R.x,1,R.z,Math.cos(a)*v,rand(2,6),Math.sin(a)*v,rand(.8,1.4),rand(.12,.22),.8,.4,1,4,1)}
 toast('Разлом закрыт! Убито тварей: '+R.k+'. Забирай сокровища.',3.5);chime([440,554,659,880],.12);csAdd('rift')}}}
 
-function banner(t,sub,kind){const b=$('banner');b.className='on '+(kind||'');document.body.classList.add('bn');clearTimeout(banner.u);banner.u=setTimeout(()=>document.body.classList.remove('bn'),kind==='boss'?3800:3000);b.innerHTML=`<i></i><b>${esc(t)}</b><small>${esc(sub||'')}</small><i></i>`;clearTimeout(banner.t);banner.t=setTimeout(()=>b.className=kind||'',kind==='boss'?3600:2800)}
+function banner(t,sub,kind){const b=$('banner');b.className='on '+(kind||'');document.body.classList.add('bn');clearTimeout(banner.u);banner.u=setTimeout(()=>document.body.classList.remove('bn'),kind==='boss'?4400:3500);b.innerHTML=`<i></i><b>${esc(t)}</b><small>${esc(sub||'')}</small><i></i>`;clearTimeout(banner.t);banner.t=setTimeout(()=>b.className=kind||'',kind==='boss'?3600:2800)}
 
 /* ================= МУЗЫКА (процедурный эмбиент) ================= */
 let MUS=null,musOn=(()=>{try{return localStorage.getItem('tlen_mus')!=='0'}catch(e){return true}})();
@@ -1586,3 +1586,27 @@ if(navigator.share){navigator.share({title:'Земли Тлена',text:txt,url}
 $('chBody').addEventListener('click',e=>{if(e.target.closest('[data-share]'))shareHero()});
 
 const rerollCost=()=>Math.round(20*Math.max(1,P.maxZone>8?8+(P.maxMap||1):P.maxZone));
+
+/* мировые подписи не залезают под интерфейс и за край экрана */
+let HUDR=[],hudT=0;
+function hudRects(){HUDR=[];for(const el of document.querySelectorAll('#hud .trow .hb,#hud .gold,#hud .tl,#hud .tl *,#banner b,#banner small,#zoneName,#zoneSub,#objTxt,#mini,#skills .sk,.globe,#bossBar,#toast,#partyHud,#buffs,#bPing,#banner.on b,#feed .fd,#interact,#lvlTxt')){const cs=getComputedStyle(el);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)continue;if(el.closest('[style*="display: none"],[style*="display:none"]'))continue;const r=el.getBoundingClientRect();if(r.width<2||r.height<2)continue;HUDR.push({l:r.left-3,t:r.top-3,r:r.right+3,b:r.bottom+3})}}
+function fitLabels(){const now=performance.now();if(now-hudT>(document.body.classList.contains('bn')||$('toast').style.visibility?120:500)){hudT=now;hudLayout();hudRects()}const vw=innerWidth;
+const placed=[];for(const host of [$('npcl'),$('labels'),$('nums')]){if(!host)continue;for(const el of host.children){if(el.style.display==='none')continue;el.style.marginLeft='0px';const r=el.getBoundingClientRect();if(r.width<1)continue;
+let dx=0;if(r.left<6)dx=6-r.left;else if(r.right>vw-6)dx=vw-6-r.right;if(dx)el.style.marginLeft=dx+'px';
+const L=r.left+dx,R=r.right+dx;let hit=false;for(const h of HUDR)if(L<h.r&&R>h.l&&r.top<h.b&&r.bottom>h.t){hit=true;break}
+if(!hit&&host!==$('nums'))for(const q of placed)if(L<q.r&&R>q.l&&r.top<q.b&&r.bottom>q.t){hit=true;break}
+if(!hit&&host!==$('nums'))placed.push({l:L-2,r:R+2,t:r.top-2,b:r.bottom+2});el.style.visibility=hit?'hidden':''}}}
+addEventListener('resize',()=>hudT=0);
+
+/* раскладка HUD: заголовок зоны, полоса босса и подсказка не наезжают на кнопки */
+function hudLayout(){const tr=document.querySelector('#hud .trow'),tl=document.querySelector('#hud .tl'),bb=$('bossBar'),to=$('toast');if(!tr||!tl)return;
+tl.style.maxWidth='';bb.style.marginTop='';to.style.marginTop='';to.style.visibility=(document.body.classList.contains('bn')||+getComputedStyle($('banner')).opacity>.05)?'hidden':'';
+const R=tr.getBoundingClientRect(),T=tl.getBoundingClientRect();
+if(T.top<R.bottom&&T.bottom>R.top&&T.right>R.left-8)tl.style.maxWidth=Math.max(120,R.left-T.left-10)+'px';
+if(bb.style.display!=='none'&&bb.offsetParent){const B=bb.getBoundingClientRect(),T2=tl.getBoundingClientRect();let push=0;
+for(const X of [R,T2])if(B.left<X.right&&B.right>X.left&&B.top<X.bottom&&B.bottom>X.top)push=Math.max(push,X.bottom+6-B.top);if(push>0)bb.style.marginTop=push+'px'}
+if(to.classList.contains('on')){const O=to.getBoundingClientRect();let push=0;const obs=[tl.getBoundingClientRect(),R,$('zoneSub').getBoundingClientRect()];if(bb.offsetParent)obs.push(bb.getBoundingClientRect());const ob=$('objTxt');if(ob&&ob.offsetParent)obs.push(ob.getBoundingClientRect());
+for(const X of obs)if(X.width&&O.left<X.right&&O.right>X.left&&O.top<X.bottom&&O.bottom>X.top)push=Math.max(push,X.bottom+8-O.top);if(push>0)to.style.marginTop=push+'px'}}
+addEventListener('resize',()=>setTimeout(hudLayout,50));setInterval(hudLayout,700);
+
+function kfmt(n){n=Math.floor(n);if(n<10000)return String(n);if(n<1e6)return (n/1000).toFixed(n<1e5?1:0).replace('.0','')+'к';return (n/1e6).toFixed(1).replace('.0','')+'м'}
