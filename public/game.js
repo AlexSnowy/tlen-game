@@ -1488,3 +1488,7 @@ $('chBody').addEventListener('click',e=>{const b=e.target.closest('[data-lbs]');
 
 /* долгое нажатие на кнопку умения — описание */
 for(let i=0;i<3;i++){const b=$('s'+i);let tm=null;b.addEventListener('pointerdown',()=>{clearTimeout(tm);tm=setTimeout(()=>{const id=P&&P.slots[i],sk=id&&SKILLS[id];if(!sk)return;const L=(P.links&&P.links[id]||[]).filter(Boolean).map(k=>SUPP[k].n);toast(`${sk.n} (ур. ${skLvl(id)}): ${sk.d} ${skNums(id,Math.max(1,skLvl(id))).replace(/<[^>]+>/g,'')}${L.length?' · Камни: '+L.join(', '):''}`,4.5)},550)});for(const ev of ['pointerup','pointercancel','pointerleave'])b.addEventListener(ev,()=>clearTimeout(tm))}
+
+/* мягкий круг света под героем */
+{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,230,190,.55)');g.addColorStop(.5,'rgba(255,210,150,.18)');g.addColorStop(1,'rgba(255,200,140,0)');x.fillStyle=g;x.fillRect(0,0,128,128);
+const m=new THREE.Mesh(new THREE.PlaneGeometry(9,9).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.38}));m.position.y=.04;m.renderOrder=1;H.g.add(m);H.glow=m}
