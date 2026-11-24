@@ -22,6 +22,21 @@ body.bn #coach{opacity:0!important}
 .sn.sm{font-size:8.5px!important;letter-spacing:-.1px}
 #objTxt b,.lbt b,.num,#hpTxt,#mpTxt,.badge{white-space:nowrap}
 @media (max-width:600px){body.bn #objTxt,body.bn #mini{opacity:0;transition:opacity .4s}}
+.lfpre{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px}
+.lfp{background:rgba(255,255,255,.04);border:1px solid #4a3d2c;border-radius:10px;padding:8px 9px;text-align:left;color:#e6dccb;cursor:pointer;font:inherit}
+.lfp b{display:block;font:600 13px Rubik,system-ui,sans-serif;color:#ffd98a}.lfp small{display:block;font-size:11px;line-height:1.3;color:#a99a80;margin-top:2px}
+.lfp.on{border-color:#e0b562;background:rgba(224,181,98,.14);box-shadow:inset 0 0 0 1px #e0b562}
+.lfrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.lfn{font:600 13px Rubik,system-ui,sans-serif;flex:none;min-width:86px}
+.seg{display:flex;border:1px solid #4a3d2c;border-radius:8px;overflow:hidden;flex:none}
+.seg button{background:none;border:0;border-left:1px solid #4a3d2c;color:#bfb29b;font:500 12px Rubik,system-ui,sans-serif;padding:6px 9px;cursor:pointer;white-space:nowrap}
+.seg button:first-child{border-left:0}.seg button.on{background:rgba(224,181,98,.2);color:#ffe2a6}.seg button:disabled{cursor:default}
+.lfchk{display:flex!important;gap:9px;align-items:flex-start;margin:10px 0 2px;font-size:13px;line-height:1.4;cursor:pointer}.lfchk input{flex:none;width:17px;height:17px;margin:1px 0 0;accent-color:#c9a25a}
+.lfsl{display:flex;flex-wrap:wrap;gap:6px}
+.lfsl button{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.03);border:1px solid #3e3426;border-radius:999px;color:#7d715f;font:500 12px Rubik,system-ui,sans-serif;padding:5px 10px;cursor:pointer;text-decoration:line-through}
+.lfsl button.on{color:#e6dccb;border-color:#8a6a36;text-decoration:none}.lfsl svg.gi{width:14px;height:14px}
+.loot.man{border-style:dashed;opacity:.92}
+@media (max-width:520px){.lfrow{flex-direction:column;align-items:stretch;gap:5px}.seg{width:100%}.seg button{flex:1;padding:7px 4px}}
 </style>
 <link rel="preload" href="fonts/rubik-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -419,6 +434,10 @@ body.bn #toast{opacity:0!important}
 <div class="panel" id="pStash"><div class="pw tw">
   <header><div><h3>Хранилище</h3><p>Общий сундук: вещи в нём доступны всем вашим героям.</p></div><span class="gpill" id="stGold"></span><button class="x" data-close>×</button></header>
   <div id="stBody"></div>
+</div></div>
+<div class="panel" id="pLF"><div class="pw tw" style="max-width:560px">
+  <header><div><h3>Фильтр добычи</h3><p>Что показывать на земле и что подбирать само.</p></div><button class="x" data-close>×</button></header>
+  <div id="lfBody"></div>
 </div></div>
 <div class="panel" id="pCh"><div class="pw tw" style="max-width:620px">
   <header><div><h3>Испытания</h3><p>Задания, награды и справочник по игре.</p></div><button class="x" data-close>×</button></header>

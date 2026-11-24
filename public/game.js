@@ -504,8 +504,8 @@ const gemG=new THREE.OctahedronGeometry(.22,0),orbG=new THREE.SphereGeometry(.18
 const RCH=['#d6d2c8','#8ea2ff','#ffe36b','#d8782e'],RN=['Обычный','Магический','Редкий','Уникальный'];
 function lootObj(p,el,o){const x=p.x+rand(-1.8,1.8),z=p.z+rand(-1.8,1.8),g=new THREE.Group();g.position.set(p.x,1,p.z);dyn.add(g);$('labels').appendChild(el);el.style.display='none';
 const l=Object.assign({g,el,pos:g.position,fly:{t:0,sx:p.x,sz:p.z,tx:x,tz:z}},o);el.onclick=()=>{H.target=new THREE.Vector3(l.fly.tx,0,l.fly.tz);H.pick=l};loot.push(l);return l}
-function dropItem(p,it){const up=P&&isUpg(it);if(P&&!up&&((P.lf>=1&&it.rar===0)||(P.lf>=2&&it.rar===1))){return dropGold(p,Math.max(1,Math.round(price(it)*.6)))}
-const el=document.createElement('div');el.className='loot t'+it.rar;el.style.color=RCH[it.rar];el.innerHTML=(up?'<b class="lup">▲</b>':'')+itIcon(it)+esc(it.name)+(it.upg?' +'+it.upg:'');const l=lootObj(p,el,{it,hi:it.rar>=2||up});
+function dropItem(p,it){const up=P&&isUpg(it);const lv=P?lfVerdict(it):2;if(lv===0){const gg=Math.max(1,Math.round(price(it)*.6));lfStat.n++;lfStat.g+=gg;return dropGold(p,gg)}
+const el=document.createElement('div');el.className='loot t'+it.rar;el.style.color=RCH[it.rar];el.innerHTML=(up?'<b class="lup">▲</b>':'')+itIcon(it)+esc(it.name)+(it.upg?' +'+it.upg:'');const l=lootObj(p,el,{it,hi:it.rar>=2||up,auto:lv===2});if(lv===1)el.classList.add('man');
 const col=new THREE.Color(RCH[it.rar]);const gem=new THREE.Mesh(gemG,new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:it.rar>=2?2.5:1.2,roughness:.3,metalness:.3}));gem.position.y=.35;l.g.add(gem);l.gem=gem;
 if(it.rar>=2){const b=new THREE.Mesh(new THREE.CylinderGeometry(.18,.45,9,12,1,true),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2),map:beamTex,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));b.position.y=4.5;b.scale.y=.01;l.g.add(b);l.beam=b}
 if(it.rar===3){haptic('ok');chime([523,784,1047,1568],.11);l.beam&&(l.beam.scale.x=l.beam.scale.z=1.6)}else if(it.rar===2)chime([660,990],.08)}
@@ -564,7 +564,7 @@ const RC=RCH;
 function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass','ovStory','ovDlg'].some(x=>$(x).classList.contains('on'))}
 function closePanels(){lobbyClose();for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith','pStash','pCh'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(w==='sk'||w==='pas'||w==='inv')tutEv(w);if(w==='shop'||w==='smith')tutEv('town');if(w==='portal')tutEv('portal');if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
-({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');$('pShop').querySelector('header p').textContent=npcQuote('merchant');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');$('pSmith').querySelector('header p').textContent=npcQuote('smith');T.res=null;renderSmith()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
+({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');$('pShop').querySelector('header p').textContent=npcQuote('merchant');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');$('pSmith').querySelector('header p').textContent=npcQuote('smith');T.res=null;renderSmith()},lf:()=>{$('pLF').classList.add('on');renderLF()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closePanels);
 document.querySelectorAll('.panel').forEach(p=>p.addEventListener('pointerdown',e=>{if(e.target===p)closePanels()}));
 const ICO={weapon:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',wand:'<path d="M5 20L15.5 9.5"/><circle cx="17.5" cy="6.5" r="3.2"/>',staff:'<path d="M6 21L18 4"/><circle cx="18" cy="4.5" r="2.5"/><path d="M14 6l3 3"/>',
@@ -593,7 +593,7 @@ return `<div class="dslot ${sel?'sel':''} ${blocked?'blk':''}" data-eq="${s}" st
 const s=ST;$('statList').innerHTML=[['Урон',Math.round(s.min)+'–'+Math.round(s.max)],['Урон в сек. (атака)',fmt(s.dps,0)],['Скорость атак',fmt(s.aps,0)+'/с'],['Шанс крита',fmt(s.crit,0)+'%'],['Крит. урон',Math.round(s.critM)+'%'],['Здоровье',Math.round(s.hp)],['Мана',Math.round(s.mana)+(s.reserve?` (резерв ${Math.round(s.reserve*100)}%)`:'')],['Броня',Math.round(s.armor)],
 ['Огонь / Холод / Молния',`+${Math.round(s.fireP+s.dmgP)}% / +${Math.round(s.coldP+s.dmgP)}% / +${Math.round(s.lightP+s.dmgP)}%`],['Физ. / Яд / Свет',`+${Math.round(s.physP+s.dmgP)}% / +${Math.round(s.chaosP+s.dmgP)}% / +${Math.round(s.holyP+s.dmgP)}%`],['Регенерация',fmt(s.regen,0)+'/с'],['Вампиризм',fmt(s.leech,0)+'%'],['Скорость бега',(s.move>=0?'+':'')+Math.round(s.move)+'%'],['Редкость добычи','+'+Math.round(s.rarity)+'%']].map(x=>`<dt>${x[0]}</dt><dd>${x[1]}</dd>`).join('');
 $('orbBar').innerHTML=ORB_K.map(k=>`<span class="orb" title="${ORBS[k].n}: ${ORBS[k].d}" style="--c:${ORBS[k].c}">${uiI('orb:'+k,ORBS[k].c)}${P.orbs[k]||0}</span>`).join('');
-$('bagCount').textContent='Сумка '+P.bag.length+'/36 · '+P.gold+' зол.';$('lfBtn').textContent='Фильтр добычи: '+['все вещи','без обычных','только редкие'][P.lf|0];$('sellAll').style.display=ctx==='merchant'?'':'none';$('sellEvery').style.display=ctx==='merchant'?'':'none';
+$('bagCount').textContent='Сумка '+P.bag.length+'/36 · '+P.gold+' зол.';$('lfBtn').textContent=lfLabel();$('sellAll').style.display=ctx==='merchant'?'':'none';$('sellEvery').style.display=ctx==='merchant'?'':'none';
 let shop='';if(ctx==='merchant'){shop='<div class="shop"><b>Товары торговки</b><div class="bag">'+S.shop.map((it,i)=>cellHTML(it,S.sel&&S.sel.w==='shop'&&S.sel.k===i?'sel':'',`data-shop="${i}"`)).join('')+'</div><div class="acts">'+
 ['trans','alt','aug'].map(k=>`<button class="ab alt" data-buyorb="${k}">${uiI('orb:'+k,ORBS[k].c,'width:18px;height:18px;vertical-align:-4px;margin-right:6px')}${ORBS[k].n} · ${orbPrice(k)} зол.</button>`).join('')+'</div></div>'}$('shopBox').innerHTML=shop;
 let cells='';for(let i=0;i<36;i++){const it=P.bag[i];const sel=S.sel&&S.sel.w==='bag'&&S.sel.k===i;cells+=it?cellHTML(it,sel?'sel':'',`data-bag="${i}"`):'<button class="cell" disabled style="cursor:default"></button>'}$('bag').innerHTML=cells;
@@ -607,7 +607,7 @@ if(!ctx&&w==='bag')acts+=`<button class="ab alt" data-a="drop">Выбросит�
 if(!it.corr)acts+='<div class="orbacts">'+ORB_K.filter(k=>P.orbs[k]>0&&(it.rar<3||k==='vaal')).map(k=>`<button class="ob" data-orb="${k}" style="--c:${ORBS[k].c}" title="${ORBS[k].d}">${uiI('orb:'+k,ORBS[k].c)}${ORBS[k].n} (${P.orbs[k]})</button>`).join('')+'</div>'}
 d.innerHTML=`${ttHTML(it)}${w!=='eq'?cmpHTML(it):''}<div class="acts">${acts}</div>`}
 const orbPrice=k=>({trans:25,alt:40,aug:60}[k])*Math.max(1,S.L||1);
-$('lfBtn').onclick=()=>{P.lf=((P.lf|0)+1)%3;save();renderInv();toast(['Показываются все вещи','Обычные вещи сразу превращаются в золото','Обычные и магические превращаются в золото. Вещи лучше надетых всегда видны'][P.lf],2.6)};
+$('lfBtn').onclick=()=>togglePanel('lf');
 $('pInv').addEventListener('click',e=>{const b=e.target.closest('[data-bag],[data-eq],[data-a],[data-shop],[data-orb],[data-buyorb]');if(!b)return;
 if(b.dataset.bag!==undefined){S.sel={w:'bag',k:+b.dataset.bag};renderInv();return}if(b.dataset.shop!==undefined){S.sel={w:'shop',k:+b.dataset.shop};renderInv();return}
 if(b.dataset.buyorb){const k=b.dataset.buyorb,pr=orbPrice(k);if(P.gold>=pr){P.gold-=pr;P.orbs[k]=(P.orbs[k]||0)+1;snd(1200,.08,'square',.05)}renderInv();return}
@@ -827,7 +827,7 @@ if(S.mode!=='dead'){const mm=ST.mana*(1-ST.reserve);H.mana=Math.min(mm,H.mana+ST
 H.moving=moving;if(!H.leap)heroLoco(dt,moving);}
 if(S.mode!=='zone')return;
 if(OBJ&&OBJ.barrier&&!OBJ.done){const d=Math.hypot(p.x-BOSSP.x,p.z-BOSSP.z);if(d<10.3){p.x=BOSSP.x+(p.x-BOSSP.x)/d*10.3;p.z=BOSSP.z+(p.z-BOSSP.z)/d*10.3}}updObjective(dt);
-for(const l of loot.slice())if(l.fly.t>=1&&Math.hypot(l.pos.x-p.x,l.pos.z-p.z)<(l.it?1.5:2.8))tryPick(l);
+for(const l of loot.slice())if(l.fly.t>=1&&(!l.it||l.auto||H.pick===l)&&Math.hypot(l.pos.x-p.x,l.pos.z-p.z)<(l.it?1.5:2.8))tryPick(l);
 for(const c of chests)if(!c.open&&Math.hypot(c.x-p.x,c.z-p.z)<2.2)openChest(c);
 // whirl
 if(H.whirl){const w=H.whirl;w.t-=dt;w.tick-=dt;if(w.tick<=0){w.tick=w.int/(ST.aps/1.3);aoeHit(p.x,p.z,w.r,w.ctx);for(let i=0;i<10;i++){const a=rand(0,6.28);emit(p.x+Math.cos(a)*w.r*.8,rand(.6,1.4),p.z+Math.sin(a)*w.r*.8,-Math.sin(a)*8,0,Math.cos(a)*8,.25,.4,1.6,1.5,1.3,0,3)}noise(.06,.05,2200)}H.c.root.rotation.y=time*14;if(w.t<=0)H.whirl=null}
@@ -1368,7 +1368,7 @@ let hapT=0;function haptic(k){if(typeof SET!=='undefined'&&!SET.vib)return;const
 const GUIDE=[['Управление','Телефон: коснись экрана и веди пальцем — герой идёт и сам бьёт ближайших врагов. Q/E/R — умения, синяя кнопка — рывок в сторону движения, красная — флакон. ПК: WASD или мышь, Q/E/R, пробел, F.'],
 ['Лагерь','Торговка Вера покупает и продаёт вещи и сферы. Кузнец Гром затачивает вещи до +10 и добавляет свойства на верстаке. Хранилище — общий сундук для всех героев. Портал на севере ведёт в земли и на карты.'],
 ['Портал','Кнопка «В лагерь» оставляет портал открытым: в окне портала появится «Вернуться» — зона останется такой, какой ты её оставил. После смерти тоже можно вернуться.'],
-['Добыча','Чем ярче подпись и выше столб света, тем ценнее вещь: белые — обычные, синие — магические, жёлтые — редкие, оранжевые — уникальные. ▲ — лучше надетого. Фильтр добычи в сумке превращает мусор в золото.'],
+['Добыча','Чем ярче подпись и выше столб света, тем ценнее вещь: белые — обычные, синие — магические, жёлтые — редкие, оранжевые — уникальные. ▲ — лучше надетого. Фильтр добычи (кнопка в сумке) прячет мусор и превращает его в золото; можно выбрать строгость, редкость и типы вещей, а также что подбирать автоматически.'],
 ['Сферы','Превращения: обычная → магическая. Перемен: перебросить магическую. Дополнения: +свойство магической. Царская: магическая → редкая. Хаоса: перебросить редкую. Возвышения: +свойство редкой. Божественная: перебросить значения. Очищения: убрать всё. Ваал: осквернить вещь — может стать сильнее (заточка до +12, особое свойство) или не измениться, но изменить её потом нельзя. Сферы работают и на картах.'],
 ['Заточка','Каждая ступень +10% ко всем свойствам вещи. С +1 оружие мерцает, с +6 появляется аура, на +10 — лучи. При неудаче сгорает золото, вещь остаётся.'],
 ['Умения и камни','У каждого класса 21 умение в трёх ветках, с собой — три. В каждое умение можно вставить 2 камня поддержки: больше снарядов, цепь, область, урон и другие. Камни падают с редких монстров и стражей.'],
@@ -1728,3 +1728,25 @@ for(const e of document.querySelectorAll('#interact.on,#skills .sk,.globe,#lvlTx
 for(let k=0;k<6;k++){const C=c.getBoundingClientRect();let top=null;for(const r of obs)if(C.left<r.right+6&&C.right>r.left-6&&C.top<r.bottom+8&&C.bottom>r.top-8)top=top===null?r.top:Math.min(top,r.top);if(top===null)break;
 c.style.bottom=Math.max(8,innerHeight-top+10)+'px'}}
 addEventListener('resize',()=>setTimeout(coachLayout,60));
+
+/* ===== фильтр добычи (как в PoE) ===== */
+const LF_PRE={all:{n:'Всё',d:'Подбирать всё подряд',r:[2,2,2]},norm:{n:'Обычный',d:'Белые — в золото, синие — по нажатию',r:[0,1,2]},strict:{n:'Строгий',d:'Только редкие и лучше надетых',r:[0,0,2]},vstrict:{n:'Очень строгий',d:'Автоподбор только ▲ и уникальных',r:[0,0,1]}};
+const LF_ST=['Скрыть','По нажатию','Подбирать'];
+function lfCfg(){if(!P.lfc){const pre=['norm','norm','strict'][P.lf|0]||'norm';P.lfc={pre,r:LF_PRE[pre].r.slice(),sl:{},up:1}}return P.lfc}
+function lfVerdict(it){const c=lfCfg();if(it.rar>=3)return 2;const up=isUpg(it);if(up&&c.up)return 2;if(c.sl[it.slot]===0)return 0;return c.r[it.rar]??2}
+let lfStat={n:0,g:0};
+function lfHTML(){const c=lfCfg();return `<p class="muted" style="margin:0 0 10px">Скрытые вещи сразу превращаются в золото. Сферы, золото, камни и карты подбираются всегда.</p>
+<div class="sect"><span>Строгость</span></div><div class="lfpre">${Object.entries(LF_PRE).map(([k,p])=>`<button class="lfp${c.pre===k?' on':''}" data-lfpre="${k}"><b>${p.n}</b><small>${p.d}</small></button>`).join('')}${c.pre==='custom'?'<button class="lfp on"><b>Свой</b><small>Настроен вручную</small></button>':''}</div>
+<div class="sect"><span>По редкости</span></div>
+${['Обычные','Магические','Редкие'].map((n,i)=>`<div class="lfrow"><span class="lfn" style="color:${RCH[i]}">${n}</span><div class="seg">${LF_ST.map((t,v)=>`<button data-lfr="${i}" data-v="${v}" class="${c.r[i]===v?'on':''}">${t}</button>`).join('')}</div></div>`).join('')}
+<div class="lfrow"><span class="lfn" style="color:${RCH[3]}">Уникальные</span><div class="seg"><button class="on" disabled>Подбирать всегда</button></div></div>
+<label class="lfchk"><input type="checkbox" data-lfup ${c.up?'checked':''}><span><b style="color:#5ee07a">▲</b> Вещи лучше надетых — подбирать всегда, даже если скрыты правилом</span></label>
+<div class="sect"><span>Типы вещей</span></div><div class="lfsl">${SLOTS.map(k=>`<button data-lfsl="${k}" class="${c.sl[k]===0?'':'on'}">${itIconSlot(k)}${SLOT_N[k]}</button>`).join('')}</div>
+<p class="muted" style="margin:8px 0 0">Выключенный тип прячется целиком (кроме ▲ и уникальных).${lfStat.n?` За эту вылазку скрыто ${lfStat.n} вещ. → ${kfmt(lfStat.g)} золота.`:''}</p>`}
+function itIconSlot(k){const m={weapon:'w:sword',offhand:'o:shield',helmet:'helmet:0',chest:'chest:0',gloves:'gloves:0',boots:'boots:0',ring:'ring:0',amulet:'amulet:0'};return gi(IT_IC[m[k]],'currentColor')}
+function renderLF(){$('lfBody').innerHTML=lfHTML()}
+function lfLabel(){const c=lfCfg();return 'Фильтр добычи: '+(c.pre==='custom'?'свой':LF_PRE[c.pre].n.toLowerCase())}
+document.addEventListener('click',e=>{const b=e.target.closest('#pLF [data-lfpre],#pLF [data-lfr],#pLF [data-lfsl]');if(!b||!P)return;const c=lfCfg();
+ if(b.dataset.lfpre){c.pre=b.dataset.lfpre;c.r=LF_PRE[c.pre].r.slice();c.sl={};c.up=1}else if(b.dataset.lfr!==undefined){c.r[+b.dataset.lfr]=+b.dataset.v;c.pre='custom'}else{const k=b.dataset.lfsl;c.sl[k]=c.sl[k]===0?1:0;if(c.sl[k])delete c.sl[k];c.pre='custom'}
+ save();renderLF();snd(700,.06,'sine',.05,1.2)});
+document.addEventListener('change',e=>{if(e.target.matches('#pLF [data-lfup]')&&P){const c=lfCfg();c.up=e.target.checked?1:0;c.pre='custom';save();renderLF()}});
