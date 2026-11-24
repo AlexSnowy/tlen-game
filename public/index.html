@@ -311,6 +311,7 @@ body.bn #toast{opacity:0!important}
 #feed{position:fixed;left:max(10px,env(safe-area-inset-left));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 120px);z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:4px;max-width:min(60vw,360px)}.fd{font:500 12px Rubik;color:#e8d8b0;background:rgba(10,8,6,.7);border-left:2px solid #d8782e;padding:4px 8px;border-radius:0 8px 8px 0;animation:fdin .4s}@keyframes fdin{from{opacity:0;transform:translateX(-10px)}}
 @media (max-width:600px) and (orientation:portrait){#feed{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 200px)}}
 .cell.uq{animation:uq 2.2s ease-in-out infinite}@keyframes uq{50%{box-shadow:inset 0 0 18px rgba(216,120,46,.45),0 0 10px rgba(216,120,46,.5)}}.cell.cr::before{content:"";position:absolute;left:3px;top:3px;width:7px;height:7px;border-radius:50%;background:#d20000;box-shadow:0 0 4px #f00}
+#zoneName,#zoneSub{pointer-events:auto;cursor:pointer}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
