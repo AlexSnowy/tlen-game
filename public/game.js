@@ -809,7 +809,7 @@ return false}
 
 /* ================= UPDATE ================= */
 let time=0;
-function update(dt){updEnchant(dt);updHaz(dt);monFx(dt);updRift(dt);updShrines(dt);updEss(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
+function update(dt){updEnchant(dt);updPet(dt);updHaz(dt);monFx(dt);updRift(dt);updShrines(dt);updEss(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
 if(!H.leap&&!H.charge)H.face=angLerp(H.face,H.faceT,1-Math.pow(.0005,dt));H.c.root.rotation.y=H.face;
 for(let i=0;i<3;i++)H.cds[i]=Math.max(0,H.cds[i]-dt);H.dashCd=Math.max(0,H.dashCd-dt);H.inv=Math.max(0,H.inv-dt);S.bagWarn-=dt;H.castT-=dt;H.c.lock-=dt;H.immortal=Math.max(0,H.immortal-dt);H.lastCast=(H.lastCast||0)-dt;H.aimT=(H.aimT||0)-dt;
 for(let i=H.queue.length-1;i>=0;i--){const q=H.queue[i];q.t-=dt;if(q.t<=0){H.queue.splice(i,1);q.f()}}
@@ -1197,7 +1197,7 @@ const CH=[
 {id:'k100',n:'Первая кровь',d:'Убить 100 монстров',ic:'sword-slice',p:()=>[cs('k'),100],rw:{alt:2,trans:2}},
 {id:'k1000',n:'Жнец',d:'Убить 1000 монстров',ic:'reaper-scythe',p:()=>[cs('k'),1000],rw:{chaos:2}},
 {id:'r25',n:'Охотник на редких',d:'Убить 25 редких монстров',ic:'arrow-scope',p:()=>[cs('r'),25],rw:{regal:1}},
-{id:'b3',n:'Победитель стражей',d:'Победить 3 стражей',ic:'crenulated-shield',p:()=>[cs('b'),3],rw:{aug:2,alt:2}},
+{id:'b3',n:'Победитель стражей',d:'Победить 3 стражей · награда: питомец-огонёк',ic:'crenulated-shield',p:()=>[cs('b'),3],rw:{aug:2,alt:2}},
 {id:'camp',n:'Конец кампании',d:'Победить Сердце Тлена',ic:'death-skull',p:()=>[P.maxZone>8?1:0,1],rw:{exalt:1}},
 {id:'uniq',n:'Легенда',d:'Подобрать уникальную вещь',ic:'crowned-skull',p:()=>[cs('u'),1],rw:{chaos:2}},
 {id:'up6',n:'Аура кузнеца',d:'Заточить вещь до +6',ic:'anvil-impact',p:()=>[cs('up'),6],rw:{divine:1}},
@@ -1521,6 +1521,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="vib" ${SET.vib?'checked':''}> Вибрация</label>
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
+<label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
 $('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
 $('chBody').addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k||k==='vol')return;const v=e.target.checked;if(k==='mus'){if(v!==musOn)musToggle()}else if(k==='q'){Q=v?'low':'high';try{localStorage.setItem('tlen_q',Q)}catch(_){}setQBtns();applyQ()}else{SET[k]=v?1:0;setSave()}});
@@ -1538,3 +1539,11 @@ toast('Портал вернул тебя в «'+keep.name+'»',2.5)}
 /* опасности карт: ловушки и буря */
 function updHaz(dt){if(S.mode!=='zone'||isGuest())return;if(S.hz)for(const h of S.hz){h.t-=dt;if(h.t<=0){h.t=3.2;const d=Math.hypot(h.x-H.g.position.x,h.z-H.g.position.z);if(d<24)tele(h.x,h.z,1.8,.9,(S.L*6+10),'#c0c0c0')}}
 if(mod('storm')){S.stT=(S.stT||2)-dt;if(S.stT<=0){S.stT=rand(1.2,2.4);const tg=nearestPlayer(H.g.position);const x=tg.x+rand(-6,6),z=tg.z+rand(-6,6);tele(x,z,2.2,1.1,S.L*7+12,'#9ad0ff',()=>{burst({x,y:1,z},'#cfe8ff',20,4,.3,.5,2);flash({x,y:2,z},'#cfe8ff',30,.25)})}}}
+
+/* питомец-огонёк: косметика за испытание «Победитель стражей» */
+let PET=null;
+function petOn(){return P&&(P.chc||[]).includes('b3')&&(typeof SET==='undefined'||SET.pet!==0)}
+function updPet(dt){if(!petOn()){if(PET){H.g.parent&&H.g.parent.remove(PET.m);scene.remove(PET.m);PET=null}return}
+if(!PET){const m=new THREE.Mesh(new THREE.SphereGeometry(.16,12,10),new THREE.MeshBasicMaterial({color:new THREE.Color('#9af0ff').multiplyScalar(2.5),toneMapped:false}));scene.add(m);PET={m,p:H.g.position.clone().setY(2)}}
+const t=performance.now()/1000,hp=H.g.position,tx=hp.x+Math.cos(t*.9)*1.3,tz=hp.z+Math.sin(t*.9)*1.3,ty=2.1+Math.sin(t*2.3)*.25;PET.p.x+=(tx-PET.p.x)*Math.min(1,dt*4);PET.p.z+=(tz-PET.p.z)*Math.min(1,dt*4);PET.p.y=ty;PET.m.position.copy(PET.p);
+if(Math.random()<.5)emit(PET.p.x,PET.p.y,PET.p.z,rand(-.2,.2),rand(-.1,.3),rand(-.2,.2),rand(.3,.6),rand(.08,.15),.6,1.4,1.8,0,1)}
