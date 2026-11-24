@@ -258,7 +258,7 @@ const M={g,c,type,D,name,hp:D.hp*hm,max:D.hp*hm,dmg:D.dmg*dm*(o.magic?1.2:1),spd
 st:{burn:null,bleed:null,poison:[],chill:0,shock:0,stun:0,blind:0},dotAcc:0,dotT:0};M.id=o.id!==undefined?o.id:S.mid++;if(o.id!==undefined)S.mid=Math.max(S.mid,o.id+1);M.dyn=!S.building||!!o.net;
 if(M.rare||M.magic){const el=document.createElement('div');el.className='mnl '+(M.rare?'r':'m');el.innerHTML=esc(name)+(M.rare&&rmods.length?`<small>${rmods.map(m=>m.n).join(' · ')}</small>`:'');el.style.display='none';$('labels').appendChild(el);M.lab=el}
 mons.push(M);if(NET.on&&NET.host&&!S.building&&S.mode==='zone')nsend({t:'spawn',zk:zkey(),id:M.id,type,x:+x.toFixed(1),z:+z.toFixed(1),rare:!!o.rare});return M}
-function wake(M){if(!M||M.aggro)return;if(M.boss&&OBJ&&!OBJ.done&&OBJ.barrier)return;if(M.boss){music('boss');banner(M.name,'Умения: '+M.kit.filter(k=>k!=='enrage').map(k=>BOSS_SK[k]).join(' · '),'boss');S.shake=.35;snd(70,1.2,'sawtooth',.14,.6)}M.aggro=true;if(M.D.sk){const a=M.c.play('Skeletons_Awaken_Standing',{once:true,ts:1.6,restart:true});M.wake=a?a.getClip().duration/1.6*.8:0;const p=M.g.position;burst({x:p.x,y:.3,z:p.z},'#6a5a4a',12,2.5,.5,.8,.6,-3)}}
+function wake(M){if(!M||M.aggro)return;if(M.boss&&OBJ&&!OBJ.done&&OBJ.barrier)return;if(M.boss){music('boss');banner(M.name,'Умения: '+M.kit.filter(k=>k!=='enrage').map(k=>BOSS_SK[k]).join(' · '),'boss',S.zi>=0&&!S.map?BSAY[S.zi]:'');S.shake=.35;snd(70,1.2,'sawtooth',.14,.6)}M.aggro=true;if(M.D.sk){const a=M.c.play('Skeletons_Awaken_Standing',{once:true,ts:1.6,restart:true});M.wake=a?a.getClip().duration/1.6*.8:0;const p=M.g.position;burst({x:p.x,y:.3,z:p.z},'#6a5a4a',12,2.5,.5,.8,.6,-3)}}
 
 /* ================= ALLIES ================= */
 function summon(id,lvl){const sk=SKILLS[id],p=sk.p;for(const a of allies.filter(a=>a.src===id)){a.hp=0}
@@ -559,7 +559,7 @@ collide(p,.45);return l>.08}
 
 /* ================= UI ================= */
 const RC=RCH;
-function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass'].some(x=>$(x).classList.contains('on'))}
+function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass','ovStory','ovDlg'].some(x=>$(x).classList.contains('on'))}
 function closePanels(){lobbyClose();for(const id of['pInv','pSk','pPas','pPortal','pParty','pShop','pSmith','pStash','pCh'])$(id).classList.remove('on');S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(w==='sk'||w==='pas'||w==='inv')tutEv(w);if(w==='shop'||w==='smith')tutEv('town');if(w==='portal')tutEv('portal');if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
 ({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');$('pShop').querySelector('header p').textContent=npcQuote('merchant');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');$('pSmith').querySelector('header p').textContent=npcQuote('smith');T.res=null;renderSmith()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
@@ -699,19 +699,19 @@ function enterZone(zi,tier,net,mi){tutEv('portal');if(!net)LASTZ={zi,tier,mi};if
 if(net){S.zone=net.zone;S.mods=net.mods}else if(S.pin)S.zone={n:'Обитель Пожирателя',th:3,mons:[['fallen',2],['berserker',2],['necro',1],['brute',1.5]],boss:'Пожиратель Тлена',bt:'brute',obj:{t:'hunt',n:'Убей стражей Обители',c:2},kit:['slam','meteors','spiral','summon','teleport','nova','charge','enrage'],phases:1};else S.zone={n:'Карта: '+base.n,th:base.th,mons:base.mons.concat([['fallen',1],['necro',.6],['berserker',1]]),boss:base.boss+' Кошмара',bt:base.bt,obj:pick(OBJ_POOL),kit:shuffle(Object.keys(BOSS_SK).filter(k=>k!=='enrage')).slice(0,3).concat(tier>=3?['enrage']:[])}}
 if(net&&zi>=0){S.zone=ZONES[zi]}S.mode='zone';town.visible=false;zone.visible=true;buildZone();if(NET.on&&NET.host&&!net)nsend({t:'zone',zi,tier,seed:S.seed,zone:S.zone,mods:S.mods,L:S.L});H.g.position.set(0,0,46);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.regenOff=mod('noregen');
 for(const id of P.slots)if(id&&SKILLS[id].kind==='summon'&&P.sk[id])summon(id,skLvl(id));
-music('zone');$('zoneName').textContent=S.zone.n;banner(S.zone.n,S.abyss?'Бездна · глубина '+S.abyss+' · '+S.mods.length+' мод.':S.pin?'Финальная битва Атласа':S.zi<0?'Карта · тир '+S.map+(S.mods.length?' · '+S.mods.length+' мод.':''):'Уровень монстров '+S.L,'zone');$('zoneSub').textContent=(S.mods.length?'Ур. '+S.L+' · мод.: '+S.mods.length+' ⓘ':'Уровень монстров '+S.L+' · Страж ждёт на севере');setTimeout(()=>{if(S.mode==='zone')toast('Иди на север. В конце зоны тебя ждёт '+S.zone.boss+'.',3.5)},2600);snd(200,.8,'sine',.12,2)}
+music('zone');$('zoneName').textContent=S.zone.n;banner(S.zone.n,S.abyss?'Бездна · глубина '+S.abyss+' · '+S.mods.length+' мод.':S.pin?'Финальная битва Атласа':S.zi<0?'Карта · тир '+S.map+(S.mods.length?' · '+S.mods.length+' мод.':''):'Уровень монстров '+S.L,'zone',(()=>{if(S.zi<0)return'';P.narr=P.narr||[];if(P.narr.includes(S.zi))return'';P.narr.push(S.zi);return ZNARR[S.zi]})());$('zoneSub').textContent=(S.mods.length?'Ур. '+S.L+' · мод.: '+S.mods.length+' ⓘ':'Уровень монстров '+S.L+' · Страж ждёт на севере');setTimeout(()=>{if(S.mode==='zone')toast('Иди на север. В конце зоны тебя ждёт '+S.zone.boss+'.',3.5)},2600);snd(200,.8,'sine',.12,2)}
 function bossDown(){S.cleared=true;if(S.abyss){const d=S.abyss;if(d>(P.abyssBest||0)&&d%5===0)feedPub('достиг '+d+'-й глубины Бездны');P.abyssBest=Math.max(P.abyssBest||0,d);if(d%5===0){P.abyssCk=Math.max(P.abyssCk||1,d+1);setTimeout(()=>{const p=S.boss.g.position;for(let i=0;i<Math.floor(d/5);i++)dropOrb(p);toast('Глубина '+d+' пройдена! Контрольная точка: '+(d+1),3)},800)}csAdd('abyss',d,1);csAdd('abyc')}setTimeout(()=>music('zone'),2500);let lore=null,next='';if(S.zi>=0){if(S.zi+2>P.maxZone){P.maxZone=S.zi+2;next=S.zi<7?'Открыта зона «'+ZONES[S.zi+1].n+'».':'Открыты карты Кошмара!'}if(!P.lore.includes(S.zi)){P.lore.push(S.zi);lore=S.zone.lore;if([2,5,7].includes(S.zi))next+=' Получено очко Восхождения (Пассивы)!';if(S.zi===3)next+=' Открыта великая сила Пантеона (Пассивы)!';if(S.zi===5)next+=' Открыта малая сила Пантеона (Пассивы)!'}}else{if(S.map>P.maxMap&&!S.pin&&!S.abyss){P.maxMap=S.map}P.atlas=P.atlas||[];if(!S.pin&&!S.abyss&&!P.atlas.includes(S.map)){const hadA=P.atlas.some(t=>t>=5);P.atlas.push(S.map);if(!hadA&&S.map>=5)toast('Получено очко Восхождения!',3);next='Атлас: тир '+S.map+' покорён (+3% к количеству предметов на картах).'}}
 const p=S.boss.g.position;const g=prop('arch_gate',1);g.position.set(p.x,0,p.z-4);dyn.add(g);const d=new THREE.Mesh(new THREE.CircleGeometry(1.7,40),new THREE.MeshBasicMaterial({color:new THREE.Color('#9a5cff').multiplyScalar(2.2),transparent:true,opacity:.8,side:THREE.DoubleSide,toneMapped:false,map:softTex}));d.position.set(0,1.95,0);g.add(d);exitP=g;emitters.push({x:p.x,y:1.95,z:p.z-4,kind:'portal',w:zone});
 save();$('bossBar').classList.remove('on');setTimeout(()=>{if(lore){$('loreH').textContent=S.zone.boss+' повержен';$('loreP').textContent=lore;$('loreM').textContent=next+' Собери добычу и войди в портал, чтобы вернуться в лагерь.';$('ovLore').classList.add('on');setPaused()}else toast('Страж повержен! '+next,4)},1400)}
-$('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused()};
+$('bLore').onclick=()=>{$('ovLore').classList.remove('on');setPaused();if(S.zi===7&&P&&!P.epi){P.epi=1;save();setTimeout(()=>storyPlay(EPILOGUE,()=>banner('Кампания пройдена','Открыты карты Кошмара — Атлас в портале')),300)}};
 function die(){csAdd('death');{const k=$('deadKill');if(k)k.textContent=H.lastHit?'Тебя сразил: '+H.lastHit:''}if(P.hc){P.dead=1;save();$('deadH').textContent='Герой пал навсегда';$('deadP').textContent='Хардкор не прощает. Его вещи в хранилище остаются для других героев.';$('bRevive').textContent='На титульный экран'}S.mode='dead';H.whirl=null;hFull('Death_A',1,99);setTimeout(()=>{$('ovDead').classList.add('on');setPaused()},1500);snd(80,1.4,'sawtooth',.15,.4)}
 $('bRevive').onclick=()=>{$('ovDead').classList.remove('on');if(P&&P.dead){location.reload();return}saveResume();enterTown();setPaused()};
-function interact(){const n=nearNpc();if(!n)return;if(n.id==='merchant'){npcChars[0].play('Interact',{once:true,restart:true});togglePanel('shop')}else if(n.id==='smith')togglePanel('smith');else if(n.id==='stash')togglePanel('stash');else{if(isGuest()){const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z);else toast('Жди, пока лидер группы откроет портал',2);return}togglePanel('portal')}}
+function interact(){const n=nearNpc();if(!n)return;if(n.id==='merchant'){npcChars[0].play('Interact',{once:true,restart:true});npcTalk('merchant',()=>togglePanel('shop'))}else if(n.id==='smith')npcTalk('smith',()=>togglePanel('smith'));else if(n.id==='stash')npcTalk('stash',()=>togglePanel('stash'));else{if(isGuest()){const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z);else toast('Жди, пока лидер группы откроет портал',2);return}togglePanel('portal')}}
 $('interact').onclick=interact;
 function nearNpc(){if(S.mode!=='town')return null;const p=H.g.position;return NPCS.find(n=>Math.hypot(n.x-p.x,n.z-p.z)<3.2)||null}
 async function startGame(p){initAudio();P=p;stashLoad();setTimeout(feedStart,3000);setTimeout(chBadge,500);$('ovClass').classList.remove('on');$('ovTitle').classList.remove('on');$('ovLoad').classList.add('on');$('lTxt').textContent='Призываю героя…';setPaused();
 await loadAsset(CLASSES[P.cls].model);if(H.c)H.g.remove(H.c.root);H.c=makeChar(CLASSES[P.cls].model,{show:[],keepHead:1,layered:1});H.upT=H.legT=H.fullT=0;H.g.add(H.c.root);H.buffs=[];ST=null;recalc();H.hp=ST.hp;H.mana=ST.mana;
-$('ovLoad').classList.remove('on');$('hud').classList.add('on');updSkillBar();enterTown();setPaused();sendInfo();if(NET.pendingJoin){const c=NET.pendingJoin;NET.pendingJoin=null;netConnect(c)}tutInit();if(!tutActive()&&P.lvl===1&&P.xp===0)toast(touch?'Подойди к порталу на севере лагеря. Умения и пассивы — кнопки сверху.':'Подойди к порталу на севере лагеря. Умения — K, пассивное дерево — P.',5)}
+$('ovLoad').classList.remove('on');$('hud').classList.add('on');updSkillBar();enterTown();setPaused();sendInfo();if(NET.pendingJoin){const c=NET.pendingJoin;NET.pendingJoin=null;netConnect(c)}tutInit();if(P.lvl===1&&P.xp===0&&!P.prol){P.prol=1;save();storyPlay(PROLOGUE)}if(!tutActive()&&P.lvl===1&&P.xp===0)toast(touch?'Подойди к порталу на севере лагеря. Умения и пассивы — кнопки сверху.':'Подойди к порталу на севере лагеря. Умения — K, пассивное дерево — P.',5)}
 $('bCont').onclick=()=>{const s=load();if(s)startGame(s)};
 $('bNew').onclick=()=>{$('ovTitle').classList.remove('on');$('ovClass').classList.add('on');renderClasses();setPaused()};
 function renderClasses(){$('classList').innerHTML=Object.entries(CLASSES).map(([k,c])=>`<button class="clc" data-cls="${k}" style="--c:${c.col}"><b>${uiI('cls:'+k,c.col,'width:30px;height:30px;vertical-align:-7px;margin-right:6px')}${c.n}</b><span>${c.role}</span><small>Ветки: ${c.branches.join(' · ')}</small><small>Оружие: ${c.weapons.map(w=>WBASE[w].n).join(', ')}</small></button>`).join('')}
@@ -1274,7 +1274,7 @@ const n=3+Math.floor(R.k/12);for(let i=0;i<n;i++)dropItem(p,genItem(L+1,i<2?2:1,
 for(let i=0;i<70;i++){const a=rand(0,6.28),v=rand(2,8);emit(R.x,1,R.z,Math.cos(a)*v,rand(2,6),Math.sin(a)*v,rand(.8,1.4),rand(.12,.22),.8,.4,1,4,1)}
 toast('Разлом закрыт! Убито тварей: '+R.k+'. Забирай сокровища.',3.5);chime([440,554,659,880],.12);csAdd('rift')}}}
 
-function banner(t,sub,kind){const b=$('banner');b.className='on '+(kind||'');document.body.classList.add('bn');clearTimeout(banner.u);banner.u=setTimeout(()=>document.body.classList.remove('bn'),kind==='boss'?4400:3500);b.innerHTML=`<i></i><b>${esc(t)}</b><small>${esc(sub||'')}</small><i></i>`;clearTimeout(banner.t);banner.t=setTimeout(()=>b.className=kind||'',kind==='boss'?3600:2800)}
+function banner(t,sub,kind,q){const b=$('banner');b.className='on '+(kind||'');document.body.classList.add('bn');clearTimeout(banner.u);banner.u=setTimeout(()=>document.body.classList.remove('bn'),(kind==='boss'?4400:3500)+(q?2200:0));b.innerHTML=`<i></i><b>${esc(t)}</b><small>${esc(sub||'')}</small>${q?`<em>${esc(q)}</em>`:''}<i></i>`;clearTimeout(banner.t);banner.t=setTimeout(()=>b.className=kind||'',(kind==='boss'?3600:2800)+(q?2200:0))}
 
 /* ================= МУЗЫКА (процедурный эмбиент) ================= */
 let MUS=null,musOn=(()=>{try{return localStorage.getItem('tlen_mus')!=='0'}catch(e){return true}})();
@@ -1529,7 +1529,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
 <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
-<button class="btn sm" data-tutreset>Пройти обучение заново</button>
+<button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
 <label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
 $('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
@@ -1654,4 +1654,53 @@ function tutTick(dt){if(!P||!P.tut)return;if(!tutActive()){if(tutCur)tutShow(nul
   if(off){if(v.z>1){x=W-x;y=Hh-y}const cx=W/2,cy=Hh/2,ang=Math.atan2(y-cy,x-cx);const r=Math.min(W,Hh)*.36;a.style.display='block';a.style.left=(cx+Math.cos(ang)*r)+'px';a.style.top=(cy+Math.sin(ang)*r)+'px';a.style.transform=`translate(-50%,-50%) rotate(${ang}rad)`}else a.style.display='none'}else a.style.display='none'}
 function tutReset(){P.tut=[];tutCnt=0;tutMv=0;tutLP=null;save();toast('Обучение начнётся заново',2)}
 
-document.addEventListener('click',e=>{if(e.target.closest('[data-tutreset]')){tutReset();document.querySelectorAll('.panel.on [data-close]').forEach(b=>b.click())}});
+document.addEventListener('click',e=>{if(e.target.closest('[data-prolog],[data-epilog]')){const ep=!!e.target.closest('[data-epilog]');document.querySelectorAll('.panel.on [data-close]').forEach(b=>b.click());setTimeout(()=>storyPlay(ep?EPILOGUE:PROLOGUE),50);return}if(e.target.closest('[data-tutreset]')){tutReset();document.querySelectorAll('.panel.on [data-close]').forEach(b=>b.click())}});
+
+/* ===== сюжет ===== */
+const PROLOGUE=[
+ ['Вальмор','Сто лет Орден Зари хранил врата королевства. Пока горел свет на стенах, мёртвые спали.'],
+ ['Тлен','Потом пришёл Тлен. За одну ночь почернели реки, замолчали города, а мертвецы встали из могил.'],
+ ['Пробуждение','Ты очнулся у старого костра. Ни имени, ни прошлого — только оружие в руке и чужой герб на плаще.'],
+ ['Лагерь','Торговка Вера говорит, что нашла тебя у портала на севере. Портал оживает лишь перед тобой. Будто ждал.']
+];
+const EPILOGUE=[
+ ['Тишина','Сердце Тлена рассыпалось пеплом. И в этой тишине память вернулась к тебе целиком.'],
+ ['Правда','Это ты повёл Орден Зари к Сердцу. Это ты принял его силу, чтобы спасти Вальмор, — и стал ключом, которым Тлен открыл врата.'],
+ ['Цена','Арден, Регент, Ордис — твои братья по Ордену. Ты освободил их. Им давно пора было уснуть.'],
+ ['Кошмар','Тлен отступил, но его эхо живёт в картах Кошмара. И в тебе. Вальмор ещё не спасён — Атлас ждёт своего командира.']
+];
+const ZNARR=['Здесь утонул передовой отряд Ордена. Их доспехи до сих пор поднимаются из трясины.',
+ 'Здесь хоронили рыцарей Зари. Теперь они не хотят лежать.',
+ 'Культ Тлена держит пленников у алтарей. Слышны молитвы — и крики.',
+ 'Лес сгорел в ночь, когда пал Вальмор. Пепел до сих пор тёплый.',
+ 'Печать склепа разбита изнутри. Кто-то очень хотел выйти. Или войти.',
+ 'Затопленная крепость Ордена. Священный огонь ещё горит — пока ты здесь.',
+ 'Стены дышат. Каждый шаг отдаётся эхом, будто идёшь по чужому сердцу.',
+ 'Ты был здесь. Ты помнишь этот свет.'];
+const BSAY=['«Ещё один рыцарь… Трясине всегда мало.»','«Ты опоздал на собственные похороны.»','«Владыка вернулся! Склонитесь… Нет. Он пришёл нас убить.»','«Пахнешь пеплом. Пахнешь домом.»','«Учитель? Нет… ты лишь его тень.»','«Командир… прикажи мне остановиться. Сам я не могу.»','«Ключ вернулся к замку.»','«Наконец-то. Мы снова одно целое.»'];
+// реплики NPC по прогрессу (maxZone — сколько зон открыто)
+const DLG={
+ merchant:{name:'Торговка Вера',lines:[
+  [1,'Очнулся? Я уж думала, Тлен и тебя заберёт. Портал на севере ожил, когда я тебя нашла, — кроме тебя, его никто не открывает. Иди. А что найдёшь — неси мне, куплю.'],
+  [2,'Медальон с твоим гербом? …Я видела такой. Давно. На плаще человека, что повёл Орден Зари к Сердцу.'],
+  [3,'Твоё имя на могиле? Не смотри так. Мёртвые в Вальморе врут чаще живых. Но три дня… поторопись.'],
+  [4,'Культисты не создавали Тлен. Они только молились на него. Дверь ему открыли изнутри — кто-то из своих.'],
+  [6,'Твой почерк в книге некроманта… Знаешь, я не стану спрашивать. Пока ты убиваешь мёртвых, мне всё равно, кем ты был.'],
+  [8,'Сердце зовёт тебя, я слышу это даже здесь, у костра. Вернись, слышишь? Кто-то же должен покупать у меня этот хлам.'],
+  [9,'Вернулся… Значит, Сердце молчит. Но тени всё ещё ползут из карт. Кошмар не кончился — он стал бесконечным.']]},
+ smith:{name:'Кузнец Гром',lines:[
+  [1,'Подойди-ка. Руки помнят тебя, даже если голова — нет. Принеси золото, и я заточу твоё оружие так, что оно засияет.'],
+  [4,'Пепельный лес горел три дня, когда мы отступали. Я тащил раненых. А ты шёл вперёд, к Сердцу. Один.'],
+  [7,'Арден?! Он был моим другом… Мы думали, ты погиб вместе с ним. Значит, это ты закрыл за нами ворота.'],
+  [9,'Командир. Теперь я могу так тебя звать. Точи клинок — Кошмар не ждёт.']]},
+ stash:{name:'Хранилище',lines:[[1,'Старый сундук Ордена. Всё, что положишь сюда, увидят все твои герои.']]}
+};
+function dlgNext(id){const D=DLG[id];if(!D||!P)return null;P.dlg=P.dlg||{};const mz=P.maxZone||1;let best=null;for(const [z,t] of D.lines)if(z<=mz)best=[z,t];if(!best)return null;if((P.dlg[id]||0)>=best[0])return null;return best}
+function npcTalk(id,then){const n=dlgNext(id);if(!n){then();return}P.dlg[id]=n[0];save();
+ const o=$('ovDlg');o.querySelector('b').textContent=DLG[id].name;o.querySelector('p').textContent=n[1];o.classList.add('on');setPaused();
+ const ch=npcChars&&npcChars[id==='merchant'?0:1];try{ch&&ch.play('Interact',{once:true,restart:true})}catch(e){}
+ $('dlgOk').onclick=e=>{e.stopPropagation();o.classList.remove('on');setPaused();then()}}
+function storyPlay(slides,done,title){const o=$('ovStory');let i=0;o.classList.add('on');setPaused();
+ const show=()=>{const [h,t]=slides[i];o.querySelector('h2').textContent=h;const p=o.querySelector('p');p.textContent=t;o.querySelector('.sdots').innerHTML=slides.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');p.classList.remove('in');void p.offsetWidth;p.classList.add('in');$('stNext').textContent=i<slides.length-1?'Далее':'Начать'};
+ const end=()=>{o.classList.remove('on');o.onclick=null;setPaused();done&&done()};
+ o.onclick=e=>{if(e.target.id==='stSkip')return end();i++;if(i>=slides.length)end();else show()};show()}

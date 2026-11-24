@@ -335,6 +335,21 @@ body.bn #toast{opacity:0!important}
 #tutArr{position:fixed;display:none;z-index:6;font-size:30px;color:#ffd57a;text-shadow:0 0 10px rgba(255,190,80,.9),0 2px 2px #000;pointer-events:none}
 @media (max-height:500px){#coach{bottom:calc(max(8px,env(safe-area-inset-bottom)) + 30px);width:min(360px,44vw);padding:8px 10px 7px}#coach b{font-size:13px}#coach span{font-size:12px}}
 @media (min-width:901px) and (pointer:fine){#coach{bottom:150px}}
+#ovStory{background:radial-gradient(ellipse at 50% 60%,rgba(40,24,12,.92),rgba(5,4,3,.98));cursor:pointer;z-index:40;place-items:center!important}
+#ovStory .story{max-width:520px;width:88vw;text-align:center}
+#ovStory h2{font:400 clamp(26px,7vw,40px) 'Ruslan Display',serif;color:#ffd98a;margin:14px 0 12px;text-shadow:0 0 24px rgba(255,170,60,.45)}
+#ovStory p{font:400 clamp(15px,4vw,18px)/1.6 Rubik;color:#e9dfcd;min-height:5.2em;margin:0}
+#ovStory p.in{animation:stIn .9s ease both}@keyframes stIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#ovStory .sdots{display:flex;gap:6px;justify-content:center}#ovStory .sdots i{width:7px;height:7px;border-radius:50%;background:#4a3d2c}#ovStory .sdots i.on{background:#e8b860}
+#ovStory .sbtn{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:22px}
+.lnk{background:none;border:0;color:#8f826d;font:500 12px Rubik;text-decoration:underline;cursor:pointer;padding:4px}
+#ovDlg{background:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15) 60%);place-items:end center!important;z-index:35}
+#ovDlg .dlg{width:min(560px,94vw);margin-bottom:calc(max(14px,env(safe-area-inset-bottom)) + 14px);background:linear-gradient(180deg,rgba(40,31,20,.97),rgba(20,16,11,.97));border:1px solid #8a6a36;border-radius:14px;padding:14px 16px 12px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+#ovDlg b{display:block;font:400 18px 'Ruslan Display',serif;color:#ffd98a;margin-bottom:6px}
+#ovDlg p{font:400 14.5px/1.5 Rubik;color:#ece2d0;margin:0 0 12px}
+#ovDlg .btn{display:block;margin-left:auto}
+#banner em{display:block;font:italic 400 clamp(13px,3.4vw,16px)/1.45 Rubik;color:#e9dcc2;margin:8px auto 0;max-width:560px;text-shadow:0 1px 3px #000}
+#banner.boss em{color:#ffc2a8}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -410,6 +425,8 @@ body.bn #toast{opacity:0!important}
 </div></div>
 
 <div class="ov on" id="ovLoad"><div class="card"><h1>Земли Тлена</h1><div class="lbar"><i id="lFill"></i></div><p class="muted" id="lTxt">Загрузка мира…</p></div></div>
+<div class="ov" id="ovStory"><div class="story"><div class="sdots"></div><h2></h2><p></p><div class="sbtn"><button class="btn" id="stNext">Далее</button><button class="lnk" id="stSkip">Пропустить</button></div></div></div>
+<div class="ov" id="ovDlg"><div class="dlg"><b></b><p></p><button class="btn" id="dlgOk">Дальше</button></div></div>
 <div class="ov" id="ovTitle"><div class="card tcard">
   <h1>Земли Тлена</h1>
   <p class="tag">Мёртвые встают из могил Вальмора. Уцелел лишь лагерь у старого костра.</p>
