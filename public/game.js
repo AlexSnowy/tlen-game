@@ -215,7 +215,7 @@ emitters=emitters.filter(e=>e.w!==zone);lights=lights.filter(l=>l.w==='town');if
 if(zGrass){zone.remove(zGrass);zGrass.geometry.dispose();zGrass.material.dispose();zGrass=null}dyn=new THREE.Group();zone.add(dyn);H.whirl=H.leap=H.charge=H.barrage=null;H.queue=[]}
 const mod=k=>S.mods.some(m=>m.k===k);
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?(P.atlN&&P.atlN.includes('rift')?.75:.5):.3))makeRift();S.shrines=[];const mapZ=S.zi<0&&P.atlN;for(let i=0;i<(Math.random()<.6?1:0)+(Math.random()<.3?1:0)+(mapZ&&P.atlN.includes('shr')?1:0);i++)makeShrine();S.ess=null;if(!S.pin&&Math.random()<(mapZ&&P.atlN.includes('ess')?.56:.28))makeEss()}finally{Math.random=RNG0;S.building=false}}
+function buildZone(){clearZone();S.mid=0;S.building=true;S.rift=null;Math.random=mulberry(S.seed||1);try{buildZone0();if(!S.pin&&Math.random()<(S.zi<0?(P.atlN&&P.atlN.includes('rift')?.75:.5):.3))makeRift();S.shrines=[];const mapZ=S.zi<0&&P.atlN;for(let i=0;i<(Math.random()<.6?1:0)+(Math.random()<.3?1:0)+(mapZ&&P.atlN.includes('shr')?1:0);i++)makeShrine();S.hz=[];if(mod('traps'))for(let i=0;i<14;i++){const f=freeSpot(-36,36,2);S.hz.push({x:f.x,z:f.z,t:rand(0,3)});const pl=new THREE.Mesh(new THREE.CylinderGeometry(1.8,1.8,.06,24),new THREE.MeshStandardMaterial({color:'#5a5a62',roughness:.6,metalness:.6}));pl.position.set(f.x,.03,f.z);dyn.add(pl);for(let k=0;k<9;k++){const sp2=new THREE.Mesh(new THREE.ConeGeometry(.09,.35,5),new THREE.MeshStandardMaterial({color:'#9a9aa6',metalness:.8,roughness:.3}));const a=k/9*6.28,r=k?1.1:0;sp2.position.set(f.x+Math.cos(a)*r,.2,f.z+Math.sin(a)*r);dyn.add(sp2)}}S.ess=null;if(!S.pin&&Math.random()<(mapZ&&P.atlN.includes('ess')?.56:.28))makeEss()}finally{Math.random=RNG0;S.building=false}}
 function buildZone0(){const Z=S.zone,th=THEMES[Z.th];S.th=th;
 zGround=makeGround(130,noiseTex(th.g[0],th.g[1],th.g[2],{tiles:th.tiles}),th.tiles?26:18,zone);
 const start={x:0,z:46},bossP={x:0,z:-44};const near=(x,z,r)=>Math.hypot(x-start.x,z-start.z)<r||Math.hypot(x-bossP.x,z-bossP.z)<r+3;
@@ -809,7 +809,7 @@ return false}
 
 /* ================= UPDATE ================= */
 let time=0;
-function update(dt){updEnchant(dt);monFx(dt);updRift(dt);updShrines(dt);updEss(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
+function update(dt){updEnchant(dt);updHaz(dt);monFx(dt);updRift(dt);updShrines(dt);updEss(dt);const p=H.g.position;const moving=S.mode==='dead'?false:moveHero(dt);
 if(!H.leap&&!H.charge)H.face=angLerp(H.face,H.faceT,1-Math.pow(.0005,dt));H.c.root.rotation.y=H.face;
 for(let i=0;i<3;i++)H.cds[i]=Math.max(0,H.cds[i]-dt);H.dashCd=Math.max(0,H.dashCd-dt);H.inv=Math.max(0,H.inv-dt);S.bagWarn-=dt;H.castT-=dt;H.c.lock-=dt;H.immortal=Math.max(0,H.immortal-dt);H.lastCast=(H.lastCast||0)-dt;H.aimT=(H.aimT||0)-dt;
 for(let i=H.queue.length-1;i>=0;i--){const q=H.queue[i];q.t-=dt;if(q.t<=0){H.queue.splice(i,1);q.f()}}
@@ -1534,3 +1534,7 @@ const dead=new Set(keep.dead);for(const m of mons)if(dead.has(m.id)&&!m.dead){m.
 if(OBJ&&keep.obj){OBJ.have=keep.obj.have;keep.obj.ents.forEach((d,i)=>{const e=OBJ.ents[i];if(d&&e&&!e.done){try{completeEnt(e,true,true)}catch(_){e.done=true;if(e.el)e.el.remove()}}});if(keep.obj.done&&!OBJ.done){try{objDone()}catch(_){}}updObjHud()}
 if(S.rift&&keep.rift){S.rift.st=2;S.rift.el.remove();S.rift.g.visible=false}(S.shrines||[]).forEach((x,i)=>{if(keep.shr[i]){x.used=true;x.el.remove();x.gl.visible=false}});if(S.ess&&keep.ess){S.ess.st=1;S.ess.el.remove();S.ess.cr.visible=false}
 toast('Портал вернул тебя в «'+keep.name+'»',2.5)}
+
+/* опасности карт: ловушки и буря */
+function updHaz(dt){if(S.mode!=='zone'||isGuest())return;if(S.hz)for(const h of S.hz){h.t-=dt;if(h.t<=0){h.t=3.2;const d=Math.hypot(h.x-H.g.position.x,h.z-H.g.position.z);if(d<24)tele(h.x,h.z,1.8,.9,(S.L*6+10),'#c0c0c0')}}
+if(mod('storm')){S.stT=(S.stT||2)-dt;if(S.stT<=0){S.stT=rand(1.2,2.4);const tg=nearestPlayer(H.g.position);const x=tg.x+rand(-6,6),z=tg.z+rand(-6,6);tele(x,z,2.2,1.1,S.L*7+12,'#9ad0ff',()=>{burst({x,y:1,z},'#cfe8ff',20,4,.3,.5,2);flash({x,y:2,z},'#cfe8ff',30,.25)})}}}
