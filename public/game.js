@@ -689,7 +689,8 @@ if(d.pin){if((P.frag||0)<4)return;P.frag-=4;save();closePanels();enterZone(-1,14
 if(d.free){closePanels();enterZone(-1,1,null,{zi:Math.floor(Math.random()*8),tier:1,rar:0,mods:[]});return}
 if(d.go!==undefined){const m=P.maps[AT.sel];if(!m)return;P.maps.splice(AT.sel,1);AT.sel=null;save();closePanels();enterZone(-1,m.tier,null,m)}});
 // ----- skill bar
-function updSkillBar(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id],b=$('s'+i);b.innerHTML=(sk?skIcon(sk)+`<span class="sn">${sk.n}</span>`:'<span class="sn">пусто</span>')+`<em>${['Q','E','R'][i]}</em>`;b.classList.toggle('aura',!!sk&&sk.kind==='aura');b.classList.toggle('off',!!sk&&sk.kind==='aura'&&P.auraOff.includes(id))}}
+function updSkillBar(){setTimeout(fitSn,0);updSkillBar0()}
+function updSkillBar0(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[id],b=$('s'+i);b.innerHTML=(sk?skIcon(sk)+`<span class="sn${shortSk(sk.n).length>9?' sm':''}">${esc(shortSk(sk.n))}</span>`:'<span class="sn">пусто</span>')+`<em>${['Q','E','R'][i]}</em>`;b.classList.toggle('aura',!!sk&&sk.kind==='aura');b.classList.toggle('off',!!sk&&sk.kind==='aura'&&P.auraOff.includes(id))}}
 
 /* ================= FLOW ================= */
 function rollShop(){S.shop=[];for(let i=0;i<8;i++)S.shop.push(genItem(Math.max(1,P.maxZone>8?8+P.maxMap:P.maxZone),Math.random()<.35?1:0,0,i<2?'weapon':undefined))}
@@ -1053,7 +1054,7 @@ try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
 S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
-window.__dbg={S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
+window.__dbg={updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
 const T={tab:'sell',tray:new Set(),last:null,buySel:null,sm:null,res:null};
@@ -1706,3 +1707,10 @@ function storyPlay(slides,done,title){const o=$('ovStory');let i=0;o.classList.a
  o.onclick=e=>{if(e.target.id==='stSkip')return end();i++;if(i>=slides.length)end();else show()};show()}
 
 function dlgLog(){const d=P.dlg||{};let h='';for(const id of ['merchant','smith']){const lv=d[id]||0;const ls=DLG[id].lines.filter(l=>l[0]<=lv);if(!ls.length)continue;h+=`<div class="lore1"><b>${DLG[id].name}</b>${ls.map(l=>`<p class="ld">«${esc(l[1])}»</p>`).join('')}</div>`}return h?'<div class="sect" style="margin-top:12px"><span>Разговоры у костра</span></div>'+h:''}
+
+
+const SKSHORT={'Обморожение':'Мороз','Ускользание':'Уклон','Сокрушитель':'Сокруш.','Рывок щитом':'Рывок','Лишний болт':'+1 болт','Дождь стрел':'Дождь','Мощный удар':'Мощн. удар','Огненный шар':'Огн. шар','Огненное кольцо':'Огн. кольцо','Множественные снаряды':'Мультизалп','Пылающая земля':'Пыл. земля','Ледяное копьё':'Лед. копьё','Ледяной взрыв':'Лед. взрыв','Ледяная броня':'Лед. броня','Ледяная сфера':'Лед. сфера','Цепная молния':'Цеп. молния','Энергетический щит':'Энергощит','Шоковая нова':'Шок. нова','Шаровая молния':'Шаровая','Резонанс стихий':'Резонанс','Рассекающий удар':'Рассечение','Вихрь клинков':'Вихрь','Широкий замах':'Замах','Удар в прыжке':'Прыжок','Кровотечение':'Кровотеч.','Клинок правосудия':'Правосудие','Стальная кожа':'Сталь. кожа','Землетрясение':'Землетряс.','Святой молот':'Свят. молот','Аура решимости':'Решимость','Благословение':'Благослов.','Освящённая земля':'Свят. земля','Призыв стража':'Страж','Праведный гнев':'Прав. гнев','Пронзающий выстрел':'Пронзание','Разрывной болт':'Разр. болт','Шквал болтов':'Шквал','Дымовая шашка':'Дым. шашка','Вихрь кинжалов':'Кинж. вихрь','Ловушка с шипами':'Шипы','Тысяча клинков':'Клинки','Ядовитый болт':'Яд. болт','Чумная ловушка':'Чума','Ядовитые твари':'Яд. твари','Смертельная мгла':'Мгла','Двойной удар':'Двойн. удар','Тяжёлые удары':'Тяж. удары','Боевой вихрь':'Боев. вихрь','Раскол земли':'Раскол','Прыжок с топором':'Прыжок','Ударная волна':'Уд. волна','Метание топоров':'Топоры','Крик предков':'Крик','Тотем предков':'Тотем','Кровожадность':'Кровожадн.','Кровавая жатва':'Жатва','Ярость крови':'Ярость','Бессмертный рык':'Рык'};
+function shortSk(n){return SKSHORT[n]||n}
+
+function fitSn(){document.querySelectorAll('#skills .sn').forEach(e=>{e.style.fontSize='';let f=parseFloat(getComputedStyle(e).fontSize);while(e.scrollWidth>e.clientWidth+1&&f>7){f-=.5;e.style.fontSize=f+'px'}})}
+addEventListener('resize',()=>setTimeout(fitSn,100));
