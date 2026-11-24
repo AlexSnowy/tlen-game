@@ -1612,7 +1612,7 @@ for(const it of items){const el=it.el;if((el._dx||0)!==it.dx){el._dx=it.dx;el.st
 addEventListener('resize',()=>hudT=0);
 
 /* раскладка HUD: заголовок зоны, полоса босса и подсказка не наезжают на кнопки */
-function hudLayout(){coachLayout();const tr=document.querySelector('#hud .trow'),tl=document.querySelector('#hud .tl'),bb=$('bossBar'),to=$('toast');if(!tr||!tl)return;
+function hudLayout(){coachLayout();{const ob=$('objTxt'),rows=[...document.querySelectorAll('#hud .trow')].map(e=>e.getBoundingClientRect());if(ob){ob.style.maxWidth='';const O=ob.getBoundingClientRect();for(const R of rows)if(O.width&&O.top<R.bottom&&O.bottom>R.top&&O.right>R.left-8)ob.style.maxWidth=Math.max(140,R.left-O.left-10)+'px'}}miniLayout();const tr=document.querySelector('#hud .trow'),tl=document.querySelector('#hud .tl'),bb=$('bossBar'),to=$('toast');if(!tr||!tl)return;
 tl.style.maxWidth='';bb.style.marginTop='';to.style.marginTop='';to.style.visibility=(document.body.classList.contains('bn')||+getComputedStyle($('banner')).opacity>.05)?'hidden':'';
 const R=tr.getBoundingClientRect(),T=tl.getBoundingClientRect();
 if(T.top<R.bottom&&T.bottom>R.top&&T.right>R.left-8)tl.style.maxWidth=Math.max(120,R.left-T.left-10)+'px';
@@ -2088,3 +2088,13 @@ function sharedSave(a){try{localStorage.setItem('tlen3_sgems',JSON.stringify(a))
 /* иконки узлов пассивного древа — по главному бонусу узла */
 const PAS_IC={fireP:'fireball',burnCh:'flame',coldP:'snowflake-2',chillStr:'frozen-orb',lightP:'power-lightning',chainAdd:'chain-lightning',chaosP:'poison-gas',poisonDur:'poison-bottle',spreadPoison:'poison-cloud',holyP:'holy-symbol',physP:'anvil-impact',meleeP:'broadsword',dmgP:'crossed-swords',aspd:'sword-slice',crit:'arrow-scope',critX:'arrow-scope',critM:'skull-crack',projAdd:'split-arrows',projP:'striking-arrows',pierce:'supersonic-arrow',range:'arrow-scope',aoeP:'triorb',slamR:'quake-stomp',stunCh:'hammer-drop',execute:'reaper-scythe',bleed:'blood',leech:'vampire-dracula',hp:'heart-plus',hpP:'heart-plus',regen:'templar-heart',bloodMagic:'heartburn',armorP:'layered-armor',dmgTaken:'crenulated-shield',reflect:'shield-reflect',manaP:'crystal-shine',manaRegen:'floating-crystal',cdr:'concentration-orb',auraP:'aura',move:'sprint',gold:'two-coins',rarity:'gem-pendant',xp:'laurel-crown',es:'energy-shield'};
 function pasIcon(n){if(n.t==='start'&&n.cls){const k=UI_IC['cls:'+n.cls];return GI[k]?k:null}const st=n.st||{};let best=null,bv=-1;for(const k in st){if(!PAS_IC[k]||!GI[PAS_IC[k]])continue;const v=Math.abs(+st[k]||1);const w=(k==='hp'||k==='gold'||k==='xp')?v/10:v;if(w>bv){bv=w;best=PAS_IC[k]}}return best||(n.t==='key'?'spiked-halo':n.t==='notable'?'sun':'world')}
+
+/* миникарта не прячется под кнопками на низких экранах (горизонталь в Telegram) */
+function miniLayout(){const mi=$('mini');if(!mi||S.mode==='town'&&false)return;mi.style.left=mi.style.top=mi.style.right=mi.style.width=mi.style.height=mi.style.position='';
+ const hit=(R,sel)=>{for(const e of document.querySelectorAll(sel)){const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden')continue;const r=e.getBoundingClientRect();if(r.width>2&&R.left<r.right&&R.right>r.left&&R.top<r.bottom&&R.bottom>r.top)return r}return null};
+ const OBST='#skills .sk,.globe,#hud .trow .hb,#hud .trow .gold,#interact.on,#coach.on';let R=mi.getBoundingClientRect();if(R.width<2||!hit(R,OBST))return;
+ const ob=$('objTxt'),tl=document.querySelector('#hud .tl');let top=8;for(const e of [tl,ob])if(e&&e.offsetParent!==null&&getComputedStyle(e).display!=='none'){const r=e.getBoundingClientRect();if(r.height)top=Math.max(top,r.bottom+8)}
+ let lim=innerHeight;for(const e of document.querySelectorAll('.globe')){const r=e.getBoundingClientRect();if(r.width&&r.left<200)lim=Math.min(lim,r.top-8)}
+ const sz=Math.max(56,Math.min(84,lim-top));mi.style.position='fixed';mi.style.right='auto';mi.style.left=Math.max(8,(document.querySelector('#hud .tl')||{getBoundingClientRect:()=>({left:12})}).getBoundingClientRect().left)+'px';mi.style.top=top+'px';mi.style.width=mi.style.height=sz+'px';
+ R=mi.getBoundingClientRect();if(hit(R,OBST)){mi.style.width=mi.style.height='56px'}}
+addEventListener('resize',()=>setTimeout(miniLayout,80));
