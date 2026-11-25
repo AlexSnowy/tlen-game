@@ -4,32 +4,49 @@ const MAX = 3;
 
 
 // ---------- Оплата звёздами Telegram (Stars) ----------
-// Нужны: секрет BOT_TOKEN (токен бота игры), секрет WEBHOOK_SECRET (любая длинная строка), KV-хранилище PAY.
+// Нужен только секрет BOT_TOKEN (токен бота игры). Покупки читаются из истории звёзд бота — отдельная база не нужна.
 const ITEMS = { founder: ['Набор основателя', 299], ny: ['Новогодний набор', 59], dyes: ['Краски брони', 49], fx: ['Стихии умений', 79], aura: ['Ауры и следы', 79], pet: ['Спутники-огоньки', 99], portal: ['Облик портала', 49], tab: ['+1 вкладка хранилища', 39], slot: ['+1 место для героя', 39] };
 const itemInfo = id => ITEMS[id] || (/^pass_s\d+$/.test(id) ? ['Пропуск сезона', 149] : null);
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type, X-Init', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
 const json = (o, st = 200) => new Response(JSON.stringify(o), { status: st, headers: { 'Content-Type': 'application/json', ...CORS } });
+const hex = a => [...a].map(b => b.toString(16).padStart(2, '0')).join('');
 async function hmac(key, data) { const k = await crypto.subtle.importKey('raw', typeof key === 'string' ? new TextEncoder().encode(key) : key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']); return new Uint8Array(await crypto.subtle.sign('HMAC', k, new TextEncoder().encode(data))); }
+const hookSecret = async env => hex(await hmac('tlen-webhook', env.BOT_TOKEN)).slice(0, 48);
 async function tgUser(initData, token) {
   if (!initData || !token) return null;
   const p = new URLSearchParams(initData); const hash = p.get('hash'); p.delete('hash');
   const dcs = [...p.entries()].sort((a, b) => a[0] < b[0] ? -1 : 1).map(([k, v]) => k + '=' + v).join('\n');
-  const sec = await hmac('WebAppData', token); const h = [...await hmac(sec, dcs)].map(b => b.toString(16).padStart(2, '0')).join('');
+  const h = hex(await hmac(await hmac('WebAppData', token), dcs));
   if (h !== hash) return null; if (Date.now() / 1000 - (+p.get('auth_date') || 0) > 86400 * 7) return null;
   try { return JSON.parse(p.get('user')); } catch { return null; }
 }
-const bot = (env, m, body) => fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${m}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
+const bot = (env, m, body) => fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${m}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) }).then(r => r.json());
+async function boughtBy(env, uid) {
+  const out = []; const refunded = new Set();
+  for (let off = 0; off < 5000; off += 100) {
+    const r = await bot(env, 'getStarTransactions', { offset: off, limit: 100 }); const tx = (r.ok && r.result && r.result.transactions) || [];
+    for (const t of tx) {
+      const pt = t.source && t.source.type === 'user' ? t.source : t.receiver && t.receiver.type === 'user' ? t.receiver : null; if (!pt || !pt.user || pt.user.id !== uid) continue;
+      if (t.receiver && t.receiver.type === 'user') { refunded.add(t.id); continue; }
+      let pl = {}; try { pl = JSON.parse(pt.invoice_payload || '{}'); } catch {} if (pl.i) out.push({ id: t.id, i: pl.i });
+    }
+    if (tx.length < 100) break;
+  }
+  return out.filter(x => !refunded.has(x.id)).map(x => x.i);
+}
 async function payRoute(url, req, env) {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  if (!env.BOT_TOKEN) return json({ error: 'not configured' }, 503);
   if (url.pathname === '/tg/webhook') {
-    if (req.headers.get('X-Telegram-Bot-Api-Secret-Token') !== env.WEBHOOK_SECRET) return new Response('no', { status: 403 });
+    if (req.headers.get('X-Telegram-Bot-Api-Secret-Token') !== await hookSecret(env)) return new Response('no', { status: 403 });
     const u = await req.json();
     if (u.pre_checkout_query) { const q = u.pre_checkout_query; let ok = false; try { ok = !!itemInfo(JSON.parse(q.invoice_payload).i); } catch {} await bot(env, 'answerPreCheckoutQuery', ok ? { pre_checkout_query_id: q.id, ok: true } : { pre_checkout_query_id: q.id, ok: false, error_message: 'Товар не найден' }); }
-    const sp = u.message && u.message.successful_payment;
-    if (sp) { let pl = {}; try { pl = JSON.parse(sp.invoice_payload); } catch {} const uid = String(pl.u || u.message.from.id); const key = 'u:' + uid; const list = JSON.parse(await env.PAY.get(key) || '[]'); if (!list.some(x => x.c === sp.telegram_payment_charge_id)) { list.push({ i: pl.i, c: sp.telegram_payment_charge_id, t: Date.now() }); await env.PAY.put(key, JSON.stringify(list)); } }
     return new Response('ok');
   }
-  if (url.pathname === '/tg/setup') { if (url.searchParams.get('s') !== env.WEBHOOK_SECRET) return new Response('no', { status: 403 }); return json(await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: env.WEBHOOK_SECRET, allowed_updates: ['pre_checkout_query', 'message'] })); }
+  if (url.pathname === '/tg/links') { const ids = [...Object.keys(ITEMS), 'pass_s1', 'pass_s2', 'pass_s3']; const out = {};
+    for (const id of ids) { const info = itemInfo(id); const r = await bot(env, 'createInvoiceLink', { title: info[0], description: 'Земли Тлена: ' + info[0] + '. Только облик и удобство, без влияния на силу героя.', payload: JSON.stringify({ i: id }), currency: 'XTR', prices: [{ label: info[0], amount: info[1] }] }); if (r.ok) out[id] = r.result; }
+    return json(out); }
+  if (url.pathname === '/tg/setup') { const info = await bot(env, 'getWebhookInfo'); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query'] }); return json({ before: info.result && info.result.url, set }); }
   const user = await tgUser(req.headers.get('X-Init'), env.BOT_TOKEN);
   if (!user) return json({ error: 'auth' }, 401);
   if (url.pathname === '/tg/invoice' && req.method === 'POST') {
@@ -37,7 +54,7 @@ async function payRoute(url, req, env) {
     const r = await bot(env, 'createInvoiceLink', { title: info[0], description: 'Земли Тлена: ' + info[0] + '. Только облик и удобство, без влияния на силу героя.', payload: JSON.stringify({ u: user.id, i: item }), currency: 'XTR', prices: [{ label: info[0], amount: info[1] }] });
     return r.ok ? json({ link: r.result }) : json({ error: 'tg' }, 502);
   }
-  if (url.pathname === '/tg/purchases') { const list = JSON.parse(await env.PAY.get('u:' + user.id) || '[]'); return json({ items: list.map(x => x.i) }); }
+  if (url.pathname === '/tg/purchases') return json({ items: await boughtBy(env, user.id) });
   return json({ error: 'path' }, 404);
 }
 

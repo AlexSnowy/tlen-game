@@ -1,0 +1,17 @@
+name: Pay links
+# Запуск вручную после того, как в Cloudflare задан секрет BOT_TOKEN:
+# включает приём оплаты ботом и сохраняет ссылки на оплату звёздами в public/paylinks.json
+on: { workflow_dispatch: {} }
+permissions: { contents: write }
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          W=https://tlen-game.zemlitlena.workers.dev
+          curl -sf "$W/tg/setup" | tee setup.json
+          curl -sf "$W/tg/links" -o public/paylinks.json
+          python3 -c "import json;d=json.load(open('public/paylinks.json'));assert len(d)>=10,d;print(len(d),'links')"
+          git config user.name "pay-links-bot"; git config user.email "actions@github.com"
+          git add public/paylinks.json && git commit -m "Ссылки на оплату звёздами" && git push

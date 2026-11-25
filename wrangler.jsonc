@@ -6,6 +6,5 @@
   "assets": { "directory": "./public", "binding": "ASSETS", "not_found_handling": "single-page-application" },
   "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "Room" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
-  "kv_namespaces": [{ "binding": "PAY", "id": "ВСТАВЬ_ID_KV" }],
   "observability": { "enabled": true }
 }
