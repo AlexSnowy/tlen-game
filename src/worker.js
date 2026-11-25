@@ -53,13 +53,19 @@ async function payRoute(url, req, env) {
     for (const id of ids) { const info = itemInfo(id); const r = await bot(env, 'createInvoiceLink', { title: info[0], description: 'Земли Тлена: ' + info[0] + '. Только облик и удобство, без влияния на силу героя.', payload: JSON.stringify({ i: id }), currency: 'XTR', prices: [{ label: info[0], amount: info[1] }] }); if (r.ok) out[id] = r.result; }
     return json(out); }
   if (url.pathname === '/tg/check') { const me = await bot(env, 'getMe'); const wh = await bot(env, 'getWebhookInfo'); const d = await bot(env, 'getMyDescription'); const mb = await bot(env, 'getChatMenuButton'); return json({ bot: me.result && me.result.username, upd: wh.result && wh.result.allowed_updates, pending: wh.result && wh.result.pending_update_count, err: wh.result && wh.result.last_error_message, desc: d.result && d.result.description, menu: mb.result, webhook: wh.result && wh.result.url || '', ours: (wh.result && wh.result.url || '') === url.origin + '/tg/webhook' }); }
-  if (url.pathname === '/tg/setup') { const info = await bot(env, 'getWebhookInfo'); await bot(env, 'deleteWebhook', {}); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query', 'message'] });
+  if (url.pathname === '/tg/setup') { let extra = null; const info = await bot(env, 'getWebhookInfo'); await bot(env, 'deleteWebhook', {}); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query', 'message'] });
     const menu = await bot(env, 'setChatMenuButton', { menu_button: { type: 'web_app', text: 'Играть', web_app: { url: GAME_URL } } });
     await bot(env, 'setMyDescription', { description: 'Тёмная 3D ARPG: сражайся с ордами мертвецов, собирай добычу и играй с друзьями. Нажми «Играть».' });
     await bot(env, 'setMyShortDescription', { short_description: 'Земли Тлена — тёмная 3D ARPG с кооперативом' });
     await bot(env, 'setMyDescription', { description: 'A dark 3D action RPG: fight hordes of the dead, collect loot and play with friends. Tap “Play”.', language_code: 'en' });
+    const nm = await bot(env, 'setMyName', { name: '⚔️ Земли Тлена | 3D ARPG с друзьями' });
+    await bot(env, 'setMyName', { name: '⚔️ Lands of Decay | 3D co-op ARPG', language_code: 'en' });
+    let pic = null;
+    try { const img = await fetch(GAME_URL + 'icon-512.png').then(r => r.blob()); const fd = new FormData(); fd.append('photo', JSON.stringify({ type: 'static', photo: 'attach://pic' })); fd.append('pic', img, 'icon.png');
+      pic = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/setMyProfilePhoto`, { method: 'POST', body: fd }).then(r => r.json()); } catch (e) { pic = { error: String(e) }; }
+    extra = { name: nm, pic };
     await bot(env, 'setMyCommands', { commands: [{ command: 'start', description: 'Играть / Play' }] });
-    return json({ before: info.result && info.result.url, set, menu }); }
+    return json({ before: info.result && info.result.url, set, menu, extra }); }
   const user = await tgUser(req.headers.get('X-Init'), env.BOT_TOKEN);
   if (!user) return json({ error: 'auth' }, 401);
   if (url.pathname === '/tg/invoice' && req.method === 'POST') {
