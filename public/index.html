@@ -438,6 +438,11 @@ body.bn #toast{opacity:0!important}
 #ovDlg .btn{display:block;margin-left:auto}
 #banner em{display:block;font:italic 400 clamp(13px,3.4vw,16px)/1.45 Rubik,system-ui,sans-serif;color:#e9dcc2;margin:8px auto 0;max-width:560px;text-shadow:0 1px 3px #000}
 #banner.boss em{color:#ffc2a8}
+
+/* флакон и рывок: значок по центру, счётчик зелий — плашкой внутри круга */
+.sk.flask b{top:auto;right:auto;bottom:7px;left:50%;transform:translateX(-50%);min-width:18px;padding:1px 6px;border-radius:9px;background:#c2352b;color:#fff;font:700 11px/14px Rubik,system-ui,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.6)}
+.sk.dash svg{margin-bottom:0}.sk.flask svg{margin-bottom:14px}
+@media (pointer:fine){.sk.flask svg,.sk.dash svg{margin-bottom:12px}.sk.flask b{bottom:auto;top:5px;left:auto;right:5px;transform:none}}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
