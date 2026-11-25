@@ -23,7 +23,7 @@ PLATS = {
     'newgrounds': 'itch',
     'gamejolt': 'itch',
 }
-SKIP = {'bugs.html'}
+SKIP = {'bugs.html', 'dl', 'en', 'paylinks.json'} if False else {'bugs.html', 'dl', 'paylinks.json'}
 
 
 def version():
