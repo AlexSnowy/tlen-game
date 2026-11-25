@@ -16,7 +16,8 @@ jobs:
           print('BOT:',c['bot'],'WEBHOOK:',c['webhook'] or '(нет)')
           if c['webhook'] and not c['ours']: raise SystemExit('У бота уже есть чужой вебхук — не трогаю')
           P
-          curl -sf "$W/tg/setup" | tee setup.json
+          curl -sf "$W/tg/setup" | tee setup.json; echo
+          sleep 2; curl -sf "$W/tg/check"; echo
           curl -sf "$W/tg/links" -o public/paylinks.json
           python3 -c "import json;d=json.load(open('public/paylinks.json'));assert len(d)>=10,d;print(len(d),'links')"
           git config user.name "pay-links-bot"; git config user.email "actions@github.com"

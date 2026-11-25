@@ -45,15 +45,15 @@ async function payRoute(url, req, env) {
     const msg = u.message;
     if (msg && msg.chat && !msg.successful_payment) {
       const ru = !/^(en|de|fr|es|it|pt|pl|tr|ja|ko|zh)/.test((msg.from && msg.from.language_code) || 'ru');
-      await bot(env, 'sendMessage', { chat_id: msg.chat.id, text: ru ? '⚔️ Земли Тлена — тёмная 3D ARPG прямо в Telegram.\nДобыча, камни умений, древо пассивов, боссы и кооператив до 3 игроков.\n\nЖми «Играть»!' : '⚔️ Lands of Decay — a dark 3D action RPG right in Telegram.\nLoot, skill gems, a passive tree, bosses and co-op for up to 3 players.\n\nTap “Play”!', reply_markup: { inline_keyboard: [[{ text: ru ? '▶️ Играть' : '▶️ Play', web_app: { url: GAME_URL } }]] } });
+      await bot(env, 'sendPhoto', { chat_id: msg.chat.id, photo: GAME_URL + 'press/cover-' + (ru ? 'ru' : 'en') + '.jpg', caption: ru ? '⚔️ Земли Тлена — тёмная 3D ARPG прямо в Telegram.\nДобыча, камни умений, древо пассивов, боссы и кооператив до 3 игроков.\n\nЖми «Играть»!' : '⚔️ Lands of Decay — a dark 3D action RPG right in Telegram.\nLoot, skill gems, a passive tree, bosses and co-op for up to 3 players.\n\nTap “Play”!', reply_markup: { inline_keyboard: [[{ text: ru ? '▶️ Играть' : '▶️ Play', web_app: { url: GAME_URL } }]] } });
     }
     return new Response('ok');
   }
   if (url.pathname === '/tg/links') { const ids = [...Object.keys(ITEMS), 'pass_s1', 'pass_s2', 'pass_s3']; const out = {};
     for (const id of ids) { const info = itemInfo(id); const r = await bot(env, 'createInvoiceLink', { title: info[0], description: 'Земли Тлена: ' + info[0] + '. Только облик и удобство, без влияния на силу героя.', payload: JSON.stringify({ i: id }), currency: 'XTR', prices: [{ label: info[0], amount: info[1] }] }); if (r.ok) out[id] = r.result; }
     return json(out); }
-  if (url.pathname === '/tg/check') { const me = await bot(env, 'getMe'); const wh = await bot(env, 'getWebhookInfo'); return json({ bot: me.result && me.result.username, webhook: wh.result && wh.result.url || '', ours: (wh.result && wh.result.url || '') === url.origin + '/tg/webhook' }); }
-  if (url.pathname === '/tg/setup') { const info = await bot(env, 'getWebhookInfo'); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query', 'message'] });
+  if (url.pathname === '/tg/check') { const me = await bot(env, 'getMe'); const wh = await bot(env, 'getWebhookInfo'); const d = await bot(env, 'getMyDescription'); const mb = await bot(env, 'getChatMenuButton'); return json({ bot: me.result && me.result.username, upd: wh.result && wh.result.allowed_updates, pending: wh.result && wh.result.pending_update_count, err: wh.result && wh.result.last_error_message, desc: d.result && d.result.description, menu: mb.result, webhook: wh.result && wh.result.url || '', ours: (wh.result && wh.result.url || '') === url.origin + '/tg/webhook' }); }
+  if (url.pathname === '/tg/setup') { const info = await bot(env, 'getWebhookInfo'); await bot(env, 'deleteWebhook', {}); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query', 'message'] });
     const menu = await bot(env, 'setChatMenuButton', { menu_button: { type: 'web_app', text: 'Играть', web_app: { url: GAME_URL } } });
     await bot(env, 'setMyDescription', { description: 'Тёмная 3D ARPG: сражайся с ордами мертвецов, собирай добычу и играй с друзьями. Нажми «Играть».' });
     await bot(env, 'setMyShortDescription', { short_description: 'Земли Тлена — тёмная 3D ARPG с кооперативом' });
