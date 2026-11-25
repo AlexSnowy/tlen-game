@@ -6,6 +6,7 @@ const MAX = 3;
 // ---------- Оплата звёздами Telegram (Stars) ----------
 // Нужен только секрет BOT_TOKEN (токен бота игры). Покупки читаются из истории звёзд бота — отдельная база не нужна.
 const ITEMS = { founder: ['Набор основателя', 299], ny: ['Новогодний набор', 59], dyes: ['Краски брони', 49], fx: ['Стихии умений', 79], aura: ['Ауры и следы', 79], pet: ['Спутники-огоньки', 99], portal: ['Облик портала', 49], tab: ['+1 вкладка хранилища', 39], slot: ['+1 место для героя', 39] };
+const GAME_URL = 'https://alexsnowy.github.io/tlen-game/';
 const itemInfo = id => ITEMS[id] || (/^pass_s\d+$/.test(id) ? ['Пропуск сезона', 149] : null);
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type, X-Init', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
 const json = (o, st = 200) => new Response(JSON.stringify(o), { status: st, headers: { 'Content-Type': 'application/json', ...CORS } });
@@ -41,13 +42,24 @@ async function payRoute(url, req, env) {
     if (req.headers.get('X-Telegram-Bot-Api-Secret-Token') !== await hookSecret(env)) return new Response('no', { status: 403 });
     const u = await req.json();
     if (u.pre_checkout_query) { const q = u.pre_checkout_query; let ok = false; try { ok = !!itemInfo(JSON.parse(q.invoice_payload).i); } catch {} await bot(env, 'answerPreCheckoutQuery', ok ? { pre_checkout_query_id: q.id, ok: true } : { pre_checkout_query_id: q.id, ok: false, error_message: 'Товар не найден' }); }
+    const msg = u.message;
+    if (msg && msg.chat && !msg.successful_payment) {
+      const ru = !/^(en|de|fr|es|it|pt|pl|tr|ja|ko|zh)/.test((msg.from && msg.from.language_code) || 'ru');
+      await bot(env, 'sendMessage', { chat_id: msg.chat.id, text: ru ? '⚔️ Земли Тлена — тёмная 3D ARPG прямо в Telegram.\nДобыча, камни умений, древо пассивов, боссы и кооператив до 3 игроков.\n\nЖми «Играть»!' : '⚔️ Lands of Decay — a dark 3D action RPG right in Telegram.\nLoot, skill gems, a passive tree, bosses and co-op for up to 3 players.\n\nTap “Play”!', reply_markup: { inline_keyboard: [[{ text: ru ? '▶️ Играть' : '▶️ Play', web_app: { url: GAME_URL } }]] } });
+    }
     return new Response('ok');
   }
   if (url.pathname === '/tg/links') { const ids = [...Object.keys(ITEMS), 'pass_s1', 'pass_s2', 'pass_s3']; const out = {};
     for (const id of ids) { const info = itemInfo(id); const r = await bot(env, 'createInvoiceLink', { title: info[0], description: 'Земли Тлена: ' + info[0] + '. Только облик и удобство, без влияния на силу героя.', payload: JSON.stringify({ i: id }), currency: 'XTR', prices: [{ label: info[0], amount: info[1] }] }); if (r.ok) out[id] = r.result; }
     return json(out); }
   if (url.pathname === '/tg/check') { const me = await bot(env, 'getMe'); const wh = await bot(env, 'getWebhookInfo'); return json({ bot: me.result && me.result.username, webhook: wh.result && wh.result.url || '', ours: (wh.result && wh.result.url || '') === url.origin + '/tg/webhook' }); }
-  if (url.pathname === '/tg/setup') { const info = await bot(env, 'getWebhookInfo'); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query'] }); return json({ before: info.result && info.result.url, set }); }
+  if (url.pathname === '/tg/setup') { const info = await bot(env, 'getWebhookInfo'); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query', 'message'] });
+    const menu = await bot(env, 'setChatMenuButton', { menu_button: { type: 'web_app', text: 'Играть', web_app: { url: GAME_URL } } });
+    await bot(env, 'setMyDescription', { description: 'Тёмная 3D ARPG: сражайся с ордами мертвецов, собирай добычу и играй с друзьями. Нажми «Играть».' });
+    await bot(env, 'setMyShortDescription', { short_description: 'Земли Тлена — тёмная 3D ARPG с кооперативом' });
+    await bot(env, 'setMyDescription', { description: 'A dark 3D action RPG: fight hordes of the dead, collect loot and play with friends. Tap “Play”.', language_code: 'en' });
+    await bot(env, 'setMyCommands', { commands: [{ command: 'start', description: 'Играть / Play' }] });
+    return json({ before: info.result && info.result.url, set, menu }); }
   const user = await tgUser(req.headers.get('X-Init'), env.BOT_TOKEN);
   if (!user) return json({ error: 'auth' }, 401);
   if (url.pathname === '/tg/invoice' && req.method === 'POST') {
