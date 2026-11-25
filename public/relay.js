@@ -174,3 +174,30 @@ export class Feed {
   pub(o) { if (!this.ok) { this.q.push(o); return; } o.from = this.me; this.ws.send(pkt(0x30, [...str(PFX + 'feed'), ...te.encode(JSON.stringify(o))])); }
   close() { this.closed = true; try { this.ws.close(); } catch {} }
 }
+
+// Общее хранилище retained-сообщений (жалобы на баги и т. п.): запись и чтение списка
+export function retained(base, entry, onList, onDone, brokers = BROKERS) {
+  const list = {}; let ws, done = false;
+  try { ws = new WebSocket(brokers[0], 'mqtt'); } catch { onDone && onDone(false); return () => {}; }
+  ws.binaryType = 'arraybuffer';
+  ws.onopen = () => ws.send(pkt(0x10, [...str('MQTT'), 4, 0x02, 0, 30, ...str('rt' + Math.random().toString(36).slice(2, 9))]));
+  ws.onerror = () => { if (!done) { onDone && onDone(false); done = true; } };
+  ws.onmessage = e => {
+    const d = new Uint8Array(e.data); let i = 0;
+    while (i < d.length) {
+      const t = d[i] >> 4; let mul = 1, len = 0, j = i + 1, c;
+      do { c = d[j++]; len += (c & 127) * mul; mul *= 128; } while (c & 128);
+      const p = d.subarray(j, j + len); i = j + len;
+      if (t === 2) {
+        if (entry) { const pl = entry.del ? [] : [...te.encode(JSON.stringify(entry))]; ws.send(pkt(0x31, [...str(PFX + base + '/' + entry.id), ...pl])); if (!onList) { setTimeout(() => { onDone && onDone(true); stop(); }, 600); } }
+        if (onList) ws.send(pkt(0x82, [0, 4, ...str(PFX + base + '/#'), 0]));
+      } else if (t === 3 && onList) {
+        const tl = (p[0] << 8) | p[1];
+        try { const raw = td.decode(p.subarray(2 + tl)); if (!raw) continue; const o = JSON.parse(raw); if (o && o.id) { list[o.id] = o; onList(Object.values(list)); } } catch {}
+      }
+    }
+  };
+  const stop = () => { if (done) return; done = true; try { ws.send(new Uint8Array([0xE0, 0])); ws.close(); } catch {} };
+  if (onList) setTimeout(() => { onDone && onDone(true); stop(); }, 9000);
+  return stop;
+}

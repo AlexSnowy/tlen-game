@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {RelaySocket,leaderboard,Feed} from './relay.js?v=__V__';
+import {RelaySocket,leaderboard,Feed,retained} from './relay.js?v=__V__';
 import {GI,SK_IC,IT_IC,UI_IC} from './icons.js?v=__V__';
 const gi=(n,c,st='')=>GI[n]?`<svg class="gi" viewBox="0 0 512 512" style="${c?'color:'+c+';':''}${st}">${GI[n]}</svg>`:'';
 const uiI=(k,c,st)=>gi(UI_IC[k],c,st);
@@ -950,7 +950,7 @@ $('buffs').innerHTML=H.buffs.map(b=>`<span>${b.n} ${Math.ceil(b.t)}с</span>`).j
 const n=nearNpc(),ib=$('interact');{const was=ib.classList.contains('on');ib.classList.toggle('on',!!n&&!S.paused);if(was!==ib.classList.contains('on'))coachLayout()}if(n)ib.textContent=(n.id==='portal'?'Открыть портал':n.id==='stash'?'Открыть хранилище':'Говорить: '+n.name)+(touch?'':' (Enter)');
 S.hurtV=Math.max(0,S.hurtV-dt*2.5);const low=H.hp/ST.hp<.3?.35+Math.sin(time*6)*.15:0;$('vig').style.opacity=Math.max(S.hurtV*.8,low);if(frameN%3===0)drawMini()}
 if(toastT>0){toastT-=dt;if(toastT<=0)$('toast').classList.remove('on')}
-composer.render();fitLabels();nyTick(dt);tutTick(dt)}
+composer.render();if(BUGSHOT){const f=BUGSHOT;BUGSHOT=null;try{f(renderer.domElement)}catch(e){f(null)}}fitLabels();nyTick(dt);tutTick(dt)}
 
 /* ================= NETWORK (кооператив) ================= */
 const NET={ws:null,id:null,room:null,host:true,on:false,peers:{},sendT:0,snapT:0,name:'',pendingJoin:null,leaderZone:null,syncWait:false};
@@ -1539,7 +1539,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
 <label class="zrow">Приближение камеры <input type="range" min="0.42" max="1.3" step="0.02" value="${CAMZT}" data-zoom><small>колесо мыши или два пальца</small></label> <label><input type="checkbox" data-set="ny" ${nyOn()?'checked':''}> Новогоднее настроение — снег, украшения, шапки на монстрах</label> <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
-<button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
+<button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
 <label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
 $('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
@@ -2098,3 +2098,20 @@ function miniLayout(){const mi=$('mini');if(!mi||S.mode==='town'&&false)return;m
  const sz=Math.max(56,Math.min(84,lim-top));mi.style.position='fixed';mi.style.right='auto';mi.style.left=Math.max(8,(document.querySelector('#hud .tl')||{getBoundingClientRect:()=>({left:12})}).getBoundingClientRect().left)+'px';mi.style.top=top+'px';mi.style.width=mi.style.height=sz+'px';
  R=mi.getBoundingClientRect();if(hit(R,OBST)){mi.style.width=mi.style.height='56px'}}
 addEventListener('resize',()=>setTimeout(miniLayout,80));
+
+/* ===== кнопка «Баг»: жалоба с данными для разработчика ===== */
+var BUGSHOT=null;const ERRLOG=[];
+addEventListener('error',e=>{ERRLOG.push(String(e.message||e.error||'').slice(0,200)+' @'+String(e.filename||'').split('/').pop()+':'+e.lineno);if(ERRLOG.length>12)ERRLOG.shift()});
+addEventListener('unhandledrejection',e=>{ERRLOG.push('promise: '+String(e.reason&&e.reason.message||e.reason).slice(0,200));if(ERRLOG.length>12)ERRLOG.shift()});
+function bugOpen(){let o=$('ovBug');if(!o){o=document.createElement('div');o.className='ov';o.id='ovBug';o.innerHTML=`<div class="card bugc"><h2>Сообщить о баге</h2><p class="muted">Опиши, что случилось и что ты делал перед этим. Версия игры, устройство и место в игре приложатся сами.</p>
+<textarea id="bugT" maxlength="1500" placeholder="Например: в Бездне после ямы трещина перестала ползти, монстров нет"></textarea>
+<label class="bugchk"><input type="checkbox" id="bugS" checked> Приложить снимок экрана</label>
+<div class="bugb"><button class="btn" id="bugSend">Отправить</button><button class="btn alt" id="bugX">Отмена</button></div><p class="muted" id="bugR"></p></div>`;document.body.appendChild(o);
+ $('bugX').onclick=()=>{o.classList.remove('on');setPaused()};$('bugSend').onclick=bugSend}
+ $('bugT').value='';$('bugR').textContent='';$('bugSend').disabled=false;o.classList.add('on');setPaused();setTimeout(()=>$('bugT').focus(),50)}
+function bugSend(){const txt=$('bugT').value.trim();if(txt.length<4){$('bugR').textContent='Напиши хотя бы пару слов о проблеме.';return}$('bugSend').disabled=true;$('bugR').textContent='Отправляю…';
+ const meta={v:GVER||'dev',ua:navigator.userAgent.slice(0,160),scr:innerWidth+'×'+innerHeight+' @'+devicePixelRatio,q:Q,mode:S.mode,zone:S.zone?S.zone.n:'',zi:S.zi,map:S.map||0,abyss:S.abyss||0,cls:P?P.cls:'',lvl:P?P.lvl:0,party:NET.on?(NET.host?'лидер':'в группе'):'',tg:!!(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData),errs:ERRLOG.slice(-8)};
+ const go=shot=>{const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);retained('bugs',{id,t:Date.now(),txt:txt.slice(0,1500),meta,shot},null,ok=>{$('bugR').textContent=ok?'Спасибо! Жалоба отправлена разработчику.':'Не удалось отправить — проверь интернет и попробуй ещё раз.';if(ok)setTimeout(()=>{$('ovBug').classList.remove('on');setPaused()},1400);else $('bugSend').disabled=false},BRK())};
+ if($('bugS').checked&&S.mode!=='title'){BUGSHOT=cv=>{let d=null;try{if(cv){const w=Math.min(480,cv.width),h=Math.round(cv.height*w/cv.width);const c2=document.createElement('canvas');c2.width=w;c2.height=h;c2.getContext('2d').drawImage(cv,0,0,w,h);d=c2.toDataURL('image/jpeg',.55)}}catch(e){}go(d)};setTimeout(()=>{if(BUGSHOT){BUGSHOT=null;go(null)}},1500)}else go(null)}
+
+document.addEventListener('click',e=>{if(e.target.closest('#bBug,[data-bugrep]')){e.preventDefault();if(e.target.closest('[data-bugrep]'))document.querySelectorAll('.panel.on [data-close]').forEach(b=>b.click());bugOpen()}});

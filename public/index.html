@@ -62,6 +62,12 @@ body.ny #ovTitle h1{text-shadow:0 0 22px rgba(160,200,255,.35),0 2px 0 #000}
 #tree .nf{fill:none;stroke:#c9a25a;stroke-width:2.2;opacity:.85}#tree .pn.on .nf{stroke:#ffd98a;opacity:1}#tree .pn:not(.on):not(.av) .nf{stroke:#5a4a32}
 .ov{overflow-y:auto}
 @media (max-height:520px){.ov{place-items:start center!important;padding-top:10px}.tcard h1{font-size:clamp(26px,9vh,40px)!important;margin:0 0 2px}.tcard .tag{margin-bottom:8px;font-size:12.5px}}
+.bugbtn{position:fixed;right:calc(max(12px,env(safe-area-inset-right)));top:calc(max(12px,env(safe-area-inset-top)));z-index:9;background:rgba(30,22,14,.85);border:1px solid #8a6a36;border-radius:999px;color:#f0dcae;font:600 13px Rubik,system-ui,sans-serif;padding:7px 14px;cursor:pointer}
+#ovTitle:not(.on)~.bugbtn{display:none}
+.bugc{max-width:min(520px,94vw)!important;text-align:left;background:linear-gradient(180deg,#2a2016,#1a140e);border:1px solid #8a6a36;border-radius:16px;padding:18px 18px 14px;box-shadow:0 10px 40px rgba(0,0,0,.7);margin-top:8vh}.bugc h2{margin:0 0 6px}
+#bugT{width:100%;box-sizing:border-box;min-height:120px;margin:8px 0;background:rgba(0,0,0,.35);border:1px solid #6a5434;border-radius:10px;color:#f0e6d2;font:400 14px/1.45 Rubik,system-ui,sans-serif;padding:10px;resize:vertical}
+.bugchk{display:flex!important;gap:8px;align-items:center;font-size:13px;margin:2px 0 10px}.bugb{display:flex;gap:8px;flex-wrap:wrap}
+.hb.bugh{opacity:.9}
 </style>
 <link rel="preload" href="fonts/rubik-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -503,7 +509,7 @@ body.bn #toast{opacity:0!important}
       <button class="btn alt sm" id="bExp">Экспорт сохранения</button><button class="btn alt sm" id="bImp">Импорт</button>
     </div></details>
   </div>
-  <p class="credit">3D-модели: Kay Lousberg, KayKit (CC0) · Иконки: game-icons.net (CC BY 3.0)</p>
+  <button class="bugbtn" id="bBug" title="Сообщить о баге">🐞 Баг</button><p class="credit">3D-модели: Kay Lousberg, KayKit (CC0) · Иконки: game-icons.net (CC BY 3.0)</p>
 </div></div>
 <div class="ov" id="ovClass"><div class="card"><h2>Выбери класс</h2><p>У каждого класса три ветки по 7 умений и свой вход в общее пассивное дерево.</p><div class="cls" id="classList"></div><label class="hcl"><input type="checkbox" id="hcChk"><span><b>Хардкор</b> — смерть необратима, зато +25% к редкости добычи</span></label><button class="btn alt" id="bBack">Назад</button></div></div>
 <div class="ov" id="ovDead"><div class="card"><h2 id="deadH">Ты пал</h2><p id="deadP">Тлен забрал тело, но костёр лагеря вернул тебя назад. Добыча при тебе.</p><p class="muted" id="deadKill" style="color:#ff8a7a"></p><button class="btn" id="bRevive">Очнуться у костра</button></div></div>

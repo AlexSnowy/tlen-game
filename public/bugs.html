@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Жалобы на баги — Земли Тлена</title>
+<style>
+body{margin:0;background:#141118;color:#eee3cf;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;background:#1d1822;border-bottom:1px solid #3a2f24;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;z-index:2}
+h1{font-size:18px;margin:0;color:#ffd98a;flex:1}
+button{background:#2a2230;color:#f0dcae;border:1px solid #6a5434;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+button:hover{border-color:#c9a25a}
+main{max-width:860px;margin:0 auto;padding:12px}
+.b{background:#1d1822;border:1px solid #3a2f24;border-radius:12px;padding:12px 14px;margin:10px 0}
+.b.done{opacity:.45}
+.top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;color:#a99a80;font-size:13px}
+.top b{color:#ffd98a;font-size:14px}
+.txt{white-space:pre-wrap;margin:8px 0;font-size:15.5px}
+.meta{font-size:12.5px;color:#a99a80;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px 14px}
+.meta span b{color:#cdbf9f;font-weight:500}
+.errs{font:12px/1.4 ui-monospace,Menlo,monospace;color:#ff9a8a;background:#120e14;border-radius:8px;padding:8px;margin-top:8px;white-space:pre-wrap}
+img{max-width:100%;border-radius:8px;margin-top:8px;border:1px solid #3a2f24;cursor:zoom-in}
+.acts{display:flex;gap:8px;margin-top:10px}
+#st{color:#a99a80;font-size:13px}
+.empty{color:#a99a80;text-align:center;padding:40px 0}
+</style></head><body>
+<header><h1>🐞 Жалобы игроков</h1><span id="st">загрузка…</span><button id="re">Обновить</button></header>
+<main id="list"></main>
+<script type="module">
+import {retained} from './relay.js';
+const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let items=[];const DONE=new Set(JSON.parse(localStorage.getItem('bugsDone')||'[]'));
+function draw(){const L=items.slice().sort((a,b)=>b.t-a.t);$('st').textContent='жалоб: '+L.length;
+ $('list').innerHTML=L.length?L.map(b=>{const m=b.meta||{};return `<div class="b ${DONE.has(b.id)?'done':''}"><div class="top"><b>${new Date(b.t).toLocaleString('ru-RU')}</b><span>${esc({mage:'Маг',knight:'Рыцарь',rogue:'Разбойник',barbarian:'Варвар'}[m.cls]||m.cls)} ${m.lvl?'· '+m.lvl+' ур.':''}</span><span>${esc(m.zone||m.mode)}</span></div>
+ <div class="txt">${esc(b.txt)}</div>
+ <div class="meta"><span><b>Версия:</b> ${esc(m.v)}</span><span><b>Экран:</b> ${esc(m.scr)}</span><span><b>Telegram:</b> ${m.tg?'да':'нет'}</span><span><b>Группа:</b> ${esc(m.party||'нет')}</span><span><b>Качество:</b> ${esc(m.q)}</span><span><b>Режим:</b> ${esc(m.mode)}${m.abyss?' · Бездна '+m.abyss:''}${m.map?' · карта':''}</span><span style="grid-column:1/-1"><b>Устройство:</b> ${esc(m.ua)}</span></div>
+ ${m.errs&&m.errs.length?`<div class="errs">${esc(m.errs.join('\n'))}</div>`:''}
+ ${b.shot?`<img src="${esc(b.shot)}" alt="снимок экрана" onclick="window.open(this.src)">`:''}
+ <div class="acts"><button data-done="${esc(b.id)}">${DONE.has(b.id)?'Вернуть':'Исправлено'}</button><button data-del="${esc(b.id)}">Удалить</button></div></div>`}).join(''):'<div class="empty">Жалоб пока нет.</div>'}
+const BR=(()=>{const m=location.search.match(/[?&]broker=([^&]+)/);return m?[decodeURIComponent(m[1])]:undefined})();
+function load(){items=[];$('st').textContent='загрузка…';retained('bugs',null,l=>{items=l;draw()},()=>draw(),BR)}
+document.addEventListener('click',e=>{const d=e.target.dataset;
+ if(d.done){DONE.has(d.done)?DONE.delete(d.done):DONE.add(d.done);localStorage.setItem('bugsDone',JSON.stringify([...DONE]));draw()}
+ if(d.del&&confirm('Удалить жалобу насовсем?')){retained('bugs',{id:d.del,del:1},null,()=>{items=items.filter(x=>x.id!==d.del);draw()},BR)}});
+$('re').onclick=load;load();
+</script></body></html>
