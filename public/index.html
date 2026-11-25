@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Земли Тлена</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-180.png">
+<meta name="theme-color" content="#0e0c12">
+<meta name="description" content="Тёмная 3D ARPG в браузере: добыча, камни умений, древо пассивов, боссы и кооператив до 3 игроков.">
 <style>@font-face{font-family:'Rubik';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/rubik-cyrillic-400-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
 @font-face{font-family:'Rubik';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/rubik-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Rubik';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/rubik-cyrillic-500-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
@@ -68,10 +73,11 @@ body.ny #ovTitle h1{text-shadow:0 0 22px rgba(160,200,255,.35),0 2px 0 #000}
 #bugT{width:100%;box-sizing:border-box;min-height:120px;margin:8px 0;background:rgba(0,0,0,.35);border:1px solid #6a5434;border-radius:10px;color:#f0e6d2;font:400 14px/1.45 Rubik,system-ui,sans-serif;padding:10px;resize:vertical}
 .bugchk{display:flex!important;gap:8px;align-items:center;font-size:13px;margin:2px 0 10px}.bugb{display:flex;gap:8px;flex-wrap:wrap}
 .hb.bugh{opacity:.9}
+.plat [data-pa2=tgshare],.plat [data-share],.plat #bTg{display:none!important}
 </style>
 <link rel="preload" href="fonts/rubik-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-/* VOICE: мрачное фэнтези, ARPG в духе Path of Exile
+/* VOICE: мрачное фэнтези, тёмная ARPG
    IDEA: летопись изгнанника — лагерь у костра и земли, где встают мёртвые
    PICTURE: живая 3D-сцена на весь экран; сферы здоровья и маны как стеклянные колбы
    COLOUR and TYPE: уголь, старое золото, кровь и мана; Ruslan Display + Philosopher + Rubik,system-ui,sans-serif
@@ -502,7 +508,7 @@ body.bn #toast{opacity:0!important}
   <div class="tbtns"><button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn" id="bNew">Новый герой</button></div>
   <p class="muted" id="ctlHint" style="display:none"></p>
   <div class="tmore">
-    <details class="news"><summary>Что нового</summary><ul><li><b>Новый год</b>: снег, ёлка, гирлянды, снеговики, подарки с монстров, леденцы и шапки Санты (выключается в настройках)</li><li>Цвет экипировки на герое: красится только ткань, детали остаются своими</li><li>Приближение камеры: колесо мыши, два пальца или ползунок в настройках</li><li>Бездна — кольцо Разлома и Владыка Бездны; фильтр добычи как в PoE</li><li><b>Сюжет</b>: пролог, разговоры у костра, слова стражей, финал и «Летопись»</li><li><b>Обучение</b> для новых героев — подсказки сами ведут по первым шагам</li><li>Ровный интерфейс на любых экранах, свои шрифты, подписи добычи не слипаются</li><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details>
+    <details class="news"><summary>Что нового</summary><ul><li><b>Новый год</b>: снег, ёлка, гирлянды, снеговики, подарки с монстров, леденцы и шапки Санты (выключается в настройках)</li><li>Цвет экипировки на герое: красится только ткань, детали остаются своими</li><li>Приближение камеры: колесо мыши, два пальца или ползунок в настройках</li><li>Бездна — кольцо Разлома и Владыка Бездны; гибкий фильтр добычи</li><li><b>Сюжет</b>: пролог, разговоры у костра, слова стражей, финал и «Летопись»</li><li><b>Обучение</b> для новых героев — подсказки сами ведут по первым шагам</li><li>Ровный интерфейс на любых экранах, свои шрифты, подписи добычи не слипаются</li><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details>
     <details class="news"><summary>Настройки и сохранения</summary><div class="tset">
       <div class="seg" id="qSeg"><button data-q="high">Графика: высокая</button><button data-q="low">Экономная</button></div>
       <button class="btn alt sm" id="bMus">Музыка: вкл</button>

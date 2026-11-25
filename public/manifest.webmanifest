@@ -1,0 +1,17 @@
+{
+  "name": "Земли Тлена",
+  "short_name": "Земли Тлена",
+  "description": "Тёмная 3D ARPG: добыча, камни умений, древо пассивов и кооператив до 3 игроков.",
+  "lang": "ru",
+  "start_url": "./index.html?src=pwa",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0e0c12",
+  "theme_color": "#0e0c12",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

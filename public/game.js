@@ -568,7 +568,7 @@ collide(p,.45);return l>.08}
 
 /* ================= UI ================= */
 const RC=RCH;
-function setPaused(){S.paused=!!S.panel||['ovDead','ovLore','ovTitle','ovLoad','ovClass','ovStory','ovDlg'].some(x=>$(x).classList.contains('on'))}
+function setPaused(){S.paused=!!S.panel||!!S.adPause||['ovDead','ovLore','ovTitle','ovLoad','ovClass','ovStory','ovDlg','ovBug'].some(x=>$(x)&&$(x).classList.contains('on'))}
 function closePanels(){lobbyClose();document.querySelectorAll('.panel.on').forEach(e=>e.classList.remove('on'));S.panel=null;S.sel=null;setPaused();save()}
 function togglePanel(w,ctx){if(w==='sk'||w==='pas'||w==='inv')tutEv(w);if(w==='shop'||w==='smith')tutEv('town');if(w==='portal')tutEv('portal');if(S.mode!=='town'&&S.mode!=='zone')return;if(S.panel===w&&!ctx){closePanels();return}closePanels();S.panel=w;S.ctx=ctx||null;
 ({inv:()=>{$('pInv').classList.add('on');renderInv()},sk:()=>{$('pSk').classList.add('on');renderSk()},pas:()=>{$('pPas').classList.add('on');renderPas()},portal:()=>{$('pPortal').classList.add('on');renderPortal()},party:()=>{$('pParty').classList.add('on');renderParty()},shop:()=>{$('pShop').classList.add('on');$('pShop').querySelector('header p').textContent=npcQuote('merchant');T.tab=P.bag.length?'sell':'buy';T.tray.clear();T.last=null;T.buySel=null;renderShop()},smith:()=>{$('pSmith').classList.add('on');$('pSmith').querySelector('header p').textContent=npcQuote('smith');T.res=null;renderSmith()},lf:()=>{$('pLF').classList.add('on');renderLF()},ch:()=>{$('pCh').classList.add('on');renderCh()},stash:()=>{$('pStash').classList.add('on');T.last=null;renderStash()}})[w]();setPaused()}
@@ -699,7 +699,7 @@ function updSkillBar0(){for(let i=0;i<3;i++){const id=P.slots[i],sk=id&&SKILLS[i
 
 /* ================= FLOW ================= */
 function rollShop(){S.shop=[];for(let i=0;i<8;i++)S.shop.push(genItem(Math.max(1,P.maxZone>8?8+P.maxMap:P.maxZone),Math.random()<.35?1:0,0,i<2?'weapon':undefined))}
-function enterTown(){S.mode='town';setTimeout(()=>{try{updObjHud()}catch(e){}},50);try{trophies()}catch(e){}setTimeout(()=>{try{const n=Date.now();if(P&&n-(window.__lbT||0)>600000){window.__lbT=n;leaderboard(lbEntry(),()=>{},BRK())}}catch(e){}},4000);setTimeout(()=>cloudSave(true),1500);setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
+function enterTown(){const fromZone=S.mode==='zone';S.mode='town';if(fromZone)setTimeout(platAd,700);setTimeout(()=>{try{updObjHud()}catch(e){}},50);try{trophies()}catch(e){}setTimeout(()=>{try{const n=Date.now();if(P&&n-(window.__lbT||0)>600000){window.__lbT=n;leaderboard(lbEntry(),()=>{},BRK())}}catch(e){}},4000);setTimeout(()=>cloudSave(true),1500);setTimeout(()=>music('town'),50);closePanels();clearZone();town.visible=true;zone.visible=false;H.g.position.set(2.6,0,5);H.target=null;H.buffs=[];H.es=0;recalc();H.hp=ST.hp;H.mana=ST.mana*(1-ST.reserve);H.flask=3;H.fullT=H.upT=H.legT=0;
 setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');$('bossBar').classList.remove('on');rollShop();save();$('zoneName').textContent='Лагерь у костра';$('zoneSub').textContent=touch?'Торговка, кузнец и портал на севере':'Торговка, кузнец и портал. K — камни, P — пассивы, I — сумка'}
 function enterZone(zi,tier,net,mi){tutEv('portal');if(!net)LASTZ={zi,tier,mi};if(isGuest()&&!net){toast('Портал открывает лидер группы',2);return}S.mods=[];S.seed=net?net.seed:RESUME?RESUME.seed:Math.floor(RNG0()*1e9);if(zi>=0){S.zi=zi;S.zone=ZONES[zi];S.L=zi+1;S.map=0;S.mapRar=0;S.pin=false;S.abyss=0}else{const base=mi?ZONES[mi.zi]:pick(ZONES);S.zi=-1;S.map=tier;S.L=8+tier;S.mapRar=mi?mi.rar:0;S.pin=!!(mi&&mi.pin);S.abyss=mi&&mi.abyss||0;S.mods=mi?mi.mods.map(k=>MAPMODS.find(m=>m.k===k)).filter(Boolean):[];
 if(net){S.zone=net.zone;S.mods=net.mods}else if(S.pin)S.zone={n:'Обитель Пожирателя',th:3,mons:[['fallen',2],['berserker',2],['necro',1],['brute',1.5]],boss:'Пожиратель Тлена',bt:'brute',obj:{t:'hunt',n:'Убей стражей Обители',c:2},kit:['slam','meteors','spiral','summon','teleport','nova','charge','enrage'],phases:1};else S.zone={n:'Карта: '+base.n,th:base.th,mons:base.mons.concat([['fallen',1],['necro',.6],['berserker',1]]),boss:base.boss+' Кошмара',bt:base.bt,obj:pick(OBJ_POOL),kit:shuffle(Object.keys(BOSS_SK).filter(k=>k!=='enrage')).slice(0,3).concat(tier>=3?['enrage']:[])}}
@@ -1059,7 +1059,7 @@ setInterval(()=>{if(NET.on)renderPartyHud()},700);
 try{await loadMany(base,()=>{$('lFill').style.width=loadedN/base.length*100+'%'})}catch(e){console.error(e);$('lTxt').textContent='Не удалось загрузить модели. Обнови страницу.';return}
 $('lTxt').textContent='Строю мир…';await new Promise(r=>setTimeout(r,30));
 buildTown();town.visible=true;zone.visible=false;setEnv('#1c1a26',.016,'#ffc08a',2.6,'#8090c0');renderer.compile(scene,camera);
-S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
+S.mode='title';$('ovLoad').classList.remove('on');$('ovTitle').classList.add('on');setTimeout(platReady,50);cloudLoad(ok=>{if(ok)toast('Прогресс загружен из облака Telegram',2.5);renderChars()});renderChars();setPaused();
 window.__dbg={get zoom(){return CAMZT},showUpd:m=>showUpd(m),dropSkillGem:(p,id)=>dropSkillGem(p,id),gainXp:x=>gainXp(x),sockN:it=>sockN(it),abyTick:dt=>abyTick(dt),makeAbyss:o=>makeAbyss(o||{}),makeRift:()=>makeRift(),updRift:dt=>updRift(dt),gearDbg:()=>{const ms=H.c.meshes;const r={skin:skinOf(ms)&&skinOf(ms).getHexString()};for(const n in ms)if(ms[n].userData.pal)r[n]=ms[n].userData.pal.map(c=>c.getHexString()).join(',');return JSON.stringify(r)},setZoom:z=>{setZoom(z);CAMZ=CAMZT},brTick:dt=>breachTick(dt),get NPCS(){return NPCS},updSkillBar:()=>updSkillBar(),fitSn:()=>fitSn(),S,H,feedPub:t=>feedPub(t),recalc:()=>recalc(),stc:()=>ST,dropDiv:p=>dropDiv(p),dropItem:(p,it)=>dropItem(p,it),dropOrb:p=>dropOrb(p),genItem:(...a)=>genItem(...a),heroLook:()=>heroLook(),togglePanel:(w,c)=>togglePanel(w,c),get P(){return P},enterZone,mons:()=>mons,castSkill,gainXp,SK:SKILLS,ST:()=>ST,obj:()=>OBJ,kill:m=>killMon(m),NET,joinLeader:()=>{const z=NET.leaderZone;if(z)enterZone(z.zi,z.tier,z)}}})();
 
 /* ================= ТОРГОВКА И КУЗНИЦА ================= */
@@ -1189,7 +1189,7 @@ const t0=performance.now(),D=M.boss?1.4:.7,R=M.boss?14:5;const tk=()=>{const k=(
 function monLabels(){const hp=H.g.position;for(const M of mons){if(!M.lab)continue;if(M.dead){M.lab.style.display='none';continue}const p=M.g.position;if(Math.abs(p.x-hp.x)<16&&Math.abs(p.z-hp.z)<14&&proj(cp.set(p.x,2.9*M.sc,p.z),sp)){M.lab.style.display='block';M.lab.style.transform=`translate(${sp.x}px,${sp.y}px) translate(-50%,-100%)`}else M.lab.style.display='none'}}
 function monFx(dt){monLabels();if(frameN%2)return;for(const M of mons){if(M.dead||!(M.rare||M.magic||M.boss))continue;const p=M.g.position;if(Math.random()<(M.boss?.9:M.rare?.5:.25)){const rm=M.rm||[];const c=C3(M.boss?S.th.eyes:rm.includes('fiery')?'#ff6a2a':rm.includes('frost')?'#8ad8ff':rm.includes('vamp')?'#ff2a5a':rm.includes('volatile')?'#ffb03a':rm.includes('thorns')?'#c0c0c0':M.rare?'#ffd84a':'#6a9aff');const a=rand(0,6.28),r=M.r*rand(.8,1.4);emit(p.x+Math.cos(a)*r,rand(.1,.4),p.z+Math.sin(a)*r,0,rand(.6,1.6),0,rand(.5,.9),rand(.06,.12),c[0],c[1],c[2],0,1)}}}
 
-/* подсказка предмета в стиле PoE */
+/* подсказка предмета */
 function ttHTML(it){const u=it.upg,m=1+.1*u,R=['n','m','r','u'][it.rar];const seg=[];
 const base=[];if(it.dmg)base.push(`<div>Урон: <b>${Math.round(it.dmg[0]*m)}–${Math.round(it.dmg[1]*m)}</b></div>`);if(it.wb)base.push(`<div>Ударов в секунду: <b>${WBASE[it.wb].aps}</b></div><div class="g">${WBASE[it.wb].hands===2?'Двуручное':'Одноручное'}</div>`);if(it.armor)base.push(`<div>Броня: <b>${Math.round(it.armor*m)}</b></div>`);if(u)base.push(`<div>Заточка: <b style="color:#ffd774">+${u}</b> <span class="g">(+${u*10}% к свойствам)</span></div>`);
 if(base.length)seg.push(base.join(''));seg.push(`<div class="g">Уровень предмета: <b>${it.ilvl}</b></div>`);
@@ -1373,7 +1373,7 @@ let hapT=0;function haptic(k){if(typeof SET!=='undefined'&&!SET.vib)return;const
 /* справочник */
 const GUIDE=[['Управление','Телефон: коснись экрана и веди пальцем — герой идёт и сам бьёт ближайших врагов. Q/E/R — умения, синяя кнопка — рывок в сторону движения, красная — флакон. ПК: WASD или мышь, Q/E/R, пробел, F.'],
 ['Лагерь','Торговка Вера покупает и продаёт вещи и сферы. Кузнец Гром затачивает вещи до +10 и добавляет свойства на верстаке. Хранилище — общий сундук для всех героев. Портал на севере ведёт в земли и на карты.'],
-['Камни умений','Как в PoE: умения — это камни. Они выпадают с монстров (чаще с редких и стражей), первый убитый страж каждой зоны дарит новый. Вставь камень в гнездо надетой вещи — умение появится на кнопке Q/E/R. Камни поддержки в той же вещи усиливают её умения. Камни растут в уровне вместе с героем, если вставлены. Сменишь вещь — камни переедут в новую. Гнёзда добавляет Кузнец Гром.'],
+['Камни умений','Умения — это камни. Они выпадают с монстров (чаще с редких и стражей), первый убитый страж каждой зоны дарит новый. Вставь камень в гнездо надетой вещи — умение появится на кнопке Q/E/R. Камни поддержки в той же вещи усиливают её умения. Камни растут в уровне вместе с героем, если вставлены. Сменишь вещь — камни переедут в новую. Гнёзда добавляет Кузнец Гром.'],
 ['Портал','Кнопка «В лагерь» оставляет портал открытым: в окне портала появится «Вернуться» — зона останется такой, какой ты её оставил. После смерти тоже можно вернуться.'],
 ['Добыча','Чем ярче подпись и выше столб света, тем ценнее вещь: белые — обычные, синие — магические, жёлтые — редкие, оранжевые — уникальные. ▲ — лучше надетого. Фильтр добычи (кнопка в сумке) прячет мусор и превращает его в золото; можно выбрать строгость, редкость и типы вещей, а также что подбирать автоматически.'],
 ['Сферы','Превращения: обычная → магическая. Перемен: перебросить магическую. Дополнения: +свойство магической. Царская: магическая → редкая. Хаоса: перебросить редкую. Возвышения: +свойство редкой. Божественная: перебросить значения. Очищения: убрать всё. Ваал: осквернить вещь — может стать сильнее (заточка до +12, особое свойство) или не измениться, но изменить её потом нельзя. Сферы работают и на картах.'],
@@ -1484,7 +1484,7 @@ return `<div class="sect" style="margin-top:16px"><span>Статистика г�
 /* ================= БЕЗДНА: бесконечный спуск ================= */
 function enterAbyss(d){const n=Math.min(MAPMODS.length,1+Math.floor(d/3));const mods=shuffle(MAPMODS.map(m=>m.k)).slice(0,n);
 enterZone(-1,d,null,{zi:Math.floor(Math.random()*8),tier:d,rar:2,mods,abyss:d});S.zone.n='Бездна · глубина '+d;$('zoneName').textContent=S.zone.n}
-function abyssHTML(){const best=P.abyssBest||0,ck=P.abyssCk||1;return `<div class="pin aby"><div>${gi('magic-portal','#b06aff','width:34px;height:34px')}</div><div><b>Бездна</b><small>Как в PoE: в земле раскрывается трещина — иди за ней, и она поползёт дальше. По пути открываются ямы, из которых лезут волны тварей Бездны. В конце трещины — провал и Лич Бездны. Победи его, чтобы открыть следующую глубину. Рекорд: <b style="color:#d0a0ff">${best}</b></small></div><div style="display:flex;flex-direction:column;gap:4px"><button class="ab" data-aby="${ck}">${ck>1?'С глубины '+ck:'Начать'}</button>${ck>1?'<button class="ab alt" data-aby="1">С 1</button>':''}</div></div>`}
+function abyssHTML(){const best=P.abyssBest||0,ck=P.abyssCk||1;return `<div class="pin aby"><div>${gi('magic-portal','#b06aff','width:34px;height:34px')}</div><div><b>Бездна</b><small>В земле раскрывается трещина — иди за ней, и она поползёт дальше. По пути открываются ямы, из которых лезут волны тварей Бездны. В конце трещины — провал и Лич Бездны. Победи его, чтобы открыть следующую глубину. Рекорд: <b style="color:#d0a0ff">${best}</b></small></div><div style="display:flex;flex-direction:column;gap:4px"><button class="ab" data-aby="${ck}">${ck>1?'С глубины '+ck:'Начать'}</button>${ck>1?'<button class="ab alt" data-aby="1">С 1</button>':''}</div></div>`}
 
 /* ================= ПАНТЕОН ================= */
 const PAN={maj:[{id:'sol',n:'Душа Солнца',st:{dmgTaken:-8,armorP:15},d:'−8% получаемого урона, +15% брони'},{id:'lun',n:'Душа Луны',st:{move:10,aspd:6},d:'+10% скорости бега, +6% скорости атак'},{id:'gai',n:'Душа Земли',st:{regen:5,hpP:8},d:'+5 здоровья в сек., +8% здоровья'}],
@@ -1539,7 +1539,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
 <label class="zrow">Приближение камеры <input type="range" min="0.42" max="1.3" step="0.02" value="${CAMZT}" data-zoom><small>колесо мыши или два пальца</small></label> <label><input type="checkbox" data-set="ny" ${nyOn()?'checked':''}> Новогоднее настроение — снег, украшения, шапки на монстрах</label> <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
-<button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
+<button class="btn sm" data-install style="display:none">📲 Установить как приложение</button> <button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
 <label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
 $('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
@@ -1736,7 +1736,7 @@ for(let k=0;k<6;k++){const C=c.getBoundingClientRect();let top=null;for(const r 
 c.style.bottom=Math.max(8,innerHeight-top+10)+'px';hudT=0}}
 addEventListener('resize',()=>setTimeout(coachLayout,60));
 
-/* ===== фильтр добычи (как в PoE) ===== */
+/* ===== фильтр добычи ===== */
 const LF_PRE={all:{n:'Всё',d:'Подбирать всё подряд',r:[2,2,2]},norm:{n:'Обычный',d:'Белые — в золото, синие — по нажатию',r:[0,1,2]},strict:{n:'Строгий',d:'Только редкие и лучше надетых',r:[0,0,2]},vstrict:{n:'Очень строгий',d:'Автоподбор только ▲ и уникальных',r:[0,0,1]}};
 const LF_ST=['Скрыть','По нажатию','Подбирать'];
 function lfCfg(){if(!P.lfc){const pre=['norm','norm','strict'][P.lf|0]||'norm';P.lfc={pre,r:LF_PRE[pre].r.slice(),sl:{},up:1}}return P.lfc}
@@ -1776,7 +1776,7 @@ function xmasTree(town){xmasLights=[];const t=place('tree_single_A',XT.x,XT.z,to
 function xmasTick(t){if(!xmasLights.length)return;for(const m of xmasLights){const v=.35+.65*Math.max(0,Math.sin(t*2.2+m.userData.ph));m.material.color.copy(m.userData.c).multiplyScalar(.4+v*2.4)}
  if(xmasLights.star){xmasLights.star.rotation.y=t*.8;const p=1+.08*Math.sin(t*3);xmasLights.star.scale.set(p,1.35*p,.45*p)}if(xmasLights.pl)xmasLights.pl.intensity=5+1.5*Math.sin(t*2.6)}
 
-/* ===== Разлом Бездны: расширяющееся и сужающееся кольцо (как Breach в PoE) ===== */
+/* ===== Разлом Бездны: расширяющееся и сужающееся кольцо ===== */
 function breachStart(){if(isGuest())return;const d=S.abyss;
  for(const M of mons.slice()){M.silent=true;killMon(M)}S.boss=null;$('bossBar').classList.remove('on');
  if(OBJ){if(OBJ.barrier)dyn.remove(OBJ.barrier);for(const e of OBJ.ents){e.el&&e.el.remove();for(const o of [e.g,e.gem,e.c&&e.c.root,e.mesh])if(o&&o.parent)o.parent.remove(o)}OBJ=null}
@@ -1837,7 +1837,7 @@ function restoreLoot(list){if(!list||!list.length)return;const ch=chime;chime=()
 /* версия игры: сверка в группе и проверка обновлений */
 const GBUILD=+('__T__'.replace(/\D/g,''))||0;const GVER=(()=>{try{return new URL(import.meta.url).searchParams.get('v')||''}catch(e){return ''}})();
 function showUpd(msg){let b=$('updBar');if(!b){b=document.createElement('div');b.id='updBar';b.innerHTML='<span></span><button class="updb">Обновить</button>';document.body.appendChild(b);b.querySelector('button').onclick=()=>{try{save()}catch(e){}const u=new URL(location.href);u.searchParams.set('r',Date.now());location.replace(u.toString())}}b.querySelector('span').textContent=msg;b.classList.add('on')}
-async function updCheck(){if(!GBUILD||!/^[0-9a-f]{6,}$/.test(GVER))return;try{const r=await fetch('index.html?u='+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/game\.js\?v=([0-9a-f]{6,})/);if(m&&m[1]!==GVER){if(S.mode==='town'||S.mode==='title')showUpd('Вышло обновление игры');else updCheck.pend=1}}catch(e){}}
+async function updCheck(){if((window.PLAT||'web')!=='web')return;if(!GBUILD||!/^[0-9a-f]{6,}$/.test(GVER))return;try{const r=await fetch('index.html?u='+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/game\.js\?v=([0-9a-f]{6,})/);if(m&&m[1]!==GVER){if(S.mode==='town'||S.mode==='title')showUpd('Вышло обновление игры');else updCheck.pend=1}}catch(e){}}
 setInterval(()=>{if(updCheck.pend&&S.mode==='town'){updCheck.pend=0;showUpd('Вышло обновление игры')}},3000);setTimeout(updCheck,20000);setInterval(updCheck,300000);
 
 /* ================= НОВЫЙ ГОД ================= */
@@ -1968,7 +1968,7 @@ document.addEventListener('input',e=>{if(e.target.matches('[data-zoom]')){setZoo
 
 function isSkinC(c){const s=c.clone().convertLinearToSRGB();return s.r>.82&&s.g>.55&&s.g<.86&&s.b>.4&&s.b<.76&&s.r-s.b>.14&&s.r>=s.g&&s.g>=s.b}
 
-/* ================= БЕЗДНА (как в PoE): ползущая трещина, ямы с волнами, сундук или Лич в конце ================= */
+/* ================= БЕЗДНА: ползущая трещина, ямы с волнами, сундук или Лич в конце ================= */
 const ABY_CORE=new THREE.MeshBasicMaterial({color:'#07000c',side:THREE.DoubleSide}),ABY_GLOW=new THREE.MeshBasicMaterial({color:new THREE.Color('#a050ff').multiplyScalar(2.6),transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,side:THREE.DoubleSide});
 function abyPath(sx,sz,tx,tz,len){const pts=[{x:sx,z:sz}];let x=sx,z=sz,a=Math.atan2(tz-sz,tx-sx);for(let d=0;d<len;d+=1.6){const ta=Math.atan2(tz-z,tx-x);a+=((ta-a+Math.PI*3)%(Math.PI*2)-Math.PI)*.15+(Math.random()-.5)*.55;let nx=x+Math.cos(a)*1.6,nz=z+Math.sin(a)*1.6;
  if(Math.abs(nx)>44||Math.abs(nz)>46||zoneObs.some(o=>Math.hypot(o.x-nx,o.z-nz)<o.r+.8)){a+=1.1;nx=x+Math.cos(a)*1.6;nz=z+Math.sin(a)*1.6;if(Math.abs(nx)>44||Math.abs(nz)>46)break}x=nx;z=nz;pts.push({x,z})}return pts}
@@ -2010,13 +2010,13 @@ function abyTick(dt){const A=S.aby;if(!A||S.mode!=='zone')return;const hp=H.g.po
   el.innerHTML=A.st<2?`Бездна · иди по трещине · ямы <b>${done} / ${A.pits.length}</b>`:A.lord&&!A.lord.dead?'<b style="color:#e0a8ff">Лич Бездны!</b>':'<b class="ok">✓</b> Бездна покорена · портал в лагерь открыт'}}}
 function abyNet(m){const A=S.aby;if(!A||!isGuest())return;A.prog=m.prog;abyReveal();m.pits.forEach((s,i)=>{const q=A.pits[i];if(!q)return;if(s>=1&&!q.g)abyPitOpen(q);if(s===2&&q.ring)q.ring.visible=false;q.st=s});if(m.st===2&&A.st<2){A.st=2;A.el.style.display='none'}else if(A.st<1&&m.st>=1)A.st=1}
 function abyssModeStart(){if(isGuest()){return}const d=S.abyss;
- // карта без стража и задания; половина обычных монстров остаётся, как на картах PoE
+ // карта без стража и задания; половина обычных монстров остаётся
  if(S.boss){S.boss.silent=true;killMon(S.boss)}S.boss=null;$('bossBar').classList.remove('on');let k=0;for(const M of mons.slice())if(!M.dead&&(k++%2)){M.silent=true;killMon(M)}
  if(OBJ){if(OBJ.barrier)dyn.remove(OBJ.barrier);for(const e of OBJ.ents){e.el&&e.el.remove();for(const o of [e.g,e.gem,e.c&&e.c.root,e.mesh])if(o&&o.parent)o.parent.remove(o)}OBJ=null}
  S.cleared=false;
  toast('Бездна раскрылась. Иди вдоль трещины — в её конце ждёт Лич.',4)}
 
-/* ================= КАМНИ УМЕНИЙ (как в PoE): гнёзда в вещах, камни поддержки в той же вещи ================= */
+/* ================= КАМНИ УМЕНИЙ: гнёзда в вещах, камни поддержки в той же вещи ================= */
 const GEM_SLOTS=['weapon','offhand','helmet','chest','gloves','boots'],GEM_MAX={weapon:3,offhand:2,helmet:3,chest:4,gloves:3,boots:3},GEM_SN={weapon:'Оружие',offhand:'Вторая рука',helmet:'Шлем',chest:'Доспех',gloves:'Перчатки',boots:'Сапоги'};
 function sockN(it){if(!it||!GEM_MAX[it.slot])return 0;if(it.sockN===undefined){let mx=GEM_MAX[it.slot];if(it.slot==='weapon'&&WBASE[it.wb]&&WBASE[it.wb].hands===2)mx=4;const h=((it.id||1)*2654435761>>>0)%997;it.sockN=Math.min(mx,1+(h%mx)+(it.rar>=2?1:0)+(it.rar>=3?1:0));if(it.slot==='weapon')it.sockN=Math.max(2,it.sockN)}if(!it.sk_s)it.sk_s=[];while(it.sk_s.length<it.sockN)it.sk_s.push(null);return it.sockN}
 const gemReq=(sk,l)=>sk.req+(l-1)*6,gemMax=sk=>sk.max||5,gemNeed=(sk,l)=>Math.round(need(gemReq(sk,l))*.85);
@@ -2115,3 +2115,36 @@ function bugSend(){const txt=$('bugT').value.trim();if(txt.length<4){$('bugR').t
  if($('bugS').checked&&S.mode!=='title'){BUGSHOT=cv=>{let d=null;try{if(cv){const w=Math.min(480,cv.width),h=Math.round(cv.height*w/cv.width);const c2=document.createElement('canvas');c2.width=w;c2.height=h;c2.getContext('2d').drawImage(cv,0,0,w,h);d=c2.toDataURL('image/jpeg',.55)}}catch(e){}go(d)};setTimeout(()=>{if(BUGSHOT){BUGSHOT=null;go(null)}},1500)}else go(null)}
 
 document.addEventListener('click',e=>{if(e.target.closest('#bBug,[data-bugrep]')){e.preventDefault();if(e.target.closest('[data-bugrep]'))document.querySelectorAll('.panel.on [data-close]').forEach(b=>b.click());bugOpen()}});
+
+/* ================= ПЛОЩАДКИ: Яндекс Игры, CrazyGames, GameDistribution, VK, itch.io… ================= */
+const PLAT=window.PLAT||'web';const PSDK={};let platMute=false;
+function sdkLoad(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
+async function platInit(){try{
+ if(PLAT==='yandex'){await sdkLoad('/sdk.js');PSDK.y=await YaGames.init()}
+ else if(PLAT==='crazy'){await sdkLoad('https://sdk.crazygames.com/crazygames-sdk-v3.js');await window.CrazyGames.SDK.init();PSDK.c=window.CrazyGames.SDK;try{PSDK.c.game.loadingStart()}catch(e){}}
+ else if(PLAT==='gd'){window.GD_OPTIONS={gameId:window.GD_ID||'',onEvent:ev=>{if(ev.name==='SDK_GAME_PAUSE')adPause(true);if(ev.name==='SDK_GAME_START')adPause(false)}};await sdkLoad('https://html5.api.gamedistribution.com/main.js');PSDK.g=1}
+ else if(PLAT==='vk'){await sdkLoad('https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js');PSDK.v=window.vkBridge;PSDK.v.send('VKWebAppInit')}
+}catch(e){console.warn('platform sdk',e)}}
+let platReadyDone=false;function platReady(){if(platReadyDone)return;platReadyDone=true;try{if(PSDK.y)PSDK.y.features.LoadingAPI&&PSDK.y.features.LoadingAPI.ready();if(PSDK.c)PSDK.c.game.loadingStop()}catch(e){}}
+let platPlay=false;function platGameplayTick(){const on=(S.mode==='zone'||S.mode==='town')&&!S.paused&&!document.hidden&&!AD_ON;if(on===platPlay)return;platPlay=on;try{if(PSDK.y&&PSDK.y.features.GameplayAPI)on?PSDK.y.features.GameplayAPI.start():PSDK.y.features.GameplayAPI.stop();if(PSDK.c)on?PSDK.c.game.gameplayStart():PSDK.c.game.gameplayStop()}catch(e){}}
+setInterval(platGameplayTick,500);
+let AD_ON=false,adLast=performance.now();
+function adPause(on){AD_ON=on;try{if(AC)on?AC.suspend():(!document.hidden&&AC.resume())}catch(e){}S.adPause=on;setPaused()}
+function platAd(){if(PLAT==='web'||PLAT==='itch'||AD_ON)return;if(performance.now()-adLast<180000)return;adLast=performance.now();
+ try{if(PSDK.y){PSDK.y.adv.showFullscreenAdv({callbacks:{onOpen:()=>adPause(true),onClose:()=>adPause(false),onError:()=>adPause(false)}})}
+  else if(PSDK.c){PSDK.c.ad.requestAd('midgame',{adStarted:()=>adPause(true),adFinished:()=>adPause(false),adError:()=>adPause(false)})}
+  else if(PSDK.g&&window.gdsdk){window.gdsdk.showAd().catch(()=>{})}
+  else if(PSDK.v){adPause(true);PSDK.v.send('VKWebAppShowNativeAds',{ad_format:'interstitial'}).finally(()=>adPause(false))}}catch(e){adPause(false)}}
+// звук стихает, когда игра свёрнута (требование площадок)
+document.addEventListener('visibilitychange',()=>{try{if(!AC)return;if(document.hidden)AC.suspend();else if(!AD_ON)AC.resume()}catch(e){}});
+// без системного меню по долгому нажатию/правой кнопке
+document.addEventListener('contextmenu',e=>{if(!e.target.closest('textarea,input'))e.preventDefault()});
+if(PLAT!=='web'){document.documentElement.classList.add('plat-'+PLAT,'plat');}
+platInit();
+
+/* установка как приложение (PWA) — только на сайте игры */
+let PWA_EV=null;
+if((window.PLAT||'web')==='web'&&'serviceWorker' in navigator&&location.protocol==='https:'&&!(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData)){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();PWA_EV=e;document.querySelectorAll('[data-install]').forEach(b=>b.style.display='')});
+setInterval(()=>{if(PWA_EV)document.querySelectorAll('[data-install]').forEach(b=>b.style.display='')},1500);
+document.addEventListener('click',e=>{if(e.target.closest('[data-install]')&&PWA_EV){PWA_EV.prompt();PWA_EV.userChoice.finally(()=>{PWA_EV=null;document.querySelectorAll('[data-install]').forEach(b=>b.style.display='none')})}});
