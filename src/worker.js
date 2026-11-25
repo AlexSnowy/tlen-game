@@ -46,6 +46,7 @@ async function payRoute(url, req, env) {
   if (url.pathname === '/tg/links') { const ids = [...Object.keys(ITEMS), 'pass_s1', 'pass_s2', 'pass_s3']; const out = {};
     for (const id of ids) { const info = itemInfo(id); const r = await bot(env, 'createInvoiceLink', { title: info[0], description: 'Земли Тлена: ' + info[0] + '. Только облик и удобство, без влияния на силу героя.', payload: JSON.stringify({ i: id }), currency: 'XTR', prices: [{ label: info[0], amount: info[1] }] }); if (r.ok) out[id] = r.result; }
     return json(out); }
+  if (url.pathname === '/tg/check') { const me = await bot(env, 'getMe'); const wh = await bot(env, 'getWebhookInfo'); return json({ bot: me.result && me.result.username, webhook: wh.result && wh.result.url || '', ours: (wh.result && wh.result.url || '') === url.origin + '/tg/webhook' }); }
   if (url.pathname === '/tg/setup') { const info = await bot(env, 'getWebhookInfo'); const set = await bot(env, 'setWebhook', { url: url.origin + '/tg/webhook', secret_token: await hookSecret(env), allowed_updates: ['pre_checkout_query'] }); return json({ before: info.result && info.result.url, set }); }
   const user = await tgUser(req.headers.get('X-Init'), env.BOT_TOKEN);
   if (!user) return json({ error: 'auth' }, 401);

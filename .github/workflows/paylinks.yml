@@ -10,6 +10,12 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           W=https://tlen-game.zemlitlena.workers.dev
+          curl -sf "$W/tg/check" | tee check.json; echo
+          python3 - <<'P'
+          import json;c=json.load(open('check.json'))
+          print('BOT:',c['bot'],'WEBHOOK:',c['webhook'] or '(нет)')
+          if c['webhook'] and not c['ours']: raise SystemExit('У бота уже есть чужой вебхук — не трогаю')
+          P
           curl -sf "$W/tg/setup" | tee setup.json
           curl -sf "$W/tg/links" -o public/paylinks.json
           python3 -c "import json;d=json.load(open('public/paylinks.json'));assert len(d)>=10,d;print(len(d),'links')"
