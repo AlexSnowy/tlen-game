@@ -8,7 +8,7 @@ const MAX = 3;
 const ITEMS = { founder: ['Набор основателя', 299], ny: ['Новогодний набор', 59], dyes: ['Краски брони', 49], fx: ['Стихии умений', 79], aura: ['Ауры и следы', 79], pet: ['Спутники-огоньки', 99], portal: ['Облик портала', 49], tab: ['+1 вкладка хранилища', 39], slot: ['+1 место для героя', 39] };
 const GAME_URL = 'https://alexsnowy.github.io/tlen-game/';
 const itemInfo = id => ITEMS[id] || (/^pass_s\d+$/.test(id) ? ['Пропуск сезона', 149] : null);
-const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type, X-Init', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
+const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type, X-Init, X-Key', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
 const json = (o, st = 200) => new Response(JSON.stringify(o), { status: st, headers: { 'Content-Type': 'application/json', ...CORS } });
 const hex = a => [...a].map(b => b.toString(16).padStart(2, '0')).join('');
 async function hmac(key, data) { const k = await crypto.subtle.importKey('raw', typeof key === 'string' ? new TextEncoder().encode(key) : key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']); return new Uint8Array(await crypto.subtle.sign('HMAC', k, new TextEncoder().encode(data))); }
