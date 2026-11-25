@@ -67,7 +67,7 @@ async function payRoute(url, req, env) {
     const nm = await bot(env, 'setMyName', { name: '⚔️ Земли Тлена | 3D ARPG с друзьями' });
     await bot(env, 'setMyName', { name: '⚔️ Lands of Decay | 3D co-op ARPG', language_code: 'en' });
     let pic = null;
-    try { const img = await fetch(GAME_URL + 'icon-512.png').then(r => r.blob()); const fd = new FormData(); fd.append('photo', JSON.stringify({ type: 'static', photo: 'attach://pic' })); fd.append('pic', img, 'icon.png');
+    try { const img = await fetch(GAME_URL + 'press/avatar.jpg?v=' + Date.now()).then(r => r.blob()); const fd = new FormData(); fd.append('photo', JSON.stringify({ type: 'static', photo: 'attach://pic' })); fd.append('pic', img, 'avatar.jpg');
       pic = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/setMyProfilePhoto`, { method: 'POST', body: fd }).then(r => r.json()); } catch (e) { pic = { error: String(e) }; }
     extra = { name: nm, pic };
     await bot(env, 'setMyCommands', { commands: [{ command: 'start', description: 'Играть / Play' }] });
