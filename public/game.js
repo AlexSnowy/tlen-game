@@ -1541,7 +1541,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
 <label class="zrow">Приближение камеры <input type="range" min="0.42" max="1.3" step="0.02" value="${CAMZT}" data-zoom><small>колесо мыши или два пальца</small></label> <label><input type="checkbox" data-set="ny" ${nyOn()?'checked':''}> Новогоднее настроение — снег, украшения, шапки на монстрах</label> <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
-<button class="btn sm" data-install style="display:none">📲 Установить как приложение</button> <button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
+<button class="btn sm" data-lang>🌐 Язык: Русский</button> <button class="btn sm" data-install style="display:none">📲 Установить как приложение</button> <button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
 <label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
 $('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
@@ -2291,3 +2291,10 @@ setTimeout(()=>{ent();cosApply();tgRestore();adsgramInit()},2500);
 
 function cs_t(cs){return cs&&cs.title&&COS.title.o[cs.title]?`<span class="pttl" style="color:${COS.title.o[cs.title][1]}">${esc(COS.title.o[cs.title][0])}</span>`:''}
 setInterval(()=>{const d=window.__dbg;if(d&&!d.ent){d.ent=()=>ent();d.lavOpen=lavOpen;d.cosApply=cosApply;d.offerDouble=offerDouble}},1000);
+
+/* язык: переключатель и подстраховка перевода (сохранённые русские названия вещей и т.п.) */
+document.addEventListener('click',e=>{if(e.target.closest('[data-lang]')){const en=(window.LANG||'ru')==='en';try{localStorage.tlen_lang=en?'ru':'en'}catch(_){}location.href=(window.LANG_ALT||'en/')+location.search+location.hash}});
+if(window.LANG==='en'){fetch('en/dict.json?v=__V__').then(r=>r.json()).then(D=>{const RX=/[А-Яа-яЁё][А-Яа-яЁёA-Za-z0-9 ,.!?:;«»—–\-%+()’\/№…×·]*/g;
+ const tr=s=>s.replace(RX,m=>{const t=m.trimEnd(),w=m.slice(t.length);return (D[t]!=null?D[t]:t)+w}).replace(/«/g,'“').replace(/»/g,'”');
+ const fix=n=>{if(n.nodeType===3){if(/[А-Яа-яЁё]/.test(n.nodeValue))n.nodeValue=tr(n.nodeValue)}else if(n.nodeType===1){for(const a of ['placeholder','title','aria-label'])if(n.hasAttribute&&n.hasAttribute(a)&&/[А-Яа-яЁё]/.test(n.getAttribute(a)))n.setAttribute(a,tr(n.getAttribute(a)));const w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT);let t;while(t=w.nextNode())if(/[А-Яа-яЁё]/.test(t.nodeValue))t.nodeValue=tr(t.nodeValue)}};
+ fix(document.body);new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')fix(m.target);else for(const n of m.addedNodes)fix(n)}}).observe(document.body,{subtree:true,childList:true,characterData:true})}).catch(()=>{})}

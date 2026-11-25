@@ -1,0 +1,220 @@
+Old
+Old Sword
+Old Crossbow
+bridges between neighboring classes
+Fortitude
+Mastery
+outer ring of mastery
+Ring of Strength
+Ring of Life
+Ring of Speed
+Ring of Elements
+Ring of Armor
+Ring of Fortune
+Great Ring
+Stash
+Vera the Merchant
+Grom the Smith
+Portal
+Ferocious
+Nimble
+Furious
+Steadfast
+Rotting
+Skills:
+invulnerable
+block
+Double the Guardian's loot
+Level
+Level up! You have a passive tree point.
+Level up! You have a passive tree point (P).
+on
+off
+Low health
+Not enough mana
+No target
+The flask is empty. It refills from kills.
+Quicksilver
+enchant glow: +1..5 shimmer, +6 aura, +10 rays ----
+of Strength
+of Flame
+of Life
+of the Raven
+of Storms
+of Shadows
+of Dawn
+of the Wolf
+of Frost
+of Wrath
+Doom
+Whisper
+Fang
+Ash
+Call
+Claw
+Tear
+Crown
+Sting
+Lament
+Fate
+Gift
+of the Raven
+of the Abyss
+of Decay
+of the Storm
+of the Dead
+of the Dawn
+of the Serpent
+of the King
+of Wolves
+of the Moon
+of the Night
+No orb
+A corrupted item cannot be modified
+Orbs don't work on unique items
+This orb doesn't fit this item
+Normal
+Magic
+Rare
+Unique
+gold
+Skill gem:
+for the “
+socket it (“Gems”)
+Picked up:
+use it at the workbench)
+Divination card:
+Support gem:
+socket it into a skill)
+Fragment of Decay (
+tier
+Your bag is full. Sell extra items to the merchant.
+found a unique item “
+New unique item in the collection:
+Damage:
+hits/s ·
+two-handed
+one-handed
+Armor:
+DPS
+Life
+Armor
+Crit chance
+Mana
+Instead of “
+Slot empty:
+no change
+Equipment
+I buy everything you bring from the Lands of Decay. And sell a few things.”
+I'll enhance weapons and armor. The higher the level, the higher the risk.”
+Orbs are applied to the selected item right here.
+Damage
+DPS (attack)
+Attack speed
+s
+Crit damage
+reserved
+Fire / Cold / Lightning
+Phys. / Poison / Light
+Regeneration
+Life leech
+Move speed
+Item rarity
+Bag
+gold
+Merchant's goods
+Tap an item to see its stats. Tap again to equip it.
+Buy for
+Equip
+Unequip
+Sell for
+Enhance to +
+gold · chance
+Fully enhanced
+Drop
+Give to:
+A two-handed weapon takes both hands
+No room for an off-hand
+Given:
+Success!
+The metal gave way. The gold is lost, the item is intact.
+Sold for
+Bag is empty
+Sure? Press again
+Sell all
+Sold
+items for
+Projectile
+Area
+Zone
+Chain
+Strike
+Ground slam
+Wave
+Spin
+Leap
+Dash
+Teleport
+Flurry
+Orb
+Buff
+Warcry
+Aura
+Summon
+Trap
+Totem
+Passive
+from weapon
+Cooldown
+Reserves 25% mana
+ASCENDANCY
+Elementalist
+Commands fire, ice and lightning at once.
+Elemental Triad
+Heart of the Storm
+Eternal Blaze
+Apotheosis
+Warlock
+Dark magic, poisons, and enemies' life in exchange for your own.
+Whisper of the Abyss
+Soul Eater
+Cursed Flesh
+Darkness
+Guardian
+An unbreakable wall. Stronger auras, damage is reflected.
+Stoneskin
+Radiant Aura
+Last Stand
+Retribution
+Gladiator
+Master of melee: bleeding, stuns and a flurry of blows.
+Blood Arena
+Crusher
+Crowd Champion
+Hunter
+Arrows fly farther, pierce and multiply.
+Extra Bolt
+Armor Piercing
+Tailwind
+Eye of the Storm
+Assassin
+Deadly crits and poisons, finishing off the wounded.
+Precise Strike
+Black Venom
+Coup de Grâce
+Shadow of Death
+Berserker
+Rage and life leech. Stronger when taking risks.
+Bloodlust
+Recklessness
+Vitality
+Slaughter
+Chieftain
+Ancestral fire and crushing ground slams.
+Ancestral Flame
+Earthshaker
+Aurochs Hide
+Chieftain's Fury
+Ascendancy points are granted by the guardians of the “Cultist Camp”, the “Sunken Ruins”, the “Heart of Decay” and the first conquered tier 5 map.
+Ascendancy
+points:

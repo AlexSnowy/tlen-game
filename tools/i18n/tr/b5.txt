@@ -1,0 +1,250 @@
+Purchases aren't available on this platform yet
+ad rewards ----------
+for an ad
+Loot doubled!
+Reward — after watching the video
+Pick a hero first
+Gift — after watching the video
+The Decay retreats — you're back in the fight
+Revival — after watching the video
+Revive here
+ad)
+season ----------
+Season “
+Season reward:
+shop window ----------
+Curio Shop
+Checking purchases…
+Goods
+Look
+Season
+Free
+Purchases work in the Telegram version of the game
+or support the game directly:
+Purchases aren't available on this platform yet — but there are free rewards and the season.
+Support the author
+bought
+slots
+Owned
+Purchases don't affect hero power — only looks and convenience.
+Restore purchases
+Tap to wear; tap again to remove. Party allies see your look too.
+No look items yet. They come from season rewards and packs in the “Goods” tab.
+A new season will start soon.
+until
+Season XP — for killing monsters: normal 1, magic 3, rare 8, guardians 40.
+The paid track is locked.
+Unlock for
+Pass
+Claim:
+Gift for an ad
+A random orb and gold. Left today:
+of 3.
+Watch video
+More tomorrow
+For a video you can also double the Abyss treasury, the Rift and guardian loot, and revive on the spot (except hardcore).
+Reward videos aren't available in this version of the game.
+The season pass is free too: claim the free track rewards in the “Season” tab.
+applying the look ----------
+buttons
+Physical
+Fire
+Cold
+Lightning
+Arcane
+Mage
+Spellcaster: fire, ice and lightning. Fragile, but burns crowds from afar.
+Knight
+Melee tank: blade, shield and holy light. Withstands any blow.
+Blade
+Shield
+Ranger
+Marksman and assassin: bolt volleys, shadows and poisons. Fast and deadly.
+Arrows
+Shadows
+Poisons
+Barbarian
+Axe-wielding berserker: huge area damage, life leech, rage.
+Earth
+Wand
+Staff
+Sword
+Two-handed Sword
+Crossbow
+Heavy Crossbow
+Axe
+Greataxe
+Grimoire
+Dagger
+Off-hand Axe
+Ring
+Amulet
+Hood
+Robe
+Cuirass
+Bracers
+Greaves
+Signet
+Talisman
+to damage
+physical damage
+fire damage
+cold damage
+lightning damage
+poison damage
+to life
+to mana
+mana per sec.
+attack and cast speed
+crit chance
+crit damage
+to armor
+move speed
+life per sec.
+of damage as life
+loot rarity
+It is still warm.
+Windstep
+Catch me if you can.
+Whoever wears it serves it.
+Blood Oath
+The price is paid in blood.
+Hush. Do you hear the ice cracking?
+Bastion
+Walls fall. He does not.
+Hand of the Storm
+Thunder answers the call.
+Contagion is a gift too.
+The drowned never let go of what's theirs.
+The light won't fade while its knight stands.
+Shadow Whisper
+You won't hear the first bolt.
+The earth remembers every blow.
+Orb of Transmutation
+Normal item
+magic
+Orb of Alteration
+Reroll the stats of a magic item
+Orb of Augmentation
+Add a stat to a magic item (up to 2)
+Regal Orb
+rare, +1 stat
+Chaos Orb
+Reroll all stats of a rare item
+Exalted Orb
+Add a stat to a rare item (up to 6)
+Divine Orb
+Reroll stat values
+Orb of Scouring
+Remove all stats
+Vaal Orb
+Corrupt the item: unpredictable result, can't be changed afterwards
+A projectile that explodes on impact.
+A wave of fire around the mage.
+projectile to all projectile skills per level.
+Meteor
+A meteor falling from the sky.
+Sets the ground ablaze: damage per second.
+Ignite
+Fire hits set enemies ablaze.
+Armageddon
+A rain of meteors across the area.
+A piercing ice spear, slows.
+A frost wave, slows heavily.
+Projectiles pierce one more enemy per level.
+An ice crust: armor and damage reduction.
+Blizzard
+A snowstorm in an area.
+Cold slows harder and hurts more.
+A huge slow orb pierces everything.
+Sparks
+A spray of wandering sparks.
+Lightning jumps between enemies.
+Overload
+lightning bounce per level.
+A shield absorbs damage (45% of life).
+A burst of lightning around you, shocks.
+A slow ball strikes everyone nearby with lightning.
+Boosts all elemental damage.
+A wide strike at all enemies in front.
+Spinning with a sword: damage to everyone around.
+Larger melee area.
+Leap at an enemy and strike an area.
+Three quick strikes in a row.
+Physical hits cause bleeding.
+A wave of light cleaves through enemy ranks.
+Shield Bash
+Stuns enemies in front of the knight.
+Battle Cry
+Stuns enemies, boosts armor.
+More armor and life.
+Ram through enemies with a stun.
+Fortress
+Damage taken reduced by 40%.
+Reflection
+Returns part of melee damage.
+A ground slam and a delayed aftershock.
+A hammer of light crashes down on an enemy.
+While in a slot: armor and recovery. Reserves 25% mana.
+Life recovers faster.
+Heals allies and burns enemies.
+A ghost knight fights alongside you.
+Aura of Wrath
+While in a slot: light and lightning damage.
+Light skills deal more damage.
+Volley
+A fan of five bolts.
+A powerful bolt pierces a row of enemies.
+projectile per level.
+A shower of arrows covers an area.
+The bolt explodes with fire.
+Accuracy
+Higher critical chance and damage.
+Ten shots in a row at one target.
+Shadow Strike
+Teleport behind an enemy and strike.
+Blinds enemies, speeds you up.
+Faster running and dashing.
+Spinning with blades.
+Sets a trap that explodes near an enemy.
+More damage to the wounded and stronger crits.
+A ring of daggers in all directions.
+Poisons the target.
+Poison Cloud
+A poison cloud where the enemy stands.
+Toxins
+Poison is stronger and lasts longer.
+The trap releases a poison cloud.
+Two beasts fight for you and poison enemies.
+Contagion
+Poison spreads to neighbors on death.
+While in a slot: enemies around take poison damage.
+A heavy blow, may stun.
+Two quick strikes.
+Melee deals more damage.
+Spinning with an axe, you can move.
+Rage: faster and stronger, but lower armor.
+Execution
+More damage to enemies with low life.
+A crushing blow over a huge area.
+A crack runs forward along the ground.
+Leap into the thick of the enemies.
+Ground slams cover more area.
+Three spinning axes.
+Stuns enemies, +30% damage.
+Stun
+Hits stun more often.
+The totem slams the ground around itself.
+Hits restore life.
+A ring of blood, causes bleeding.
+to life per level.
+While in a slot: physical damage and regeneration.
+Sacrifice
+Spends 15% life on a powerful blast.
+Part of the damage returns as life.
+seconds you can't die, heals 35%.
+Soul of Flame
+Ashen Heart
+Spellcraft
+Mana Flow
+Blood Magic

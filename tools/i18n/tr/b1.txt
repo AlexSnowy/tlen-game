@@ -1,0 +1,250 @@
+of
+locked
+Choose a path — forever for this hero.
+learned
+learn
+Passive points:
+Learn nodes connected to those already learned. Large nodes give strong effects, rings are keystones.
+Tap a tree node.
+Keystone
+Notable
+Class start
+Node
+class branch
+Learn
+Reset ·
+Return:
+Open portal — continue from the same place
+Campaign
+Monster level
+new
+Guardian:
+empty
+Campfire Camp
+Merchant, smith and the portal to the north
+Merchant, smith and portal. K — gems, P — passives, I — bag
+The party leader opens the portal
+Lair of the Devourer
+Devourer of Decay
+Kill the Lair's guardians
+Map:
+Nightmare
+Abyss Rift · depth
+mods
+Final battle of the Atlas
+Map · tier
+Lv.
+mods:
+The Guardian waits to the north
+Head north. At the end of the zone awaits
+reached
+th Abyss depth
+The Abyss Lich is defeated! Unlocked depth
+Unlocked zone “
+Nightmare maps unlocked!
+Ascendancy point gained (Passives)!
+Major Pantheon power unlocked (Passives)!
+Minor Pantheon power unlocked (Passives)!
+Ascendancy point gained!
+Atlas: tier
+conquered (+3% item quantity on maps).
+defeated
+Collect the loot and enter the portal to return to camp.
+Guardian defeated!
+Campaign complete
+Nightmare maps unlocked — Atlas in the portal
+You were slain by:
+The hero has fallen forever
+Hardcore is unforgiving. Their items in the stash remain for other heroes.
+To the title screen
+Wait for the party leader to open the portal
+Summoning the hero…
+Go to the portal north of the camp. Skill gems and passives are the buttons at the top.
+Go to the portal north of the camp. Skill gems — K, passive tree — P.
+All hero slots are taken (
+More slots in the Shop
+Branches:
+Weapon:
+Maximum 8 heroes. Delete one on the title screen.
+Kill the pack leaders
+Burn the nest
+Light the fire
+Free the prisoner
+Pack leader ·
+Pack leader
+Seal fragment
+Sacred fire
+Destroy the obelisk
+The path to the Guardian is open:
+Objective:
+Ambush!
+The dead rise from their graves!
+Objective complete!
+The Guardian is no longer protected.
+The barrier has fallen — the path to the Guardian is open.
+stand in the circle
+flies into a rage!
+phase
+You're back in camp. Sell your loot and upgrade your gear.
+level
+XP
+Open portal
+Open stash
+Talk:
+co-op)
+Party code — 4–8 characters
+Connection to the party lost
+Couldn't connect to the party
+You left the party
+You are now the party leader
+Player
+ 
+ally
+has a newer game version. Update, or monsters in the party won't match.
+has an old game version — ask them to restart it
+Ally
+Rift opened!
+gave you:
+Gift sent to the stash:
+You're in a party
+you're the leader
+The party is already full (3 players)
+A new player joined the party
+left the party
+The leader opened a portal:
+Go to the portal to enter.
+visual replays of allies' skills
+party: UI
+Hero name
+Name
+Create party
+Or join by code
+For example, K7QX
+Join
+Open parties
+Refresh
+Up to 3 heroes can play together. Everyone gets their own loot. Monster difficulty grows with party size.
+leader
+you)
+Party code:
+Copy code and link
+Leave party
+The leader opened:
+Go to the portal in camp.
+Over here!
+Help!
+Help
+Loot here
+Loot
+Heading to the boss
+To the boss
+Link for friends:
+Invite a friend via Telegram
+The game will minimize while you pick a chat. Come back — the party will be kept.
+Open party — visible to everyone in the “Open parties” list
+You:
+Join me in “Lands of Decay”:
+Invite copied
+Join my party in “Lands of Decay”
+Lands of Decay
+Join my party
+in camp
+in another zone
+Couldn't load models. Refresh the page.
+Building the world…
+Progress loaded from Telegram cloud
+MERCHANT AND FORGE
+Your offer
+Normal
+Magic
+Rare
+All
+Clear
+Tap items in your bag — they'll appear here. Tap again to remove.
+Items:
+you'll get
+Among them
+rare/unique/enhanced
+Sell
+better than equipped
+New goods ·
+Sold out — come back after your next run.
+Bag is full
+Orbs
+you have
+Trade:
+items for
+Bought:
+forge
+Item power
+rays
+aura
+shimmer
+none
+What to enhance
+equipped ·
+in bag ·
+max
+chance
+No items.
+Pick an item on the left.
+A corrupted item can't be enhanced.
+Fully enhanced — the weapon shines with rays.
+At +
+a glow appears:
+No risk.
+On failure the gold is lost, the item stays +
+Enhance ·
+Not enough
+The smith punched a new socket: now
+enhanced “
+to +
+Success! Now +
+stash — shared by all heroes in this browser
+Shared
+Weapons
+Valuables
+Tab
+Tab “
+Stash weapons
+Stash armor
+Stash rares and uniques
+Stash all
+tap to move
+Tab is full
+ATLAS: MAPS
+This orb doesn't fit here
+Nightmare Atlas
+Tier
+Tiers conquered:
+item quantity bonus on maps +
+Maps drop from monsters on maps; guardians drop higher-tier maps.
+items
+Simple map
+free
+The final boss of the Atlas. Requires 4 Fragments of Decay — dropped by guardians of tier 4+ maps. You have:
+wins:
+Normal
+Magic
+Rare
+map · tier
+monsters
+level
+No modifiers
+Item quantity:
+item rarity:
+Modify the map with orbs
+Open map
+tap again to choose forever
+Ascendancy path:
+monster death and aura effects
+item tooltip
+Hits per second:
+Two-handed
+One-handed
+Enhancement:
+to stats)
+Item level:
+crafted)
+Skills cost life instead of mana
+sockets:

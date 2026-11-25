@@ -1,0 +1,215 @@
+Skills cost life instead of mana.
+Tempest
+Thunderer
+Heart of Winter
+Steel
+Iron Skin
+Impenetrable
+Valor
+Blade Master
+Bastion of Faith
+Huge defense, but a slower step.
+Holiness
+Light of Faith
+Paladin
+Falcon Eye
+Sniper
+Speed
+Assassin's Luck
+Crit chance doubled, but crits are weaker.
+Plaguebearer
+Pestilence
+Strength
+Might
+Titan
+Frenzy
+damage, but half the armor.
+Indomitable
+Immortal
+light damage
+melee damage
+projectile damage
+area
+life
+mana
+mana/sec
+life/sec
+armor
+to crit chance
+ignite chance
+slow strength
+shock chance
+bleed chance
+to lightning bounces
+to pierce
+projectiles
+poison duration
+poison spread
+damage to the wounded
+ground slam area
+stun chance
+damage reflection
+aura strength
+dash cooldown speed
+to the level of all skills
+cooldown speed
+Plague Corpse
+Phantom Blade
+Skeleton Thrall
+Skeleton Warrior
+Skeleton Crossbowman
+Skeleton Sorcerer
+Bone Brute
+Necromancer
+Cultist
+Berserker of Decay
+Fallen Knight
+Swift
+Stone
+Fiery
+Vampire
+Overlord
+Icy
+Explosive
+Spiked
+Rotting Marshes
+Morg the Drowned
+Burn the rotten nests
+Under Morg's armor — a medallion with a crest. Your crest. Someone of your bloodline has been to these lands before.
+Forgotten Graveyard
+The Bone Regent
+Light the funeral fires
+Your name is carved on the Regent's tombstone. And next to it, a date of death: three days from now.
+Cultist Camp
+High Priest Issar
+Free the prisoners
+The priest laughed as he died: “We only opened the door. You were the one who walked through it.”
+Ashen Forest
+The Ashen Beast
+Kill the pack leaders
+Dying, the Ashen Beast whispered: “You opened the gates yourself. You just don't remember it.”
+Crypt of the Forgotten
+Ordis the Necromancer
+Gather the seal fragments
+In Ordis's crypt you found your spellbook. Its pages are covered in your handwriting.
+Sunken Ruins
+Arden the Fallen Paladin
+Hold the sacred fire
+Arden recognized you: “Commander? You came back… but why did you bring them with you?”
+Halls of Decay
+Keeper of the Halls
+Destroy the Guardian's obelisks
+Frescoes on the walls of the halls. Each one shows you, kneeling before the light.
+Heart of Decay
+Light the purifying fires
+The Heart of Decay beats in time with yours. You are its key. The campaign is over — the endless Nightmare maps are open.
+Monsters deal +30% damage
+Monsters get +40% life
+Monsters are 25% faster
+monsters
+Twice as many rare monsters
+No life recovery
+The ground slows by 15%
+Traps everywhere
+Storm: lightning strikes from the sky
+Burn the Nightmare nests
+Light the fires
+Gather the fragments
+Hold the fire
+Destroy the obelisks
+Crushing Blow
+Poison Pools
+Summon Servants
+Projectile Fan
+Shadow Step
+Death Spiral
+Rain of Fire
+Ramming Charge
+Ring of Death
+Fire Cross
+Whoever has seen every map sees the treasure too.
+She is always hungry.
+Crown of Thorns
+Pain returns to the one who brought it.
+Eternal Fire
+One who has become flame fears no cold.
+Giant's Stride
+The earth trembles with every step.
+The sky darkens with arrows.
+Time Loop
+Once more. And again.
+Last Breath
+Finish it. Leave no chance.
+Shredder
+Every swing leaves a mark.
+It's always January here.
+Peacemaker
+Peace comes after the last blow.
+He walks right through the ranks.
+monetization settings: pay — Telegram Stars payment server URL, adsgram — Adsgram ad block id, support — “Support the author” link (site only)
+A dark 3D ARPG in your browser: loot, skill gems, a passive tree, bosses and co-op for up to 3 players.
+grim fantasy, dark ARPG
+chronicle of an exile — a camp by the fire and lands where the dead rise
+live full-screen 3D scene; life and mana orbs as glass flasks
+coal, old gold, blood and mana; Ruslan Display + Philosopher + Rubik,system-ui,sans-serif
+full-screen scene, orbs at the edges, skills at the bottom center, panels in the center
+Gems
+Passives
+Shop
+To camp
+Space
+Call allies
+Sort
+Sell normal and magic
+Buy
+Shared chest: items in it are available to all your heroes.
+Loot filter
+What to show on the ground and what to pick up automatically.
+Quests, rewards and the game guide.
+Travel the Lands of Decay together — up to three heroes.
+The deeper you go, the stronger the dead and the richer the loot.”
+Loading the world…
+Next
+The dead rise from the graves of Valmor. Only the camp by the old fire survived.
+Happy New Year!
+Continue
+New hero
+What's new
+hero looks (armor dyes, auras, trails, wisp companions, Santa hat, skill elements), the “Snowy Darkness” season with free rewards, gifts for watching a video. Hero power is not for sale
+New Year
+snow, a tree, garlands, snowmen, gifts from monsters, candy canes and Santa hats (can be turned off in settings)
+Gear color on the hero: only the fabric is dyed, details keep their colors
+Camera zoom: mouse wheel, two fingers or the slider in settings
+Abyss — the Rift ring and the Lord of the Abyss; a flexible loot filter
+Story
+prologue, campfire talks, guardians' words, ending and the “Chronicle”
+Tutorial
+for new heroes — hints guide you through the first steps
+A clean interface on any screen, custom fonts, loot labels don't stick together
+The Atlas of maps, the endless Abyss and the Devourer of Decay
+Ascendancy, Pantheon, the mastery ring in passives
+Support gems, essences, workbench, vaal orb
+Divination cards, rifts, Legion, shrines, traps and storms on maps
+World records, world feed, open parties, “Over here!” pings
+Stash, multiple heroes, hardcore, cloud saves
+Challenges, daily quests, guide, settings, pet
+Portal to camp and back, music, weather, new graphics
+Settings and saves
+Graphics: high
+Low
+Music: on
+Export save
+Import
+Bug
+models: Kay Lousberg, KayKit (CC0) · Icons: game-icons.net (CC BY 3.0)
+Choose a class
+Each class has three branches of 7 skills and its own entry into the shared passive tree.
+Hardcore
+death is permanent, but +25% loot rarity
+Back
+You have fallen
+The Decay took your body, but the camp's fire brought you back. Your loot is with you.
+Wake by the fire
+The Guardian has fallen
+Collect the loot
+Touch the screen and drag — the hero walks. Near an enemy he attacks by himself. Skills are the round buttons on the right, dash — the blue one (in the movement direction). Bag, skills and passives are the buttons at the top.

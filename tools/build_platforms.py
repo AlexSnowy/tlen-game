@@ -8,6 +8,7 @@
 GameDistribution: перед сборкой задай GD_ID=<id игры из кабинета GD>.
 """
 import os, re, shutil, subprocess, sys, time, zipfile
+INTL = {'crazy', 'gd', 'itch'}  # международные площадки: по умолчанию английский
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'public')
@@ -33,13 +34,22 @@ def version():
 
 
 def build(name, plat, ver, stamp):
+    subprocess.check_call([sys.executable, os.path.join(ROOT, 'tools', 'i18n', 'build_en.py')], stdout=subprocess.DEVNULL)
     out = os.path.join(DIST, name)
     shutil.rmtree(out, ignore_errors=True)
     shutil.copytree(SRC, out, ignore=lambda d, files: [f for f in files if f in SKIP])
-    for fn in ('index.html', 'game.js'):
+    if plat in INTL:
+        ru = open(os.path.join(out, 'index.html'), encoding='utf-8').read().replace("window.LANG_ALT=window.LANG_ALT||'en/';", "window.LANG_ALT='./';")
+        open(os.path.join(out, 'ru.html'), 'w', encoding='utf-8').write(ru)
+        en = open(os.path.join(out, 'en', 'index.html'), encoding='utf-8').read().replace('<base href="../">\n', '').replace("window.LANG_ALT='./';", "window.LANG_ALT='ru.html';")
+        open(os.path.join(out, 'index.html'), 'w', encoding='utf-8').write(en)
+        os.remove(os.path.join(out, 'en', 'index.html'))
+    for fn in ('index.html', 'ru.html', 'game.js', 'en/game.js', 'en/index.html'):
+        if not os.path.exists(os.path.join(out, fn)):
+            continue
         p = os.path.join(out, fn)
         s = open(p, encoding='utf-8').read().replace('__V__', ver).replace('__T__', stamp)
-        if fn == 'index.html':
+        if fn.endswith('.html'):
             s = re.sub(r'<script src="https://telegram\.org/[^"]*"></script>\s*', '', s)
             gd = os.environ.get('GD_ID', '') if plat == 'gd' else ''
             inject = f'<script>window.PLAT={plat!r};' + (f'window.GD_ID={gd!r};' if plat == 'gd' else '') + '</script>\n'

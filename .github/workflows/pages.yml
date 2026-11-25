@@ -21,9 +21,10 @@ jobs:
       - run: |
           touch public/.nojekyll
           V=${GITHUB_SHA::8}
-          sed -i "s/__V__/$V/g" public/index.html public/game.js
+          python3 tools/i18n/build_en.py
+          sed -i "s/__V__/$V/g" public/index.html public/game.js public/en/index.html public/en/game.js
           T=$(date +%s)
-          sed -i "s/__T__/$T/g" public/game.js
+          sed -i "s/__T__/$T/g" public/game.js public/en/game.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

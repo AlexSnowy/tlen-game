@@ -1,0 +1,250 @@
+taken
+Corrupted
+Fragment of Decay
+defeated the Devourer of Decay!
+The Devourer of Decay is defeated! The Atlas is conquered — victory #
+CHALLENGES
+First Blood
+Kill 100 monsters
+Reaper
+Kill 1000 monsters
+Rare Hunter
+Kill 25 rare monsters
+Guardian Slayer
+Defeat 3 guardians · reward: wisp pet
+End of the Campaign
+Defeat the Heart of Decay
+Legend
+Pick up a unique item
+Smith's Aura
+Enhance an item to +6
+Radiance
+Enhance an item to +10
+Rift Warden
+Close 5 rifts
+Cartographer
+Complete 5 maps
+Atlas Conqueror
+Conquer 10 Atlas tiers
+Choose an Ascendancy path
+Collector
+Find 8 different unique items
+Depths
+Reach Abyss depth 10
+Devourer
+Defeat the Devourer of Decay
+Challenges
+Completed:
+claimed
+Claim
+Unique collection ·
+Chronicle ·
+Prologue
+Chapter
+Defeat the campaign guardians to learn the story of the Decay.
+Epilogue
+Reward:
+SUPPORT GEMS
+Multiple Projectiles
+projectiles, damage
+Pierce
+Projectiles pierce 3 more targets
+bounces, damage
+Increased Area
+to area of effect
+Concentration
+damage, area
+Brutality
+damage, mana +30%
+Faster Casting
+Cooldown 30% faster, mana +20%
+Bloodsucker
+of skill damage — to life
+Precision Strike
+chance and +30% crit multiplier
+Elemental Power
+fire, cold and lightning damage
+Support:
+empty socket
+Remove
+No suitable gems. Support gems drop from rare monsters and guardians.
+RIFT (league mechanic)
+Rift
+come closer to open
+The Rift holds while he lives
+The Rift is open! Kill creatures inside the circle — time is extended.
+Rift Guardian!
+killed
+s · killed
+Double the Rift loot
+The Rift Guardian is defeated! The Rift is closed — rich loot.
+The Rift is closed! Creatures killed:
+Grab the treasure.
+MUSIC (procedural ambient)
+Music:
+on
+off
+Morg's Wand
+Icy Whisper
+Plague Crown
+Heart of Ash
+Maw of the Abyss
+Paladin's Oath
+Crown of Decay
+Eye of the Atlas
+Full bag again? Dump it out, let's take a look.”
+Orbs are pricey these days. But for you — almost free.”
+They say real gold drops on Nightmare maps.”
+Don't sell what's better than what you're wearing. I mean it.”
+Each level makes an item 10% stronger. The higher the enhancement, the bigger the risk.”
+After the sixth level the metal starts to glow. Pretty, huh?”
+A ten is already a legend. You can see the rays a mile away.”
+Lose the gold — no big deal. The item is intact.”
+Your heroes
+fallen ·
+Hardcore ·
+Atlas:
+tiers
+Delete
+This hero has fallen forever
+Delete?
+workbench: a guaranteed stat for gold and an orb
+A corrupted item can't be changed at the workbench.
+Workbench
+one crafted stat per item
+Unique items can't be changed.
+First make the item magic (Orb of Transmutation).
+Crafted:
+Remove crafted stat
+No free slots for a stat.
+Price:
+gold + 1
+shrines: temporary blessings
+Shrine of Fury
+damage
+Shrine of Wind
+move speed, +25% attack speed
+Shrine of Stone
+damage taken
+Shrine of Life
+Strong regeneration and life leech
+Shrine of Fortune
+loot rarity and gold
+Fury
+Wind
+Stone
+Life
+Fortune
+for 25 seconds
+daily quests
+Kill 150 monsters
+Kill 10 rare monsters
+Defeat 2 guardians
+Close a rift
+Activate 2 shrines
+Awaken the Legion
+Clear 3 Abyss depths
+Complete 2 maps
+Daily quests
+refresh tomorrow
+Daily quest complete!
+tooltips on mouse hover (PC)
+vibration on phone
+guide
+Controls
+Phone: touch the screen and drag — the hero walks and auto-attacks the nearest enemies. Q/E/R — skills, blue button — dash in the movement direction, red — flask. PC: WASD or mouse, Q/E/R, space, F.
+Camp
+Vera the Merchant buys and sells items and orbs. Grom the Smith enhances items up to +10 and adds stats at the workbench. The stash is a shared chest for all heroes. The portal to the north leads to the lands and maps.
+Skill gems
+Skills are gems. They drop from monsters (more often from rares and guardians), and the first guardian killed in each zone grants a new one. Socket a gem into equipped gear — the skill appears on the Q/E/R button. Support gems in the same item boost its skills. Socketed gems level up with the hero. Change the item — the gems move to the new one. Grom the Smith adds sockets.
+The “To camp” button leaves the portal open: the portal window will show “Return” — the zone stays as you left it. You can also return after death.
+The brighter the label and the taller the light beam, the more valuable the item: white — normal, blue — magic, yellow — rare, orange — unique.
+better than equipped. The loot filter (button in the bag) hides junk and turns it into gold; you can choose strictness, rarity and item types, and what to pick up automatically.
+Transmutation: normal
+magic. Alteration: reroll a magic item. Augmentation: +stat to a magic item. Regal: magic
+rare. Chaos: reroll a rare item. Exalted: +stat to a rare item. Divine: reroll values. Scouring: remove everything. Vaal: corrupt the item — it may become stronger (enhancement up to +12, special stat) or stay the same, but it can't be changed afterwards. Orbs also work on maps.
+Enhancement
+Each level gives +10% to all stats of the item. At +1 the weapon shimmers, at +6 an aura appears, at +10 — rays. On failure the gold is lost, the item remains.
+Skills and gems
+Each class has 21 skills in three branches, three can be equipped. Each skill can hold 2 support gems: more projectiles, chain, area, damage and more. Gems drop from rare monsters and guardians.
+Defeating the guardians of the “Cultist Camp”, the “Sunken Ruins”, the “Heart of Decay” and the first tier 5 map grants Ascendancy points. Choose one of two subclasses in the “Passives” window.
+Pantheon
+Defeating the guardians of the “Ashen Forest” and the “Sunken Ruins” unlocks Pantheon powers (the “Passives” window): one major and one minor. You can change them any time.
+Atlas
+After the campaign, maps open up: tiers 1–12, rarity and modifiers. More modifiers — more loot. Each conquered tier gives +3% item quantity. Guardians of tier 4+ maps drop Fragments of Decay — 4 fragments open the Lair of the Devourer.
+Divination cards
+Rare cards from monsters. Collect a full set — Vera the Merchant (“Buy” tab) will trade it for a unique item, orbs, gems or a high-tier map.
+Essences
+Sometimes a zone has an essence crystal. Come closer — a strong guardian emerges from it. It drops an essence: at the workbench it adds a powerful stat to an item (30% stronger than the best roll), and makes a normal item rare.
+Abyss
+After the campaign the portal offers the Abyss — an endless descent. The guardian's portal leads to the next depth, monsters and modifiers grow. Every 5 depths is a checkpoint. You can leave with the “To camp” button.
+Legion
+The Legion monolith freezes a squad of enemies for 10 seconds. Each statue broken before they awaken gives extra loot.
+Events
+Rift: come closer and the circle fills with creatures — kill inside to extend the time, treasure at the end. Shrines give a strong blessing for 25 seconds.
+Party
+Up to 3 players. The “Party” button
+Create party” and send the link to a friend, or check “Open party” — then everyone will see you in the “Open parties” list. Everyone has their own loot, items can be given to an ally from the bag.
+Records
+Settings
+open party lobby
+Nobody yet. Create a party and check “Open party” — other players will see you.
+lv.
+camp
+DIVINATION CARDS
+Wolf Trail
+Unique item “Ring of a Thousand Arrows”
+Ring of a Thousand Arrows
+The pack always finds its prey.
+Ash and Flame
+Unique item “Heart of Ash”
+From the ashes a new flame rises.
+The King's Burden
+Unique item “Crown of Decay”
+Heavy is the crown of the dead.
+Exaltation
+Exalted Orbs
+Only the chosen may rise.
+The Mad Merchant
+Chaos Orbs
+He pays without looking.
+Divine Spark
+Divine Orbs
+Perfection is in the details.
+Jeweler
+random support gems
+Every gem is a story.
+Rare tier 10 map
+He has seen the edge of the world.
+Hunger of the Devourer
+Fragments of Decay
+It waits in the Lair.
+Eye of the Storm
+Unique item “Hurricane” or “Staff of Eternal Winter”
+Hurricane
+Staff of Eternal Winter
+In the eye of the storm — silence.
+collect a set — get a reward
+Divination cards rarely drop from monsters, more often from rares and guardians. Collect a full set and Vera will trade it for a reward.
+Trade
+CLOUD SAVE (Telegram) AND EXPORT
+Save code
+Copy it and keep it in your notes. Paste it via “Import” on another device.
+Code copied
+Import save
+Paste a save code. Current heroes will be replaced.
+Save loaded
+The code didn't work
+Load
+Close
+ESSENCES
+Essence of Life
+Essence of Wrath
+Essence of Frost
+Essence of Thunder
+Essence of Precision
+Essence of Fury
+Essence of Wind
+Essence of Greed
+Essence of Stone
+Essence of Hunger

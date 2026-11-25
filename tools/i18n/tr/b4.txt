@@ -1,0 +1,270 @@
+Resolve
+Blessing
+Blessing
+Consecrated Ground
+Consecrate
+Summon Guardian
+Righteous Wrath
+Wrath
+Piercing Shot
+Explosive Bolt
+Expl. Bolt
+Bolt Barrage
+Smoke Bomb
+Smoke Bomb
+Dagger Vortex
+Dagger Vortex
+Spike Trap
+Spikes
+Thousand Blades
+Blades
+Poison Bolt
+Poison Bolt
+Plague Trap
+Plague
+Venomous Beasts
+Beasts
+Deadly Mist
+Mist
+Double Strike
+Double Strike
+Heavy Blows
+Heavy Blows
+Battle Whirl
+Whirl
+Ground Split
+Split
+Axe Leap
+Shockwave
+Shockwave
+Axe Throw
+Axes
+Ancestral Cry
+Cry
+Ancestral Totem
+Bloodthirst
+Bloodthirst
+Blood Harvest
+Harvest
+Blood Rage
+Undying Roar
+Roar
+tutorial hint doesn't overlap buttons, “Talk…”, orbs and skills
+loot filter
+Pick up everything
+White — to gold, blue — on tap
+Strict
+Only rares and better than equipped
+Very strict
+Auto-pickup only
+and uniques
+Hide
+On tap
+Pick up
+Hidden items turn into gold right away. Orbs, gold, gems and maps are always picked up.
+Strictness
+Custom
+Set manually
+By rarity
+Unique
+Always pick up
+Items better than equipped — always pick up, even if hidden by a rule
+Item types
+A disabled type is hidden entirely (except
+and uniques).
+Hidden this run
+items,
+gold.
+Loot filter:
+custom
+New Year tree by the portal
+Abyss Rift: expanding and shrinking ring
+The Rift is opening! Kill inside the ring — every kill extends it.
+Lord of the Abyss
+The Rift has closed. Killed
+The Lord didn't show up.
+Rift sealed ·
+Rift closed ·
+portal to camp is open
+Lord of the Abyss!
+the ring grows
+the ring shrinks
+Rift ·
+spawn inside the ring
+monsters outside the ring vanish when it shrinks
+visuals
+loot returns to the ground after the portal
+game version: party check and update check
+A game update is out
+NEW YEAR
+snow (GPU particles around the hero)
+shared decoration materials/geometry
+frosted ground
+zone decorations
+candy cane pickups
+camp: garlands, snowmen, snowdrifts
+garland around the camp (sagging strings between lantern posts)
+Santa hat on monsters (deterministic by id — same for everyone in the party)
+New Year gift (loot)
+New Year gift
+Gift:
+and
+tick: snow, lights, candy canes
+Candy cane: +20% life and vigor for 8 s
+snow on the title screen
+gear color on the hero model: helmet
+headwear, armor
+torso and cloak, gloves
+hands, boots
+legs
+main color of the model part — from texture pixels under its UV map
+camera zoom: mouse wheel, two-finger pinch, settings slider
+ABYSS: creeping crack, pits with waves, chest or Lich at the end
+Abyss Crack
+come closer — it will creep
+Abyss Lich
+The chasm has opened — he rises from the depths
+Chasm Guardian
+The Abyss won't give up its loot without a fight
+The Abyss Treasury is open!
+Double the treasury
+The Abyss awakens! Follow the crack.
+Abyss Pit
+kill the creatures
+move on
+Abyss · follow the crack · pits
+Abyss Lich!
+Abyss conquered · portal to camp is open
+map without guardian and objective; half of the normal monsters remain
+The Abyss has opened. Follow the crack — the Lich waits at its end.
+SKILL GEMS: sockets in items, support gems in the same item
+Off-hand
+Helmet
+Body armor
+Gloves
+Boots
+gems from items in the bag/stash return to the pouch (item removed)
+Gem “
+reached level
+In socket:
+Choose a gem for the socket
+Remove to pouch
+requires
+only
+support · ×
+The pouch is empty. Gems drop from monsters, especially rares and guardians. The first guardian killed in each zone grants a new gem.
+Skills come from gems. Socket a gem into equipped gear — the skill appears on the bar. Support gems in the same item boost its skills. Gems level up with you.
+Gear sockets
+not equipped
+all linked
+Empty socket
+Skill for button
+Empty
+pouch
+Gem pouch
+To the shared pouch
+Shared pouch — for all your heroes
+take
+empty — tap
+on a gem to give it to your other heroes
+Grom the Smith punches more sockets.
+Boosts all matching skills in this item.
+XP:
+next level at
+hero lv.
+Max level
+in the shared pouch
+Gem taken to the pouch
+loot: skill gems
+Gem:
+Gem sockets
+Sockets:
+Gems in one item are linked — supports boost nearby skills.
+No more sockets can be added.
+Punch a socket ·
+passive tree node icons — by the node's main bonus
+the minimap doesn't hide under buttons on short screens (landscape in Telegram)
+“Bug” button: a report with data for the developer
+Describe what happened and what you were doing before. Game version, device and location in the game will be attached automatically.
+For example: in the Abyss after a pit the crack stopped creeping, no monsters
+Attach a screenshot
+Send
+Cancel
+Write at least a couple of words about the problem.
+Sending…
+in a party
+Thanks! The report was sent to the developer.
+Couldn't send — check your internet and try again.
+PLATFORMS: Yandex Games, CrazyGames, GameDistribution, VK, itch.io…
+sound fades when the game is minimized (platform requirement)
+no system menu on long press/right click
+install as app (PWA) — only on the game's site
+SHOP: purchases, hero look, season, ad rewards
+look
+Armor dye
+Gold
+Bone
+Blood
+Ice
+Venom
+Night
+Copper
+Snow
+Candy
+Skill element
+Flame
+Shadow
+Arcane
+Embers
+Light
+Rime
+Trail
+Arcane
+Venomous
+Snowy
+Companion
+Ember wisp
+Rime wisp
+Arcane wisp
+Firefly
+Camp portal
+Festive
+Headwear
+Santa hat
+Name frame
+Golden
+Title
+Founder
+Snowy Darkness
+Ashen Spring
+Blood Moon
+Wisp “
+Season Conqueror “
+Founder's Pack
+The “Founder” title, a golden name frame, all 8 armor dyes and the first season pass. Thank you for supporting the game!
+Season Pass
+The paid reward track of the current season: dye, aura, companion, skill element, trail, frame, title and more orbs.
+New Year Pack
+A Santa hat on the hero, a snowy trail, a festive portal and the “Candy” dye.
+Armor Dyes
+colors for armor: gold, bone, blood, ice, venom, night, copper, snow. Allies see them too.
+Skill Elements
+Recolor the glow of all skills: flame, ice, venom, shadow, gold, blood.
+Auras and Trails
+A ring of power under the hero and a glowing footstep trail — 5 variants each.
+Wisp Companions
+A wisp flies next to the hero. No combat bonuses — just pretty. 4 colors.
+Portal Look
+The camp portal: abyss, ice, gold or blood.
+stash tab
+48 more slots in the shared chest. You can buy up to 8 tabs.
+hero slot
+One more hero. 4 slots are free.
+product on the platform
+Purchase received:
+platforms: payment ----------
+Purchases are still loading, try again in a couple of seconds
+Purchase canceled
+Payment failed
+Couldn't open payment, try again later
+Purchases are available in the Telegram version of the game

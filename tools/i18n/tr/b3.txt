@@ -1,0 +1,260 @@
+come closer — free the guardian
+Essence
+The essence guardian is free!
+a powerful stat, beyond the workbench limit
+not for this item)
+A normal item becomes rare. The stat is 30% stronger than the best roll.
+Atlas development
+Call of the Rift
+Rifts appear on maps 25% more often
+Holy Places
+a shrine on every map
+Maps drop 40% more often
+Fortune Teller
+Divination cards drop twice as often
+Crystals
+Essences appear twice as often
+Rich Guardians
+Map guardians drop +2 rare items
+Hunger
+Fragments of Decay drop 50% more often
+Treasury
+to item quantity on maps
+Atlas Development
+Points: 1 for each conquered tier and each victory over the Devourer. Bonuses work only on maps.
+vaal orb: corruption
+Corruption: no change
+Corruption: new stat —
+Corruption: enhancement +2 (up to +
+Corruption: the item was reborn as rare
+Play time
+h
+min
+Monsters killed
+Rares
+Guardians
+Maps completed
+Rifts closed
+Shrines
+Uniques found
+Best enhancement
+Deaths
+Hero statistics
+ABYSS: endless descent
+Abyss · depth
+A crack opens in the ground — follow it and it will creep onward. Along the way pits open and waves of Abyss creatures crawl out. At the end of the crack — a chasm and the Abyss Lich. Defeat him to unlock the next depth. Record:
+From depth
+Start
+From 1
+PANTHEON
+Soul of the Sun
+damage taken, +15% armor
+Soul of the Moon
+move speed, +6% attack speed
+Soul of the Earth
+life per sec., +8% life
+Soul of Hunger
+life leech
+Soul of Greed
+rarity, +15% gold
+Soul of Time
+to cooldown speed
+can be changed at any time
+Major power
+Minor power
+Unlocks after defeating the guardian “
+world records
+Loading records…
+Hero
+By level
+By Abyss
+By Atlas
+Share hero
+Your hero enters the table automatically when you open this tab. The name is taken from the “Party” window.
+long press on a skill button — description
+Gems:
+soft circle of light under the hero
+You: Over here!
+trophies in camp for defeated guardians
+settings
+Volume
+Music
+Vibration
+Damage numbers
+Screen shake
+Camera zoom
+mouse wheel or two fingers
+New Year mood — snow, decorations, hats on monsters
+World feed (other players' news)
+Install as app
+Report a bug
+Replay the tutorial
+Reread the prologue
+Reread the ending
+Wisp pet (for the “Guardian Slayer” challenge)
+Low graphics
+Happy holidays! Snow is already falling, decorations will appear in the next location.
+New Year mood is off
+portal to town and back
+The portal brought you back to “
+loot stays in place
+map hazards: traps and storm
+wisp pet: cosmetic for the “Guardian Slayer” challenge
+world feed
+LEGION
+Legion Monolith
+come closer — time will freeze
+The Legion is frozen in time! Smash the statues before they awaken — each one gives loot.
+seconds until awakening
+The Legion has awakened!
+auto-lower graphics if the phone can't keep up
+Graphics switched to low for smoothness. You can change it back in settings.
+My hero in “Lands of Decay”:
+defeated the Devourer
+Can you do better?
+Text copied — send it to your friends
+world labels don't go under the interface or off screen
+HUD layout: zone title, boss bar and hint don't overlap buttons
+k
+m
+tutorial at start
+Move
+Drag your finger on the left half of the screen — that's the joystick.
+WASD or arrow keys. You can use the mouse too: hold LMB on the ground.
+Portal to Valmor
+Go to the glowing portal north of the camp
+and press the action button.
+and press E or space.
+Combat
+The hero attacks automatically when an enemy is near. Approach the dead and kill three.
+Skill
+Press the round skill button in the bottom right.
+Press 1 or the right mouse button — that's how a skill works.
+The flask heals
+Health is dropping — tap the flask with the heart.
+Health is dropping — press Q to drink the flask.
+The lightning button — dash toward the joystick. Use it to dodge attacks.
+Space — dash. Use it to dodge attacks.
+Walk up to a label on the ground — the item goes to your bag. The label color is the rarity.
+New skill gem!
+Open “Gems” at the top and put the gem into a free socket of equipped gear — the skill will appear on the bar.
+Passive tree
+Open “Passives” and take a node next to the start — these are permanent bonuses.
+Zone objective
+The objective is at the top left. Complete it, and the path to the Guardian at the end of the zone opens.
+Equip items in the “Bag”: a green arrow
+means the item is better than the equipped one.
+Orbs change item stats. Open the “Bag”, pick an item and tap an orb below.
+Campaign complete. The Atlas is open in the portal: maps with tiers and mods. The higher the tier, the richer the loot.
+Vera the Merchant will buy your extras, Grom the Smith will enhance your weapon. Walk up to either of them.
+Hide tutorial
+Skip
+Tutorial hidden. You can bring it back in “Challenges”
+Settings.
+Sure? Press again
+Tutorial complete
+From here — you're on your own. Good luck in the Lands of Decay.
+linear order for the main steps
+arrow to an NPC beyond the screen edge
+The tutorial will start over
+story
+Valmor
+For a hundred years the Order of Dawn guarded the gates of the kingdom. While the light burned on the walls, the dead slept.
+Decay
+Then came the Decay. In a single night the rivers turned black, the cities fell silent, and the dead rose from their graves.
+Awakening
+You woke by an old campfire. No name, no past — only a weapon in hand and a stranger's crest on your cloak.
+Vera the Merchant says she found you by the portal to the north. The portal comes alive only for you. As if it had been waiting.
+Silence
+The Heart of Decay crumbled to ash. And in that silence your memory returned to you whole.
+Truth
+It was you who led the Order of Dawn to the Heart. It was you who took its power to save Valmor — and became the key the Decay used to open the gates.
+The Price
+Arden, the Regent, Ordis — your brothers of the Order. You set them free. It was long past time for them to sleep.
+Nightmare
+The Decay has retreated, but its echo lives on in the Nightmare maps. And in you. Valmor is not yet saved — the Atlas awaits its commander.
+The Order's vanguard drowned here. Their armor still rises from the bog.
+Here the knights of Dawn were buried. Now they refuse to lie still.
+The Cult of Decay keeps prisoners at the altars. You hear prayers — and screams.
+The forest burned the night Valmor fell. The ash is still warm.
+The crypt's seal is broken from the inside. Someone really wanted to get out. Or in.
+The Order's sunken fortress. The sacred fire still burns — while you are here.
+The walls breathe. Every step echoes, as if you were walking through someone else's heart.
+You've been here. You remember this light.
+Another knight… The bog is never satisfied.”
+You're late for your own funeral.”
+The Lord has returned! Kneel… No. He came to kill us.”
+You smell of ash. You smell of home.”
+Teacher? No… you're only his shadow.”
+Commander… order me to stop. I can't do it myself.”
+The key has returned to the lock.”
+At last. We are whole again.”
+NPC lines by progress (maxZone — how many zones are open)
+Awake? I thought the Decay would take you too. The portal to the north came alive when I found you — nobody but you can open it. Go. Whatever you find, bring it to me, I'll buy it.
+A medallion with your crest? …I've seen one. Long ago. On the cloak of the man who led the Order of Dawn to the Heart.
+Your name on a grave? Don't look at me like that. The dead in Valmor lie more often than the living. But three days… hurry.
+The cultists didn't create the Decay. They only prayed to it. The door was opened from the inside — by one of our own.
+Your handwriting in the necromancer's book… You know, I won't ask. As long as you kill the dead, I don't care who you were.
+The Heart is calling you, I can hear it even here, by the fire. Come back, you hear? Someone has to buy this junk from me.
+You're back… So the Heart is silent. But shadows still crawl out of the maps. The Nightmare hasn't ended — it has become endless.
+Come here. My hands remember you, even if your head doesn't. Bring gold, and I'll enhance your weapon until it shines.
+The Ashen Forest burned for three days while we retreated. I carried the wounded. And you went forward, to the Heart. Alone.
+Arden?! He was my friend… We thought you died with him. So it was you who shut the gates behind us.
+Commander. Now I can call you that. Sharpen your blade — the Nightmare won't wait.
+The Order's old chest. Everything you put here will be seen by all your heroes.
+Next
+Campfire Talks
+Frostbite
+Frost
+Evasion
+Dodge
+Crush
+Shield Charge
+bolt
+Rain of Arrows
+Rain
+Heavy Strike
+Heavy Strike
+Fireball
+Fireball
+Ring of Fire
+Fire Ring
+Multishot
+Burning Ground
+Burn Ground
+Ice Spear
+Ice Spear
+Ice Blast
+Ice Blast
+Ice Armor
+Ice Armor
+Frost Orb
+Frost Orb
+Chain Lightning
+Chain Light.
+Energy Shield
+Energy Shield
+Shock Nova
+Shock Nova
+Ball Lightning
+Ball Light.
+Elemental Resonance
+Resonance
+Cleaving Strike
+Cleave
+Blade Vortex
+Vortex
+Wide Swing
+Swing
+Leap Slam
+Bleeding
+Bleed
+Blade of Justice
+Justice
+Steel Skin
+Steel Skin
+Earthquake
+Quake
+Holy Hammer
+Holy Hammer
+Aura of Resolve
