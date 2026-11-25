@@ -2298,3 +2298,6 @@ if(window.LANG==='en'){fetch('en/dict.json?v=__V__').then(r=>r.json()).then(D=>{
  const tr=s=>s.replace(RX,m=>{const t=m.trimEnd(),w=m.slice(t.length);return (D[t]!=null?D[t]:t)+w}).replace(/«/g,'“').replace(/»/g,'”');
  const fix=n=>{if(n.nodeType===3){if(/[А-Яа-яЁё]/.test(n.nodeValue))n.nodeValue=tr(n.nodeValue)}else if(n.nodeType===1){for(const a of ['placeholder','title','aria-label'])if(n.hasAttribute&&n.hasAttribute(a)&&/[А-Яа-яЁё]/.test(n.getAttribute(a)))n.setAttribute(a,tr(n.getAttribute(a)));const w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT);let t;while(t=w.nextNode())if(/[А-Яа-яЁё]/.test(t.nodeValue))t.nodeValue=tr(t.nodeValue)}};
  fix(document.body);new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')fix(m.target);else for(const n of m.addedNodes)fix(n)}}).observe(document.body,{subtree:true,childList:true,characterData:true})}).catch(()=>{})}
+
+/* кнопка настроек на главном экране */
+document.addEventListener('click',e=>{if(e.target.closest('#bSet')){e.preventDefault();if(S.panel==='ch'&&S.chTab==='g'){togglePanel('ch');return}S.chTab='g';if(S.panel==='ch')togglePanel('ch');togglePanel('ch')}});

@@ -443,6 +443,7 @@ body.bn #toast{opacity:0!important}
 .sk.flask b{top:auto;right:auto;bottom:7px;left:50%;transform:translateX(-50%);min-width:18px;padding:1px 6px;border-radius:9px;background:#c2352b;color:#fff;font:700 11px/14px Rubik,system-ui,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.6)}
 .sk.dash svg{margin-bottom:0}.sk.flask svg{margin-bottom:14px}
 @media (pointer:fine){.sk.flask svg,.sk.dash svg{margin-bottom:12px}.sk.flask b{bottom:auto;top:5px;left:auto;right:5px;transform:none}}
+.hb.hbic{font-size:20px;min-width:44px;padding-left:10px;padding-right:10px}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -455,7 +456,7 @@ body.bn #toast{opacity:0!important}
   <div class="tl"><b id="zoneName">Лагерь</b><small id="zoneSub"></small><div id="objTxt" class="objt"></div><div id="partyHud"></div></div>
   <div class="tr">
     <div class="trow"><span class="gold" id="gold">0 зол.</span><button class="hb" id="bParty">Группа<kbd>G</kbd></button><button class="hb" id="bInv">Сумка<kbd>I</kbd></button><button class="hb" id="bSk">Камни<kbd>K</kbd><i class="badge" id="skB"></i></button><button class="hb" id="bPas">Пассивы<kbd>P</kbd><i class="badge" id="pasB"></i></button></div>
-    <div class="trow"><button class="hb" id="bCh">Испытания<kbd>J</kbd><i class="badge" id="chB"></i></button><button class="hb" id="bLav">Лавка<i class="badge" id="lavB" style="display:none"></i></button><button class="hb" id="bTown">В лагерь<kbd>T</kbd></button></div>
+    <div class="trow"><button class="hb" id="bCh">Испытания<kbd>J</kbd><i class="badge" id="chB"></i></button><button class="hb" id="bLav">Лавка<i class="badge" id="lavB" style="display:none"></i></button><button class="hb hbic" id="bSet" title="Настройки" aria-label="Настройки">⚙</button><button class="hb" id="bTown">В лагерь<kbd>T</kbd></button></div>
     <canvas id="mini" width="140" height="140"></canvas>
   </div>
   <div id="bossBar"><b id="bossName"></b><div class="bar"><i id="bossFill"></i></div></div>
