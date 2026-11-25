@@ -1,5 +1,5 @@
 // Офлайн-кэш: страница и код — из сети (с запасным кэшем), модели/шрифты/картинки — из кэша.
-const C = 'tlen-v1';
+const C = 'tlen-v2';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {
