@@ -49,12 +49,6 @@ async function payRoute(url, req, env) {
     }
     return new Response('ok');
   }
-  if (url.pathname === '/tg/avatar' && req.method === 'POST') {
-    const k = req.headers.get('X-Key') || ''; const kh = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(k))));
-    if (kh !== '24f85e0dbcd0891e2eb87474096144e8a713d2c4df73d3db01581840cbb7d60e') return json({ error: 'key' }, 403);
-    const img = await req.blob(); const fd = new FormData(); fd.append('photo', JSON.stringify({ type: 'static', photo: 'attach://pic' })); fd.append('pic', img, 'avatar.jpg');
-    return json(await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/setMyProfilePhoto`, { method: 'POST', body: fd }).then(r => r.json()));
-  }
   if (url.pathname === '/tg/links') { const ids = [...Object.keys(ITEMS), 'pass_s1', 'pass_s2', 'pass_s3']; const out = {};
     for (const id of ids) { const info = itemInfo(id); const r = await bot(env, 'createInvoiceLink', { title: info[0], description: 'Земли Тлена: ' + info[0] + '. Только облик и удобство, без влияния на силу героя.', payload: JSON.stringify({ i: id }), currency: 'XTR', prices: [{ label: info[0], amount: info[1] }] }); if (r.ok) out[id] = r.result; }
     return json(out); }
