@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Земли Тлена</title>
+<script>/* настройки монетизации: pay — адрес сервера оплаты Telegram Stars, adsgram — id рекламного блока Adsgram, support — ссылка «Поддержать автора» (только сайт) */window.TLEN_CFG={pay:"",adsgram:"",support:""}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-180.png">
@@ -74,6 +75,22 @@ body.ny #ovTitle h1{text-shadow:0 0 22px rgba(160,200,255,.35),0 2px 0 #000}
 .bugchk{display:flex!important;gap:8px;align-items:center;font-size:13px;margin:2px 0 10px}.bugb{display:flex;gap:8px;flex-wrap:wrap}
 .hb.bugh{opacity:.9}
 .plat [data-pa2=tgshare],.plat [data-share],.plat #bTg{display:none!important}
+
+.lavc{max-width:min(680px,95vw)!important;position:relative;margin-top:4vh}.lavx{position:absolute;right:10px;top:8px}
+#lavTabs{margin:6px 0 10px}.lavnote{font-size:13px;margin:6px 0 10px}
+.lavg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:9px}
+.lavi{background:rgba(0,0,0,.28);border:1px solid #6a5230;border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:6px}
+.lavi b{font-size:14.5px;color:#ffd98a}.lavi p{margin:0;font-size:12.5px;line-height:1.4;opacity:.85;flex:1}.lavi.own{opacity:.7}.lic{margin-right:6px}
+.lavok{color:#8ae07a;font-size:13px}.lavc2{margin-bottom:8px}.lsw{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px;box-shadow:0 0 6px currentColor}
+.lavs{background:rgba(0,0,0,.3);border-left:3px solid var(--c);border-radius:8px;padding:8px 10px;font-size:13.5px}.lavs small{display:block;opacity:.7;margin-top:4px}
+.lbar{display:block;height:7px;background:rgba(255,255,255,.1);border-radius:4px;margin-top:5px;overflow:hidden}.lbar i{display:block;height:100%;background:linear-gradient(90deg,#c08a30,#ffd36a)}
+.lst{display:flex;flex-direction:column;gap:3px;max-height:46vh;overflow-y:auto;font-size:12.5px}.lsh,.lsr{display:grid;grid-template-columns:32px 1fr 1fr;gap:5px;align-items:center}.lsh{opacity:.6;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+.lrw{border-radius:7px;padding:5px 7px;background:rgba(255,255,255,.05);border:1px solid transparent;color:inherit;text-align:left;font:inherit}.lrw.lock{opacity:.5}.lrw.got{opacity:.55;color:#8ae07a}.lrw.rdy{border-color:#c09040;background:rgba(220,160,60,.18);cursor:pointer;color:#ffe2a0}.lrw.lcos{font-weight:700}
+.lsr.rch>span:first-child{color:#ffd36a;font-weight:700}
+.adoffer{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%) scale(.9);opacity:0;pointer-events:none;z-index:7;background:linear-gradient(180deg,#e8b040,#a86a1a);color:#1a1006;font:700 15px Philosopher,serif;border:1px solid #ffe2a0;border-radius:14px;padding:9px 16px;box-shadow:0 6px 24px rgba(0,0,0,.6);transition:.25s}
+.adoffer small{display:block;font-weight:400;font-size:11px;opacity:.8}.adoffer.on{opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1)}
+.peerl.pfr{border:1px solid var(--fc);border-radius:8px;padding:1px 6px;box-shadow:0 0 8px var(--fc);background:rgba(0,0,0,.35)}.pttl{display:block;font-size:10.5px;font-weight:400}
+.plat-crazy #bLavT,.plat-gd #bLavT{}
 </style>
 <link rel="preload" href="fonts/rubik-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -432,7 +449,7 @@ body.bn #toast{opacity:0!important}
   <div class="tl"><b id="zoneName">Лагерь</b><small id="zoneSub"></small><div id="objTxt" class="objt"></div><div id="partyHud"></div></div>
   <div class="tr">
     <div class="trow"><span class="gold" id="gold">0 зол.</span><button class="hb" id="bParty">Группа<kbd>G</kbd></button><button class="hb" id="bInv">Сумка<kbd>I</kbd></button><button class="hb" id="bSk">Камни<kbd>K</kbd><i class="badge" id="skB"></i></button><button class="hb" id="bPas">Пассивы<kbd>P</kbd><i class="badge" id="pasB"></i></button></div>
-    <div class="trow"><button class="hb" id="bCh">Испытания<kbd>J</kbd><i class="badge" id="chB"></i></button><button class="hb" id="bTown">В лагерь<kbd>T</kbd></button></div>
+    <div class="trow"><button class="hb" id="bCh">Испытания<kbd>J</kbd><i class="badge" id="chB"></i></button><button class="hb" id="bLav">Лавка<i class="badge" id="lavB" style="display:none"></i></button><button class="hb" id="bTown">В лагерь<kbd>T</kbd></button></div>
     <canvas id="mini" width="140" height="140"></canvas>
   </div>
   <div id="bossBar"><b id="bossName"></b><div class="bar"><i id="bossFill"></i></div></div>
@@ -505,10 +522,10 @@ body.bn #toast{opacity:0!important}
   <h1>Земли Тлена</h1>
   <p class="tag">Мёртвые встают из могил Вальмора. Уцелел лишь лагерь у старого костра.</p><p class="nyt" id="nyTag">❄ С наступающим Новым годом! ❄</p>
   <div id="charList"></div>
-  <div class="tbtns"><button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn" id="bNew">Новый герой</button></div>
+  <div class="tbtns"><button class="btn" id="bCont" style="display:none">Продолжить</button><button class="btn" id="bNew">Новый герой</button><button class="btn alt" id="bLavT">✦ Лавка</button></div>
   <p class="muted" id="ctlHint" style="display:none"></p>
   <div class="tmore">
-    <details class="news"><summary>Что нового</summary><ul><li><b>Новый год</b>: снег, ёлка, гирлянды, снеговики, подарки с монстров, леденцы и шапки Санты (выключается в настройках)</li><li>Цвет экипировки на герое: красится только ткань, детали остаются своими</li><li>Приближение камеры: колесо мыши, два пальца или ползунок в настройках</li><li>Бездна — кольцо Разлома и Владыка Бездны; гибкий фильтр добычи</li><li><b>Сюжет</b>: пролог, разговоры у костра, слова стражей, финал и «Летопись»</li><li><b>Обучение</b> для новых героев — подсказки сами ведут по первым шагам</li><li>Ровный интерфейс на любых экранах, свои шрифты, подписи добычи не слипаются</li><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details>
+    <details class="news"><summary>Что нового</summary><ul><li><b>Лавка редкостей</b>: облик героя (краски брони, ауры, следы, спутники-огоньки, шапка Санты, стихии умений), сезон «Снежная Тьма» с бесплатными наградами, подарки за ролик. Сила героя не продаётся</li><li><b>Новый год</b>: снег, ёлка, гирлянды, снеговики, подарки с монстров, леденцы и шапки Санты (выключается в настройках)</li><li>Цвет экипировки на герое: красится только ткань, детали остаются своими</li><li>Приближение камеры: колесо мыши, два пальца или ползунок в настройках</li><li>Бездна — кольцо Разлома и Владыка Бездны; гибкий фильтр добычи</li><li><b>Сюжет</b>: пролог, разговоры у костра, слова стражей, финал и «Летопись»</li><li><b>Обучение</b> для новых героев — подсказки сами ведут по первым шагам</li><li>Ровный интерфейс на любых экранах, свои шрифты, подписи добычи не слипаются</li><li>Атлас карт, Бездна без конца и Пожиратель Тлена</li><li>Восхождение, Пантеон, кольцо мастерства в пассивах</li><li>Камни поддержки, эссенции, верстак, сфера ваал</li><li>Гадальные карты, разломы, Легион, святилища, ловушки и буря на картах</li><li>Мировые рекорды, лента мира, открытые группы, метки «Сюда!»</li><li>Хранилище, несколько героев, хардкор, облачные сохранения</li><li>Испытания, задания дня, справочник, настройки, питомец</li><li>Портал в лагерь и обратно, музыка, погода, новая графика</li></ul></details>
     <details class="news"><summary>Настройки и сохранения</summary><div class="tset">
       <div class="seg" id="qSeg"><button data-q="high">Графика: высокая</button><button data-q="low">Экономная</button></div>
       <button class="btn alt sm" id="bMus">Музыка: вкл</button>
