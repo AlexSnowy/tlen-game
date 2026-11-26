@@ -52,7 +52,7 @@ def build(name, plat, ver, stamp):
         if fn.endswith('.html'):
             s = re.sub(r'<script src="https://telegram\.org/[^"]*"></script>\s*', '', s)
             gd = os.environ.get('GD_ID', '') if plat == 'gd' else ''
-            inject = f'<script>window.PLAT={plat!r};' + (f'window.GD_ID={gd!r};' if plat == 'gd' else '') + '</script>\n'
+            inject = f'<script>window.PLAT={plat!r};window.PLAT_SRC={name!r};' + (f'window.GD_ID={gd!r};' if plat == 'gd' else '') + '</script>\n'
             s = s.replace('<head>', '<head>\n' + inject, 1)
         open(p, 'w', encoding='utf-8').write(s)
     zp = os.path.join(DIST, f'zemli-tlena-{name}.zip')

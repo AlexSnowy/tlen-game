@@ -1541,7 +1541,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
 <label class="zrow">Приближение камеры <input type="range" min="0.42" max="1.3" step="0.02" value="${CAMZT}" data-zoom><small>колесо мыши или два пальца</small></label> <label><input type="checkbox" data-set="ny" ${nyOn()?'checked':''}> Новогоднее настроение — снег, украшения, шапки на монстрах</label> <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
-<button class="btn sm" data-lang>🌐 Язык: Русский</button> <button class="btn sm" data-install style="display:none">📲 Установить как приложение</button> <button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
+<button class="btn sm" data-lang>🌐 Язык: Русский</button> <button class="btn sm" data-stat>📊 Статистика: ${(()=>{try{return localStorage.tlen_stat==='0'?'выкл':'вкл'}catch(_){return 'вкл'}})()}</button> <button class="btn sm" data-install style="display:none">📲 Установить как приложение</button> <button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
 <label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
 $('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
@@ -2301,3 +2301,35 @@ if(window.LANG==='en'){fetch('en/dict.json?v=__V__').then(r=>r.json()).then(D=>{
 
 /* кнопка настроек на главном экране */
 document.addEventListener('click',e=>{if(e.target.closest('#bSet')){e.preventDefault();if(S.panel==='ch'&&S.chTab==='g'){togglePanel('ch');return}S.chTab='g';if(S.panel==='ch')togglePanel('ch');togglePanel('ch')}});
+
+/* ===== СТАТИСТИКА (Яндекс Метрика): откуда пришёл игрок и как играет ===== */
+const YM=+(CFG.ym||0);
+const YM_SRC=window.PLAT_SRC||PLAT;
+const YM_ASK=YM_SRC==='newgrounds';/* на Newgrounds — только с согласия игрока */
+const YM_OK=!!YM&&!['crazy','gd','poki'].includes(PLAT)&&(()=>{try{const v=localStorage.tlen_stat;return YM_ASK?v==='1':v!=='0'}catch(_){return !YM_ASK}})();
+if(YM&&YM_ASK){try{if(localStorage.tlen_stat==null){const b=document.createElement('div');b.id='statAsk';b.style.cssText='position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:9999;background:#15110dee;border:1px solid #6b5636;color:#e8dcc4;font:13px sans-serif;padding:10px 12px;border-radius:8px;max-width:92vw;display:flex;gap:8px;align-items:center;flex-wrap:wrap';b.innerHTML='<span>This game uses Yandex Metrica (anonymous play statistics) and a co-op relay server. Allow statistics?</span><button data-s=1>Allow</button><button data-s=0>No thanks</button>';b.onclick=e=>{const v=e.target.dataset&&e.target.dataset.s;if(v==null)return;try{localStorage.tlen_stat=v}catch(_){}b.remove();if(v==='1')location.reload()};document.body.appendChild(b)}}catch(_){}}
+function ymCall(...a){try{if(YM_OK&&window.ym)window.ym(YM,...a)}catch(_){}}
+function goal(n,p){ymCall('reachGoal',n,p||{})}
+if(YM_OK){try{
+  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(let j=0;j<e.scripts.length;j++){if(e.scripts[j].src===r)return}k=e.createElement(t);a=e.getElementsByTagName(t)[0];k.async=1;k.src=r;a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js','ym');
+  const tg=TGW(),q=new URLSearchParams(location.search);
+  const src=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param)||q.get('src')||q.get('utm_source')||'';
+  const where=tg?'telegram':YM_SRC;
+  window.ym(YM,'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,params:{platform:where,source:src||'-',lang:document.documentElement.lang||'ru'}});
+  if(tg)window.ym(YM,'userParams',{tg_lang:(tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.language_code)||'-'});
+}catch(_){}}
+if(YM_OK){
+  /* активное время в игре: вкладка видна и игра не на паузе */
+  let act=0;const marks=[1,5,15,30,60,120];
+  setInterval(()=>{if(document.hidden||!window.P)return;act+=15;const m=act/60;for(const k of marks)if(m===k)goal('play_'+k+'m')},15000);
+  const _sg=startGame;startGame=function(p){try{goal(p&&p.lvl<=1&&!p.xp?'hero_new':'hero_continue',{cls:p&&p.cls})}catch(_){}return _sg.apply(this,arguments)};
+  const _gx=gainXp;gainXp=function(x){const l0=P&&P.lvl;const r=_gx.apply(this,arguments);try{for(const k of [5,10,20,30,40,50,70,90])if(l0<k&&P.lvl>=k)goal('lvl_'+k,{cls:P.cls})}catch(_){}return r};
+  const zSeen=new Set();const _ez=enterZone;enterZone=function(zi,tier,net,mi){const r=_ez.apply(this,arguments);try{const k=zi+':'+(tier||0);if(!zSeen.has(k)){zSeen.add(k);goal('zone',{zone:zi,tier:tier||0,lvl:P&&P.lvl})}}catch(_){}return r};
+  const _die=die;die=function(){try{goal('death',{zone:S.zi,lvl:P&&P.lvl})}catch(_){}return _die.apply(this,arguments)};
+  const _buy=buy;buy=function(id){try{goal('shop_click',{item:id})}catch(_){}return _buy.apply(this,arguments)};
+  const _gr=grant;grant=function(id,quiet){try{if(!quiet)goal('purchase',{item:id})}catch(_){}return _gr.apply(this,arguments)};
+  const _pr=platRewarded;platRewarded=function(ok,fail){return _pr.call(this,()=>{goal('ad_reward');ok&&ok()},fail)};
+  document.addEventListener('click',e=>{if(e.target.closest('#bLav,#bLavT'))goal('shop_open')},true);
+}
+
+document.addEventListener('click',e=>{const b=e.target.closest('[data-stat]');if(!b)return;try{const off=localStorage.tlen_stat==='0';localStorage.tlen_stat=off?'1':'0';b.textContent='📊 Статистика: '+(off?'вкл':'выкл');toast(off?'Статистика включится после перезапуска':'Статистика выключена',2)}catch(_){}});
