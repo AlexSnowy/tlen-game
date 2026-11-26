@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>Передача файлов</title></head>
+<body style="background:#111;color:#ddd;font:14px sans-serif;padding:20px">
+<p id="s">Передаю файлы в консоль…</p>
+<script>
+/* Служебная страница: открывается из консоли площадки и передаёт ей файлы игры (иконку, обложку, скриншоты, архив).
+   Файлы отправляются только в окно, которое её открыло, и только на перечисленные домены консолей. */
+(async () => {
+  const ALLOW = ['https://games.yandex.ru'];
+  const s = document.getElementById('s');
+  const files = (new URLSearchParams(location.search).get('f') || '').split(',').filter(Boolean);
+  if (!window.opener) { s.textContent = 'Эту страницу нужно открывать из консоли.'; return; }
+  const out = [];
+  for (const f of files) {
+    if (!/^(ya|dl)\/[\w.\-]+$/.test(f)) continue;
+    const r = await fetch('../' + f, { cache: 'no-store' });
+    if (!r.ok) { out.push({ name: f, error: r.status }); continue; }
+    const b = await r.blob();
+    out.push({ name: f.split('/').pop(), path: f, type: b.type || (f.endsWith('.zip') ? 'application/zip' : 'image/png'), blob: b });
+  }
+  for (const o of ALLOW) { try { window.opener.postMessage({ tlenFiles: out }, o); } catch (e) {} }
+  s.textContent = 'Готово: ' + out.length + ' файл(ов). Окно можно закрыть.';
+  setTimeout(() => window.close(), 1500);
+})();
+</script>
+</body></html>
