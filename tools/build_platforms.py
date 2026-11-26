@@ -44,6 +44,13 @@ def build(name, plat, ver, stamp):
         en = open(os.path.join(out, 'en', 'index.html'), encoding='utf-8').read().replace('<base href="../">\n', '').replace("window.LANG_ALT='./';", "window.LANG_ALT='ru.html';")
         open(os.path.join(out, 'index.html'), 'w', encoding='utf-8').write(en)
         os.remove(os.path.join(out, 'en', 'index.html'))
+    if plat == 'yandex':
+        # Яндекс Игры принимают ровно один index.html: только русская версия, без переключателя языка
+        shutil.rmtree(os.path.join(out, 'en'), ignore_errors=True)
+        p = os.path.join(out, 'index.html')
+        s = open(p, encoding='utf-8').read().replace("window.LANG_ALT=window.LANG_ALT||'en/';", "window.LANG_ALT='';")
+        s = s.replace('</head>', '<style>[data-lang]{display:none!important}</style>\n</head>', 1)
+        open(p, 'w', encoding='utf-8').write(s)
     for fn in ('index.html', 'ru.html', 'game.js', 'en/game.js', 'en/index.html'):
         if not os.path.exists(os.path.join(out, fn)):
             continue
