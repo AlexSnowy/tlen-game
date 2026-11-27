@@ -1541,7 +1541,7 @@ function setHTML(){return `<div class="sect" style="margin-top:4px"><span>Нас
 <label><input type="checkbox" data-set="nums" ${SET.nums?'checked':''}> Цифры урона</label>
 <label><input type="checkbox" data-set="shake" ${SET.shake?'checked':''}> Тряска экрана</label>
 <label class="zrow">Приближение камеры <input type="range" min="0.42" max="1.3" step="0.02" value="${CAMZT}" data-zoom><small>колесо мыши или два пальца</small></label> <label><input type="checkbox" data-set="ny" ${nyOn()?'checked':''}> Новогоднее настроение — снег, украшения, шапки на монстрах</label> <label><input type="checkbox" data-set="feed" ${SET.feed!==0?'checked':''}> Лента мира (новости других игроков)</label>
-<button class="btn sm" data-lang>🌐 Язык: Русский</button> <button class="btn sm" data-stat>📊 Статистика: ${(()=>{try{return localStorage.tlen_stat==='0'?'выкл':'вкл'}catch(_){return 'вкл'}})()}</button> <button class="btn sm" data-install style="display:none">📲 Установить как приложение</button> <button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
+<button class="btn sm" data-lang>🌐 Язык: Русский</button> <button class="btn sm" data-stat>📊 Статистика: ${(()=>{try{return localStorage.tlen_stat==='0'?'выкл':'вкл'}catch(_){return 'вкл'}})()}</button> <button class="btn sm" data-privacy>📄 Конфиденциальность</button> <button class="btn sm" data-install style="display:none">📲 Установить как приложение</button> <button class="btn sm" data-bugrep>🐞 Сообщить о баге</button> <button class="btn sm" data-tutreset>Пройти обучение заново</button> <button class="btn sm" data-prolog>Перечитать пролог</button>${P&&P.epi?' <button class="btn sm" data-epilog>Перечитать финал</button>':''}
 <label><input type="checkbox" data-set="pet" ${SET.pet!==0?'checked':''}> Питомец-огонёк (за испытание «Победитель стражей»)</label>
 <label><input type="checkbox" data-set="q" ${Q==='low'?'checked':''}> Экономная графика</label></div>`}
 $('chBody').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.set;if(!k)return;if(k==='vol'){SET.vol=+e.target.value;setSave()}});
@@ -2333,3 +2333,5 @@ if(YM_OK){
 }
 
 document.addEventListener('click',e=>{const b=e.target.closest('[data-stat]');if(!b)return;try{const off=localStorage.tlen_stat==='0';localStorage.tlen_stat=off?'1':'0';b.textContent='📊 Статистика: '+(off?'вкл':'выкл');toast(off?'Статистика включится после перезапуска':'Статистика выключена',2)}catch(_){}});
+
+document.addEventListener('click',e=>{if(!e.target.closest('[data-privacy]'))return;const en=window.LANG==='en'||/\/en\//.test(location.pathname);try{window.open((/\/en\//.test(location.pathname)?'../':'')+(en?'privacy-en.html':'privacy.html'),'_blank')}catch(_){}});
