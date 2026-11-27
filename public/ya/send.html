@@ -6,7 +6,7 @@
 /* Служебная страница: открывается из консоли площадки и передаёт ей файлы игры (иконку, обложку, скриншоты, архив).
    Файлы отправляются только в окно, которое её открыло, и только на перечисленные домены консолей. */
 (async () => {
-  const ALLOW = ['https://games.yandex.ru'];
+  const ALLOW = ['https://games.yandex.ru','https://developer.crazygames.com'];
   const s = document.getElementById('s');
   const files = (new URLSearchParams(location.search).get('f') || '').split(',').filter(Boolean);
   if (!window.opener) { s.textContent = 'Эту страницу нужно открывать из консоли.'; return; }
