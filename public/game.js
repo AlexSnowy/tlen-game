@@ -2201,7 +2201,7 @@ async function yaPayInit(){if(!PSDK.y)return;try{YPAY=await PSDK.y.getPayments({
  try{YPL=await PSDK.y.getPlayer({scopes:false});const d=await YPL.getData(['ent']);if(d&&d.ent){const r=JSON.parse(d.ent),E=ent();for(const k of ['unl','own','pp'])Object.assign(E[k],r[k]||{});E.tab=Math.max(E.tab,r.tab|0);E.slot=Math.max(E.slot,r.slot|0);try{localStorage.setItem(ENT_KEY,JSON.stringify(E))}catch(e){}}}catch(e){}lavRender()}
 function yaSaveEnt(){if(!YPL||!ENT)return;try{YPL.setData({ent:JSON.stringify({unl:ENT.unl,own:ENT.own,pp:ENT.pp,tab:ENT.tab,slot:ENT.slot})},true).catch(()=>{})}catch(e){}}
 const TGW=()=>{try{const w=window.Telegram&&Telegram.WebApp;return w&&w.initData?w:null}catch(e){return null}};
-let PAYL=null;fetch('paylinks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&Object.keys(j).length){PAYL=j;lavRender()}}).catch(()=>{});
+let PAYL=null;if(!window.PLAT_SRC)fetch('paylinks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&Object.keys(j).length){PAYL=j;lavRender()}}).catch(()=>{});
 const payMode=()=>PSDK.y?'ya':TGW()&&(PAYL||CFG.pay)?'tg':null;
 async function tgRestore(){const w=TGW();if(!w)return;try{const r=await fetch(CFG.pay+'/tg/purchases',{headers:{'X-Init':w.initData}});const j=await r.json();const E=ent();let cnt={tab:0,slot:0};for(const it of j.items||[]){if(it in cnt)cnt[it]++;else grant(it,true)}E.tab=Math.max(E.tab,Math.min(8,cnt.tab));E.slot=Math.max(E.slot,Math.min(12,cnt.slot));entSave();lavRender()}catch(e){}}
 async function buy(id){const it=shopItem(id);if(!it||owned(id))return;const m=payMode();
