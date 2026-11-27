@@ -23,7 +23,7 @@ PLATS = {
     'newgrounds': 'itch',
     'gamejolt': 'itch',
 }
-SKIP = {'bugs.html', 'dl', 'paylinks.json', 'ya'}
+SKIP = {'bugs.html', 'dl', 'paylinks.json', 'ya', 'cg'}
 
 
 def version():
