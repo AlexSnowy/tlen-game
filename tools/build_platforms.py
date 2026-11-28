@@ -51,6 +51,14 @@ def build(name, plat, ver, stamp):
         s = open(p, encoding='utf-8').read().replace("window.LANG_ALT=window.LANG_ALT||'en/';", "window.LANG_ALT='';")
         s = s.replace('</head>', '<style>[data-lang]{display:none!important}</style>\n</head>', 1)
         open(p, 'w', encoding='utf-8').write(s)
+        # в корне должен быть единственный .html — страницы политики переносим в docs/
+        os.makedirs(os.path.join(out, 'docs'), exist_ok=True)
+        for f in ('privacy.html', 'privacy-en.html'):
+            if os.path.exists(os.path.join(out, f)):
+                shutil.move(os.path.join(out, f), os.path.join(out, 'docs', f))
+        g = os.path.join(out, 'game.js')
+        gs = open(g, encoding='utf-8').read().replace("?'privacy-en.html':'privacy.html')", "?'docs/privacy-en.html':'docs/privacy.html')")
+        open(g, 'w', encoding='utf-8').write(gs)
     for fn in ('index.html', 'ru.html', 'game.js', 'en/game.js', 'en/index.html'):
         if not os.path.exists(os.path.join(out, fn)):
             continue
