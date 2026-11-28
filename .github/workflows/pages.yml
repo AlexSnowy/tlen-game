@@ -23,7 +23,7 @@ jobs:
           V=${GITHUB_SHA::8}
           python3 tools/i18n/build_en.py
           python3 tools/build_platforms.py && mkdir -p public/dl && cp dist/*.zip public/dl/
-          cp -r dist/crazygames public/dl/cg && (cd public/dl/cg && find . -type f | sed 's|^./||' > files.txt)
+          cp -r dist/vk public/vkapp && cp -r dist/crazygames public/dl/cg && (cd public/dl/cg && find . -type f | sed 's|^./||' > files.txt)
           sed -i "s/__V__/$V/g" public/index.html public/game.js public/en/index.html public/en/game.js
           T=$(date +%s)
           sed -i "s/__T__/$T/g" public/game.js public/en/game.js
